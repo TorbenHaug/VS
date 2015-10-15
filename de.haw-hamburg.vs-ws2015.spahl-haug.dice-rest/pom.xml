@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.haw-hamburg.vs-ws2015</groupId>
+    	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug</artifactId>
+		<version>0.1.0</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<groupId>${parent.groupId}</groupId>
+	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</artifactId>
+	<packaging>jar</packaging>
+	<name>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</name>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>1.2.6.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+	</build>
+</project>
