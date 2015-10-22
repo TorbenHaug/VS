@@ -1,4 +1,4 @@
-package hello;
+package de.haw_hamburg.vs_ws2015.spahl_haug.dice_rest;
 
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @EnableAutoConfiguration
-public class SampleController {
+public class Main {
 
     @RequestMapping("/")
     @ResponseBody
     String home() {
-        return "Hello World!";
+        return "Hello WorldMa!";
     }
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(SampleController.class, args);
+        SpringApplication.run(Main.class, args);
     }
 }

@@ -11,7 +11,7 @@
 	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug</artifactId>
 	<version>0.1.0</version>
 	<packaging>pom</packaging>
-	
+
 	<!-- Modules -->
 	<modules>
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</module>
