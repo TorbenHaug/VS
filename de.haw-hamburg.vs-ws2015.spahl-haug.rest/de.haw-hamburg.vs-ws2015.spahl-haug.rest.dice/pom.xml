@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>de.haw-hamburg.vs-ws2015</groupId>
-		<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug</artifactId>
+		<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest</artifactId>
 		<version>0.1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -11,7 +11,7 @@
 		<docker.image.prefix>springio</docker.image.prefix>
 	</properties>
 	<!--<groupId>${parent.groupId}</groupId>-->
-	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</artifactId>
+	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest.dice</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 	<dependencyManagement>
@@ -39,7 +39,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</finalName>
+		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.rest.dice</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
