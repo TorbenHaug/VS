@@ -7,10 +7,13 @@
 		<version>0.1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>${parent.groupId}</groupId>
+	<properties>
+		<docker.image.prefix>springio</docker.image.prefix>
+	</properties>
+	<!--<groupId>${parent.groupId}</groupId>-->
 	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</artifactId>
 	<packaging>jar</packaging>
-	<name>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</name>
+	<name>${project.artifactId}</name>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -35,12 +38,14 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<properties>
-		<docker.image.prefix>springio</docker.image.prefix>
-	</properties>
 	<build>
 		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</finalName>
-
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -92,11 +97,10 @@
 					<entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<!-- copy the service's jar file from target into the root directory of the image -->
 					<exposes>
-						<expose>8080</expose>
+						<expose>${server.port}</expose>
 					</exposes>
 					<resources>
 						<resource>
-							<targetPath>/</targetPath>
 							<directory>${project.build.directory}</directory>
 							<include>${project.build.finalName}.jar</include>
 						</resource>

@@ -5,6 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 	    <java.version>1.8</java.version>
+		<!-- Server Port -->
+		<server.port>6789</server.port>
 	</properties>
 	<!-- The Basics -->
 	<groupId>de.haw-hamburg.vs-ws2015</groupId>
@@ -14,6 +16,7 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</module>
+		<module>${project.artifactId}.dice-rest</module>
+		<module>${project.artifactId}.rmi</module>
 	</modules>
 </project>

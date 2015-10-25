@@ -2,17 +2,16 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.dice_rest;
 
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
-import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
+@RequestMapping("/")
 @EnableAutoConfiguration
 public class Main {
 
-    @RequestMapping("/")
-    @ResponseBody
-    String home() {
-        return "Hello WorldMa!";
+    @RequestMapping(value = "/dice", method = RequestMethod.GET,  produces = "application/json")
+    public Roll dice() {
+        return new Roll();
     }
 
     public static void main(String[] args) throws Exception {
