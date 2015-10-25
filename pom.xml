@@ -16,7 +16,7 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>${project.artifactId}.dice-rest</module>
-		<module>${project.artifactId}.rmi</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.dice-rest</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rmi</module>
 	</modules>
 </project>

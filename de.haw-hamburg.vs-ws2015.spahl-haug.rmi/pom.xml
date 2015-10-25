@@ -15,8 +15,8 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>${project.artifactId}.server</module>
-		<module>${project.artifactId}.client</module>
-		<module>${project.artifactId}.util</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rmi.server</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rmi.client</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rmi.util</module>
 	</modules>
 </project>
