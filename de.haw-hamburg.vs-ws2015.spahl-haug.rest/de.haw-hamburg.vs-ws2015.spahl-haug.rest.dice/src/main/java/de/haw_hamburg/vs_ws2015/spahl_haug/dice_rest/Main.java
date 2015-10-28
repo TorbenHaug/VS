@@ -11,6 +11,7 @@ public class Main {
 
     @RequestMapping(value = "/dice", method = RequestMethod.GET,  produces = "application/json")
     public Roll dice() {
+    	System.out.println("Anfrage");
         return new Roll();
     }
 

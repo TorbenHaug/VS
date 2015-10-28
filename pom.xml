@@ -6,7 +6,7 @@
 	<properties>
 	    <java.version>1.8</java.version>
 		<!-- Server Port -->
-		<server.port>6789</server.port>
+		<server.port>4567</server.port>
 	</properties>
 	<!-- The Basics -->
 	<groupId>de.haw-hamburg.vs-ws2015</groupId>

@@ -15,11 +15,11 @@ public class Main {
         LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
 
         DiceRMI diceRMI = new DiceRMIImpl();
-        DiceRMI stub = (DiceRMI) UnicastRemoteObject.exportObject(diceRMI, 0);
+        //DiceRMI stub = (DiceRMI) UnicastRemoteObject.exportObject(diceRMI, 0);
         RemoteServer.setLog(System.out);
 
         Registry registry = LocateRegistry.getRegistry();
-        registry.rebind( "DiceRMI", stub );
+        registry.rebind( "DiceRMI", diceRMI );
 //        registry.rebind( "192.168.99.101:1234/DiceRMI", stub );
         System.out.println( "DiceRMI angemeldet" );
     }
