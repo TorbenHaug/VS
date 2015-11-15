@@ -2,6 +2,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 import java.util.List;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,7 +38,6 @@ public class Main {
 		games.setGames(gameService.getAllGames());
 		return new ResponseEntity<>(games , HttpStatus.OK);
 	}
-
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
@@ -77,7 +77,13 @@ public class Main {
 		return gameService.getPlayerReady(gameID, playerID);
 	}
 
-	public static void main(final String[] args) throws Exception {
+    @RequestMapping(value = "/games/{gameID}/players/current", method = RequestMethod.GET,  produces = "application/json")
+    public ResponseEntity<Player> getCurrentPlayer(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, GameNotStartedException {
+        Player player = gameService.getCurrentPlayer(gameID);
+        return new ResponseEntity<>(player, HttpStatus.OK);
+    }
+
+    public static void main(final String[] args) throws Exception {
 		SpringApplication.run(Main.class, args);
 	}
 

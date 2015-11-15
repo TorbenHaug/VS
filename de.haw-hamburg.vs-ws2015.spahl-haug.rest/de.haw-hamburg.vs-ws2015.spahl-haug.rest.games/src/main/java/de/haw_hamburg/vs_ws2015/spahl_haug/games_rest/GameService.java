@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 
 
@@ -91,4 +92,7 @@ public class GameService {
 		return getGame(gameID).getPlayers();
 	}
 
+	public Player getCurrentPlayer(long gameID) throws GameNotStartedException, GameDoesntExistsException {
+		return getGame(gameID).getCurrentPlayer();
+	}
 }

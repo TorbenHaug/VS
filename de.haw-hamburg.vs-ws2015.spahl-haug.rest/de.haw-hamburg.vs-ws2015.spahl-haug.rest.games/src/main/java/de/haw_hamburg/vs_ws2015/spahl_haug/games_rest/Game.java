@@ -1,5 +1,7 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
+
 import java.util.ArrayList;
 import java.util.List;import java.util.function.Predicate;
 
@@ -7,7 +9,7 @@ public class Game {
 
 	private final long gameid;
 	private final List<Player> players;
-	private boolean started;
+	private boolean started = false;
 	private final int currentPlayer = 0;
 
 	public Game(final long id) {
@@ -51,5 +53,13 @@ public class Game {
 
 	public void start() {
 		this.started = true;
+	}
+
+	public Player getCurrentPlayer() throws GameNotStartedException {
+		if (started) {
+			return players.get(currentPlayer);
+		} else {
+			throw new GameNotStartedException("Game " + getGameid() + " has not stated yet");
+		}
 	}
 }

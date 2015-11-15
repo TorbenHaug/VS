@@ -20,4 +20,11 @@ public class ErrorHandler {
 	public ErrorMessage onPlayerDoesntExists(final PlayerDoesntExistsException error) {
 		return new ErrorMessage(404, "Not Found", error.getMessage());
 	}
+
+	@ExceptionHandler(GameNotStartedException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorMessage onGameNotStarted(final GameNotStartedException error) {
+		return new ErrorMessage(403, "Forbidden", error.getMessage());
+	}
 }
