@@ -20,4 +20,18 @@ public class ErrorHandler {
 	public ErrorMessage onPlayerDoesntExists(final PlayerDoesntExistsException error) {
 		return new ErrorMessage(404, "Not Found", error.getMessage());
 	}
+
+	@ExceptionHandler(MutexIsYoursException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	public ErrorMessage onMutexIsYours(final MutexIsYoursException error) {
+		return new ErrorMessage(200, "You have it already", error.getMessage());
+	}
+
+	@ExceptionHandler(MutexAllreadyAquiredException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorMessage onMutexAllreadyAquired(final MutexAllreadyAquiredException error) {
+		return new ErrorMessage(409, "Already Auired", error.getMessage());
+	}
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 
 
@@ -89,6 +91,14 @@ public class GameService {
 	public List<Player> getplayersFromGame(final long gameID) throws GameDoesntExistsException {
 		// TODO Auto-generated method stub
 		return getGame(gameID).getPlayers();
+	}
+
+	public Player getMutex(final long gameID) throws GameDoesntExistsException {
+		return getGame(gameID).getMutex();
+	}
+
+	public void aquireMutex(final long gameID) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException {
+		getGame(gameID).aquireMutex();
 	}
 
 }
