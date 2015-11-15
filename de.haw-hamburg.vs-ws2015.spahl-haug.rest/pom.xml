@@ -18,5 +18,6 @@
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rest.errorhandler</module>
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rest.dice</module>
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rest.games</module>
+		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rest.boards</module>
 	</modules>
 </project>
