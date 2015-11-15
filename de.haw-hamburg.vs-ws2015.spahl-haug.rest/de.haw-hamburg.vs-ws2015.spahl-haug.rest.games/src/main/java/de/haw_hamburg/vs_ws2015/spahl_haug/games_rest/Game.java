@@ -15,7 +15,7 @@ public class Game {
 	private final long gameid;
 	private final List<Player> players;
 	private boolean started = false;
-	private final int currentPlayer = 0;
+	private int currentPlayer = 0;
 	private int mutexHolder = -1;
 
 	public Game(final long id) {
@@ -93,5 +93,14 @@ public class Game {
 
 	public void releaseMutex() {
 		mutexHolder = -1;
+	}
+
+	@JsonIgnore
+	public boolean isStarted() {
+		return started;
+	}
+
+	public void nextTurn() {
+		currentPlayer = (currentPlayer + 1) % players.size();
 	}
 }
