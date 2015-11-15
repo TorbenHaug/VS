@@ -37,6 +37,12 @@ public class Main {
 		return new ResponseEntity<>(games , HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.GET,  produces = "application/json")
+	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
+		Player player = gameService.getPlayerFromGame(gameID, playerID);
+        return new ResponseEntity<>(player, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
 	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException{
 		gameService.addPlayerToGame(gameID, playerID);

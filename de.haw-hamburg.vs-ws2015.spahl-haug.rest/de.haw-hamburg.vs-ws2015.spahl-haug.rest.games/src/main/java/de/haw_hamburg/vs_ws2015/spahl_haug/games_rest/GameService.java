@@ -46,7 +46,7 @@ public class GameService {
 		return game;
 	}
 
-	private Player getPlayerFromGame(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException{
+	public Player getPlayerFromGame(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException{
 		final Player player = getGame(gameID).getPlayer(playerID);
 		if (player == null){
 			throw new PlayerDoesntExistsException("Player " + playerID + " in Game " + gameID + " not found");
