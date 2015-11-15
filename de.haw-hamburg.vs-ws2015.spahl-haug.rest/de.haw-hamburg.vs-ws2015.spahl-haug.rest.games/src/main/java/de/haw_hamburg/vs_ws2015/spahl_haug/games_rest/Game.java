@@ -1,7 +1,7 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;import java.util.function.Predicate;
 
 public class Game {
 
@@ -37,5 +37,16 @@ public class Game {
 			}
 		}
 		return null;
+	}
+
+	public void removePlayer(final long playerID) {
+		players.removeIf(new Predicate<Player>() {
+
+			@Override
+			public boolean test(final Player t) {
+				return t.getId() == playerID;
+			}
+		});
+
 	}
 }

@@ -75,4 +75,8 @@ public class GameService {
 		return new ArrayList<>(games.values());
 	}
 
+	public void removePlayerFromGame(final long gameID, final long playerID) throws GameDoesntExistsException {
+		getGame(gameID).removePlayer(playerID);
+	}
+
 }

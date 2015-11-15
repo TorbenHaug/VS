@@ -42,6 +42,11 @@ public class Main {
 		gameService.addPlayerToGame(gameID, playerID);
 	}
 
+	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.DELETE,  produces = "application/json")
+	public void removePlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException{
+		gameService.removePlayerFromGame(gameID, playerID);
+	}
+
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}/ready", method = RequestMethod.PUT,  produces = "application/json")
 	public void signalPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
 		gameService.signalPlayerReady(gameID, playerID);
