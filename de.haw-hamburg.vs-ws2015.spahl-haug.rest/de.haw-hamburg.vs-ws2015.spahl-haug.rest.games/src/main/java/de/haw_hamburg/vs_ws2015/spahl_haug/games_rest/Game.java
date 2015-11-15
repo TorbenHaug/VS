@@ -7,8 +7,8 @@ public class Game {
 
 	private final long gameid;
 	private final List<Player> players;
-
-
+	private boolean started;
+	private final int currentPlayer = 0;
 
 	public Game(final long id) {
 		super();
@@ -47,6 +47,9 @@ public class Game {
 				return t.getId() == playerID;
 			}
 		});
+	}
 
+	public void start() {
+		this.started = true;
 	}
 }

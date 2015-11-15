@@ -65,6 +65,13 @@ public class GameService {
 	public void signalPlayerReady(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
 		final Player player = getPlayerFromGame(gameID, playerID);
 		player.setReady(true);
+		boolean gameStartable = true;
+		for(final Player aPlayer: getplayersFromGame(gameID)){
+			gameStartable = gameStartable && aPlayer.isReady();
+		}
+		if(gameStartable){
+			getGame(gameID).start();
+		}
 	}
 
 	public boolean getPlayerReady(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
