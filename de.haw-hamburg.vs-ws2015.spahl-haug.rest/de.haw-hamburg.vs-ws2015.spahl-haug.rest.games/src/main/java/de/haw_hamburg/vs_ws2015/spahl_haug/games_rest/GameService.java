@@ -79,4 +79,9 @@ public class GameService {
 		getGame(gameID).removePlayer(playerID);
 	}
 
+	public List<Player> getplayersFromGame(final long gameID) throws GameDoesntExistsException {
+		// TODO Auto-generated method stub
+		return getGame(gameID).getPlayers();
+	}
+
 }
