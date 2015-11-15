@@ -5,6 +5,7 @@ import java.util.List;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,17 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 public class Main {
 
 	private static GameService gameService = new GameService();
+	private static String serviceID = null;
+
+	public static void setServiceID(final String id){
+		serviceID = id;
+	}
+
+	@RequestMapping(value = "/api", method = RequestMethod.GET,  produces = "application/json")
+	public String getAPI() {
+		final String api = "This is our api";
+		return api;
+	}
 
 	@RequestMapping(value = "/games", method = RequestMethod.POST,  produces = "application/json")
 	public ResponseEntity<Game> createGame() {
@@ -103,7 +115,7 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		SpringApplication.run(Main.class, args);
+		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
 	}
 
 }
