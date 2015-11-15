@@ -3,6 +3,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 public class Player {
 	private final long id;
 	private final String name;
+	private int position = 0;
+	private String place = null;
 	private boolean ready;
 
 	public Player(final String name, final long id){
@@ -24,6 +26,22 @@ public class Player {
 
 	public void setReady(final boolean b) {
 		this.ready = b;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(final int position) {
+		this.position = position;
+	}
+
+	public String getPlace() {
+		return place;
+	}
+
+	public void setPlace(final String place) {
+		this.place = place;
 	}
 
 	@Override

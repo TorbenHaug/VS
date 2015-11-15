@@ -90,4 +90,8 @@ public class Game {
 		}
 
 	}
+
+	public void releaseMutex() {
+		mutexHolder = -1;
+	}
 }

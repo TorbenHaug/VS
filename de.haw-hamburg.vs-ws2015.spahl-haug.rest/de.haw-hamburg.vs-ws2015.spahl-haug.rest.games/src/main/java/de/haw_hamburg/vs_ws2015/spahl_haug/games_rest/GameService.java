@@ -94,7 +94,7 @@ public class GameService {
 		return getGame(gameID).getPlayers();
 	}
 
-	public Player getCurrentPlayer(long gameID) throws GameNotStartedException, GameDoesntExistsException {
+	public Player getCurrentPlayer(final long gameID) throws GameNotStartedException, GameDoesntExistsException {
 		return getGame(gameID).getCurrentPlayer();
 	}
 
@@ -104,6 +104,11 @@ public class GameService {
 
 	public void aquireMutex(final long gameID) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException {
 		getGame(gameID).aquireMutex();
+	}
+
+	public void releaseMutex(final long gameID) throws GameDoesntExistsException {
+		getGame(gameID).releaseMutex();
+
 	}
 
 }
