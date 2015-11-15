@@ -5,6 +5,8 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import java.util.ArrayList;
 import java.util.List;import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 
@@ -36,6 +38,7 @@ public class Game {
 		}
 	}
 
+	@JsonIgnore
 	public Player getPlayer(final long playerID) {
 		for(final Player aPlayer: players){
 			if(aPlayer.getId() == playerID){
@@ -59,6 +62,7 @@ public class Game {
 		this.started = true;
 	}
 
+	@JsonIgnore
 	public Player getCurrentPlayer() throws GameNotStartedException {
 		if (started) {
 			return players.get(currentPlayer);
@@ -67,6 +71,7 @@ public class Game {
 		}
 	}
 
+	@JsonIgnore
 	public Player getMutex() {
 		if(mutexHolder == -1){
 			return null;
