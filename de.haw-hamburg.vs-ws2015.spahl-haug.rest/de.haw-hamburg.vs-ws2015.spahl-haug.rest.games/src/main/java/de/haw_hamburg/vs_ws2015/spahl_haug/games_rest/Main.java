@@ -79,11 +79,11 @@ public class Main {
 		return gameService.getPlayerReady(gameID, playerID);
 	}
 
-    @RequestMapping(value = "/games/{gameID}/players/current", method = RequestMethod.GET,  produces = "application/json")
-    public ResponseEntity<Player> getCurrentPlayer(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, GameNotStartedException {
-        Player player = gameService.getCurrentPlayer(gameID);
-        return new ResponseEntity<>(player, HttpStatus.OK);
-    }
+	@RequestMapping(value = "/games/{gameID}/players/current", method = RequestMethod.GET,  produces = "application/json")
+	public ResponseEntity<Player> getCurrentPlayer(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, GameNotStartedException {
+		final Player player = gameService.getCurrentPlayer(gameID);
+		return new ResponseEntity<>(player, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.GET,  produces = "application/json")
 	public Player getPlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException{
@@ -94,6 +94,12 @@ public class Main {
 	@ResponseStatus(HttpStatus.CREATED)
 	public void putPlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, MutexAllreadyAquiredException, MutexIsYoursException{
 		gameService.aquireMutex(gameID);
+	}
+
+	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.DELETE,  produces = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+	public void deletePlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException{
+		gameService.releaseMutex(gameID);
 	}
 
 	public static void main(final String[] args) throws Exception {

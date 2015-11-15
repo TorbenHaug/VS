@@ -66,14 +66,18 @@ public class GameService {
 	}
 
 	public void signalPlayerReady(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
-		final Player player = getPlayerFromGame(gameID, playerID);
-		player.setReady(true);
-		boolean gameStartable = true;
-		for(final Player aPlayer: getplayersFromGame(gameID)){
-			gameStartable = gameStartable && aPlayer.isReady();
-		}
-		if(gameStartable){
-			getGame(gameID).start();
+		if(getGame(gameID).isStarted()){
+			final Player player = getPlayerFromGame(gameID, playerID);
+			player.setReady(true);
+			boolean gameStartable = true;
+			for(final Player aPlayer: getplayersFromGame(gameID)){
+				gameStartable = gameStartable && aPlayer.isReady();
+			}
+			if(gameStartable){
+				getGame(gameID).start();
+			}
+		}else {
+			getGame(gameID).nextTurn();
 		}
 	}
 
@@ -94,7 +98,7 @@ public class GameService {
 		return getGame(gameID).getPlayers();
 	}
 
-	public Player getCurrentPlayer(long gameID) throws GameNotStartedException, GameDoesntExistsException {
+	public Player getCurrentPlayer(final long gameID) throws GameNotStartedException, GameDoesntExistsException {
 		return getGame(gameID).getCurrentPlayer();
 	}
 
@@ -104,6 +108,11 @@ public class GameService {
 
 	public void aquireMutex(final long gameID) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException {
 		getGame(gameID).aquireMutex();
+	}
+
+	public void releaseMutex(final long gameID) throws GameDoesntExistsException {
+		getGame(gameID).releaseMutex();
+
 	}
 
 }
