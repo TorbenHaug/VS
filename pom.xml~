@@ -16,7 +16,6 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>de.haw-hamburg.vs-ws2015.spahl-haug.frontend</module>
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rest</module>
 		<module>de.haw-hamburg.vs-ws2015.spahl-haug.rmi</module>
 	</modules>

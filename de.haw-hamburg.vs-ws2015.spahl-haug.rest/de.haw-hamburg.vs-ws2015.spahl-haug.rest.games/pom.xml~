@@ -44,7 +44,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.rest.games</finalName>
+		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.rest.dice</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
