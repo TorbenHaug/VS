@@ -118,4 +118,8 @@ public class Main {
 		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
 	}
 
+	public static String getServiceID() {
+		return serviceID;
+	}
+
 }
