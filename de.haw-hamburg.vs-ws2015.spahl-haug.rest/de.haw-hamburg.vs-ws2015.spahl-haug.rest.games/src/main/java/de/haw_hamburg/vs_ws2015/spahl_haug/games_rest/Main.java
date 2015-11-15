@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
@@ -41,9 +43,9 @@ public class Main {
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
-        Player player = gameService.getPlayerFromGame(gameID, playerID);
-        return new ResponseEntity<>(player, HttpStatus.OK);
-    }
+		final Player player = gameService.getPlayerFromGame(gameID, playerID);
+		return new ResponseEntity<>(player, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<Game> getGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
@@ -83,7 +85,18 @@ public class Main {
         return new ResponseEntity<>(player, HttpStatus.OK);
     }
 
-    public static void main(final String[] args) throws Exception {
+	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.GET,  produces = "application/json")
+	public Player getPlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException{
+		return gameService.getMutex(gameID);
+	}
+
+	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.PUT,  produces = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+	public void putPlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, MutexAllreadyAquiredException, MutexIsYoursException{
+		gameService.aquireMutex(gameID);
+	}
+
+	public static void main(final String[] args) throws Exception {
 		SpringApplication.run(Main.class, args);
 	}
 

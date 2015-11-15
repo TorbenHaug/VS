@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 
 
@@ -95,4 +97,13 @@ public class GameService {
 	public Player getCurrentPlayer(long gameID) throws GameNotStartedException, GameDoesntExistsException {
 		return getGame(gameID).getCurrentPlayer();
 	}
+
+	public Player getMutex(final long gameID) throws GameDoesntExistsException {
+		return getGame(gameID).getMutex();
+	}
+
+	public void aquireMutex(final long gameID) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException {
+		getGame(gameID).aquireMutex();
+	}
+
 }
