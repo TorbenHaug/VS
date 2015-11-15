@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 
 
 @ComponentScan
@@ -37,10 +38,23 @@ public class Main {
 		return new ResponseEntity<>(games , HttpStatus.OK);
 	}
 
+
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
-		Player player = gameService.getPlayerFromGame(gameID, playerID);
+        Player player = gameService.getPlayerFromGame(gameID, playerID);
         return new ResponseEntity<>(player, HttpStatus.OK);
+    }
+
+	@RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET,  produces = "application/json")
+	public ResponseEntity<Game> getGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
+		return new ResponseEntity<>(gameService.getGame(gameID) , HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/games/{gameID}/players", method = RequestMethod.GET,  produces = "application/json")
+	public ResponseEntity<PlayersDTO> getPlayersFromGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
+		final PlayersDTO playersDTO = new PlayersDTO();
+		playersDTO.setPlayers(gameService.getplayersFromGame(gameID));
+		return new ResponseEntity<>(playersDTO , HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
