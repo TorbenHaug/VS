@@ -1,4 +1,4 @@
-package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common;
+package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.login;
 
 import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IButton;
@@ -15,35 +15,34 @@ import org.jowidgets.common.widgets.controller.IActionListener;
 import org.jowidgets.common.widgets.layout.MigLayoutDescriptor;
 import org.jowidgets.tools.widgets.blueprint.BPF;
 
-public class LoginWindow {
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.AbstractWindow;
 
-	final IFrameBluePrint frameBp;
-	final IFrame frame;
-	final IButtonBluePrint buttonBp;
-	final IButton button;
-	final IInputFieldBluePrint<String> userNameBp;
-	final IInputField userName;
+public class LoginWindow extends AbstractWindow{
 
-	public LoginWindow(){
-		frameBp = BPF.frame();
-		frameBp.setSize(new Dimension(1024, 768)).setTitle("Monopoly - Login");
-		frameBp.setCloseable(false);
+	private final IButtonBluePrint buttonBp;
+	private final IButton button;
+	private final IInputFieldBluePrint<String> userNameBp;
+	private final IInputField userName;
 
-		frame = Toolkit.createRootFrame(frameBp);
-		frame.setLayout(new MigLayoutDescriptor("[]", "[]"));
+	public LoginWindow(final ILoginActions loginActions){
+		super(false,new Dimension(230, 120));
+		final String textFieldCC = "growx, w 0::";
+		getFrame().setTitle("Monopoly - Login");
+		getFrame().setLayout(new MigLayoutDescriptor("wrap", "[grow, 0::]", "[]"));
 
 		userNameBp = BPF.inputFieldString();
-		userName = frame.add(userNameBp);
+		userName = getFrame().add(userNameBp, textFieldCC);
+		//userName.setPreferredSize(new Dimension(180, 50));
 
 		buttonBp = BPF.button().setText("Login");
-		button = frame.add(buttonBp);
+		button = getFrame().add(buttonBp);
 		button.addActionListener(new IActionListener() {
 			@Override
 			public void actionPerformed() {
-				System.out.println(userName.getText());
+				loginActions.onLogin(userName.getText());
 			}
 		});
 
-		frame.setVisible(true);
+		getFrame().setVisible(true);
 	}
 }
