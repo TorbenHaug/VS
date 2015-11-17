@@ -9,8 +9,12 @@ import java.util.Map;
 
 public class BoardService {
 
-	private final Map<Integer, Board> boards = new HashMap<>();
+	private final Map<Long, Board> boards = new HashMap<>();
 
 	public BoardService(){
 	}
+
+    public Board getBoard(long gameID) {
+        return boards.get(gameID);
+    }
 }

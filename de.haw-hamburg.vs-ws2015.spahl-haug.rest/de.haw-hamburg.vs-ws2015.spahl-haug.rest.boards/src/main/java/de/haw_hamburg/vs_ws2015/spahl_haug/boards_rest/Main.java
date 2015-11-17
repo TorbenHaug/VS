@@ -26,13 +26,23 @@ public class Main {
 	private final static String urlString = "http://141.22.71.60:4568";
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
-	public GamesDTO createGame() {
+	public GamesDTO getGames() {
 		RestTemplate restTemplate = new RestTemplate();
 		GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
 		return gamesDTO;
 	}
 
-	public static void main(final String[] args) throws Exception {
+    @RequestMapping(value = " /boards/{gameid}", method = RequestMethod.GET,  produces = "application/json")
+    public Board getBoardToGame(@PathVariable(value="gameid") final long gameID) {
+        return boardService.getBoard(gameID);
+    }
+
+    @RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
+    public Board createBoard(@PathVariable(value="gameid") final long gameID) {
+        return null;
+    }
+
+    public static void main(final String[] args) throws Exception {
 		//		final ServiceRepository repo = new ServiceRepository();
 		//		System.err.println(repo.getService("spahl_haug_games"));
 		SpringApplication.run(Main.class, args);
