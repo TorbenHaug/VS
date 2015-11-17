@@ -115,7 +115,8 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+		SpringApplication.run(Main.class, args);
 	}
 
 	public static String getServiceID() {
