@@ -11,7 +11,7 @@
 		<docker.image.prefix>springio</docker.image.prefix>
 	</properties>
 	<!--<groupId>${parent.groupId}</groupId>-->
-	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest.errorhandler</artifactId>
+	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest.servicerepository</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 	<dependencyManagement>
@@ -39,7 +39,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.rest.errorhandler</finalName>
+		<finalName>de.haw-hamburg.vs-ws2015.spahl-haug.rest.servicerepository</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

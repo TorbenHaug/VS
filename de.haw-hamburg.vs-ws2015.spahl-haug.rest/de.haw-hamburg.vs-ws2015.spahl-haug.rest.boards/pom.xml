@@ -33,6 +33,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>de.haw-hamburg.vs-ws2015</groupId>
+			<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest.servicerepository</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
