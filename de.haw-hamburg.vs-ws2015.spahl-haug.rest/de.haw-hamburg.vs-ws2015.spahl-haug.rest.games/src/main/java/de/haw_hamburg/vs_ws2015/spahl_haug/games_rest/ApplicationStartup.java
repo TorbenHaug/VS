@@ -3,6 +3,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -104,7 +105,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 							// Found non-loopback site-local address. Return it immediately...
 							return inetAddr;
 						}
-						else if (candidateAddress == null) {
+						else if ((candidateAddress == null) && (inetAddr instanceof Inet4Address)) {
 							// Found non-loopback address, but not necessarily site-local.
 							// Store it as a candidate to be returned if site-local address is not subsequently found...
 							candidateAddress = inetAddr;
