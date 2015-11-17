@@ -11,7 +11,7 @@ public class Board {
 
     private List<Field> fields;
     // Map<PlayerId, PositionId>
-    private Map<Integer, Integer> positions;
+    private Map<Long, Integer> positions;
 
     public Board() {
         String los = "Los";
@@ -28,8 +28,20 @@ public class Board {
         return fields;
     }
 
-    public Map<Integer, Integer> getPositions() {
+    public Map<Long, Integer> getPositions() {
         return positions;
+    }
+
+    public int getPosition(long playerId) {
+        return positions.get(playerId);
+    }
+
+    public void addPositions(long playerId, int positionId) {
+        positions.put(playerId, positionId);
+    }
+
+    public void removePlayer(long playerID){
+            positions.remove(playerID);
     }
 
     @Override
