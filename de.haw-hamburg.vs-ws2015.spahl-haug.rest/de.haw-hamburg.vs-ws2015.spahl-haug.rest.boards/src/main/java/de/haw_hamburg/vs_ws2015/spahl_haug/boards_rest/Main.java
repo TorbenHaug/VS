@@ -22,8 +22,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class Main {
 
 	public static void main(final String[] args) throws Exception {
-		final ServiceRepository repo = new ServiceRepository();
-		System.err.println(repo.getService("spahl_haug_games"));
+		//		final ServiceRepository repo = new ServiceRepository();
+		//		System.err.println(repo.getService("spahl_haug_games"));
 		SpringApplication.run(Main.class, args);
 	}
 
