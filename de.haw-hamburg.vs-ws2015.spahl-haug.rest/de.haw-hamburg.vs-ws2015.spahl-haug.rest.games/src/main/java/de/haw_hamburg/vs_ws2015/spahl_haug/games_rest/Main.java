@@ -64,6 +64,12 @@ public class Main {
 		return new ResponseEntity<>(gameService.getGame(gameID) , HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/games/{gameID}", method = RequestMethod.DELETE,  produces = "application/json")
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
+		gameService.deleteGame(gameID);
+	}
+
 	@RequestMapping(value = "/games/{gameID}/players", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<PlayersDTO> getPlayersFromGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
 		final PlayersDTO playersDTO = new PlayersDTO();
