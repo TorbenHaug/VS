@@ -11,12 +11,13 @@ import org.springframework.web.client.RestTemplate;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameList;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.gamelobby.GameLobbyWindow;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.lobby.ILobbyActions;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.lobby.LobbyWindow;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.login.ILoginActions;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.login.LoginWindow;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
-import gamelobby.GameLobbyWindow;
+
 
 public class WindowManager {
 

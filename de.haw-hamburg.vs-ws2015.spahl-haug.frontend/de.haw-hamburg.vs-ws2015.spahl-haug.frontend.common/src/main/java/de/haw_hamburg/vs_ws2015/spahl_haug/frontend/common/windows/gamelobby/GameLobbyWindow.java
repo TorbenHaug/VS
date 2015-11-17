@@ -1,4 +1,4 @@
-package gamelobby;
+package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.gamelobby;
 
 import org.jowidgets.api.layout.NullLayout;
 import org.jowidgets.api.threads.IUiThreadAccess;
@@ -39,7 +39,9 @@ public class GameLobbyWindow extends AbstractWindow{
 			@Override
 			public void actionPerformed() {
 				try {
-					template.put(serviceRepository.getService("gamesldt") + "/" + gameId + "/players/" + username + "/ready" , String.class);
+					final String url = serviceRepository.getService("gamesldt") + "/" + gameId + "/players/" + username + "/ready";
+					System.out.println(url);
+					template.put( url, null);
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -59,15 +61,23 @@ public class GameLobbyWindow extends AbstractWindow{
 
 			@Override
 			public void run() {
-				threadAccess.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						final Player player = playerList.getValue();
+				boolean running = true;
+				while(running){
+					try {
+						Thread.sleep(1000);
+						threadAccess.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								final Player player = playerList.getValue();
 
-						playerList.setElements(getGame(gameId).getPlayers());
-						playerList.setValue(player);
+								playerList.setElements(getGame(gameId).getPlayers());
+								playerList.setValue(player);
+							}
+						});
+					} catch (final InterruptedException e) {
+						running = false;
 					}
-				});
+				}
 
 			}
 		});
