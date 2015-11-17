@@ -24,8 +24,8 @@ public class LoginWindow extends AbstractWindow{
 	private final IInputFieldBluePrint<String> userNameBp;
 	private final IInputField userName;
 
-	public LoginWindow(final ILoginActions loginActions){
-		super(false,new Dimension(230, 120));
+	public LoginWindow(final ILoginActions loginActions, final IApplicationLifecycle lifecycle){
+		super(false,new Dimension(230, 120), lifecycle);
 		final String textFieldCC = "growx, w 0::";
 		getFrame().setTitle("Monopoly - Login");
 		getFrame().setLayout(new MigLayoutDescriptor("wrap", "[grow, 0::]", "[]"));
@@ -39,6 +39,7 @@ public class LoginWindow extends AbstractWindow{
 		button.addActionListener(new IActionListener() {
 			@Override
 			public void actionPerformed() {
+				System.out.println("login");
 				loginActions.onLogin(userName.getText());
 			}
 		});

@@ -3,6 +3,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows;
 import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IFrame;
 import org.jowidgets.api.widgets.blueprint.IFrameBluePrint;
+import org.jowidgets.common.application.IApplicationLifecycle;
 import org.jowidgets.common.types.Dimension;
 import org.jowidgets.tools.widgets.blueprint.BPF;
 
@@ -10,11 +11,11 @@ public class AbstractWindow implements IDisposable{
 	private final IFrameBluePrint frameBp;
 	private final IFrame frame;
 
-	public AbstractWindow(final boolean closeable, final Dimension size){
+	public AbstractWindow(final boolean closeable, final Dimension size, final IApplicationLifecycle lifecycle){
 		frameBp = BPF.frame();
 		frameBp.setCloseable(closeable);
 		frameBp.setSize(size);
-		frame = Toolkit.createRootFrame(frameBp);
+		frame = Toolkit.createRootFrame(frameBp, lifecycle);
 	}
 
 	protected IFrameBluePrint getFrameBp() {
@@ -27,6 +28,6 @@ public class AbstractWindow implements IDisposable{
 
 	@Override
 	public void dispose() {
-		frame.dispose();
+		//frame.setVisible(false);
 	}
 }
