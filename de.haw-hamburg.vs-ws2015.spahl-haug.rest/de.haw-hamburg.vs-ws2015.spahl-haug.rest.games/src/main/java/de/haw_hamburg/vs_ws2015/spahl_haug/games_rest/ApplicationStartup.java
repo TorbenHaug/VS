@@ -1,5 +1,8 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -7,7 +10,9 @@ import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +26,25 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.ResponseRegisterServic
 @Component
 public class ApplicationStartup implements ApplicationListener<ContextRefreshedEvent> {
 
+	private int getServerPort() {
+		final Properties prop = new Properties();
+		final String propFileName = "application.properties";
+
+		final InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+
+		if (inputStream != null) {
+			try {
+				prop.load(inputStream);
+			} catch (final IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+
+		}
+		return Integer.valueOf(prop.getProperty("server.port"));
+	}
+
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
@@ -29,7 +53,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		dto.setService("gameslt");
 		try {
 			SSLUtil.turnOffSslChecking();
-			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + "/games");
+			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games");
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,8 +101,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 				for (final Enumeration inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
 					final InetAddress inetAddr = (InetAddress) inetAddrs.nextElement();
 					if (!inetAddr.isLoopbackAddress()) {
-
-						if (inetAddr.isSiteLocalAddress()) {
+						if (inetAddr.getHostAddress().startsWith("141")) {
 							// Found non-loopback site-local address. Return it immediately...
 							return inetAddr;
 						}
