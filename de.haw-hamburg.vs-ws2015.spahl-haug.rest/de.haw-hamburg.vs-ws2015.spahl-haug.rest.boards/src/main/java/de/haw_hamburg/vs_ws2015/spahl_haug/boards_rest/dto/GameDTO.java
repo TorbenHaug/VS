@@ -4,9 +4,7 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.util.List;
 
-/**
- * Created by Louisa on 17.11.2015.
- */
+
 public class GameDTO {
     private long gameid;
     @Ignore
