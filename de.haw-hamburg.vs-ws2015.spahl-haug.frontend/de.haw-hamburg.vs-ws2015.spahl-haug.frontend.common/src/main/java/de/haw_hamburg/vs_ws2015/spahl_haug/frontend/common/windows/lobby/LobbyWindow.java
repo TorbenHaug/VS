@@ -7,6 +7,8 @@ import java.util.List;
 import org.jowidgets.api.model.table.ISimpleTableModel;
 import org.jowidgets.api.model.table.ITableColumn;
 import org.jowidgets.api.model.table.ITableModel;
+import org.jowidgets.api.threads.IUiThreadAccess;
+import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IButton;
 import org.jowidgets.api.widgets.IComboBox;
 import org.jowidgets.api.widgets.ITable;
@@ -21,31 +23,32 @@ import org.jowidgets.common.types.Dimension;
 import org.jowidgets.common.widgets.controller.IActionListener;
 import org.jowidgets.common.widgets.layout.MigLayoutDescriptor;
 import org.jowidgets.tools.model.table.SimpleTableModel;
+import org.jowidgets.tools.threads.UiSingleThreadAccess;
 import org.jowidgets.tools.widgets.blueprint.BPF;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameList;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.AbstractWindow;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 
 public class LobbyWindow extends AbstractWindow{
 
+	private final IComboBoxSelectionBluePrint<Game> gameListBp;
+	private final IComboBox<Game> gameList;
 	private final IButtonBluePrint createGameBp;
 	private final IButton createGame;
 	private final IButtonBluePrint enterGameBp;
 	private final IButton enterGame;
 
-
 	public LobbyWindow(final String userName,final ILobbyActions lobbyActions, final IApplicationLifecycle lifecycle) {
 		super(false, new Dimension(1024, 768),lifecycle);
 		final List<Game> games = new ArrayList<Game>();
-		for(int i = 0; i<20; i++){
-			final Game game = new Game();
-			game.setGameid(i);
-			games.add(game);
-		}
 
 		final String buttonCC = "growx, w 0::";
 		getFrame().setTitle("Monopoly - Lobby -" + userName);
-		getFrame().setLayout(new MigLayoutDescriptor("wrap", "[150][grow, 0::]", "[][]"));
+		getFrame().setLayout(new MigLayoutDescriptor("wrap", "[150][grow, 0::]", "[grow, 0::][]"));
 		createGameBp = BPF.button().setText("New Game");
 		createGame = getFrame().add(createGameBp,buttonCC);
 		createGame.addActionListener(new IActionListener() {
@@ -54,9 +57,10 @@ public class LobbyWindow extends AbstractWindow{
 				lobbyActions.createNewGame();
 			}
 		});
-		final IComboBoxSelectionBluePrint<Game> gameListBp = BPF.comboBoxSelection(games);
-		final IComboBox<Game> gameList = getFrame().add(gameListBp, "span 1 2");
-		gameList.setSize(800, 600);
+
+		gameListBp = BPF.comboBoxSelection(games);
+		gameList = getFrame().add(gameListBp, "growx, span 1 2");
+
 		enterGameBp = BPF.button().setText("Enter Game");
 		enterGame = getFrame().add(enterGameBp);
 		enterGame.addActionListener(new IActionListener() {
@@ -66,6 +70,13 @@ public class LobbyWindow extends AbstractWindow{
 			}
 		});
 		getFrame().setVisible(true);
+	}
+
+	public void updateGames(final GameList games){
+		final Game game = gameList.getValue();
+
+		gameList.setElements(games.getGames());
+		gameList.setValue(game);
 
 	}
 

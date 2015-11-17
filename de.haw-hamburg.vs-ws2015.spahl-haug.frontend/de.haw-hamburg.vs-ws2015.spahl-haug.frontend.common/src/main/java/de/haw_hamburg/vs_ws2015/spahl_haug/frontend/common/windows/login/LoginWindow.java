@@ -1,5 +1,6 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.login;
 
+import org.jowidgets.api.threads.IUiThreadAccess;
 import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IButton;
 import org.jowidgets.api.widgets.IFrame;
@@ -23,6 +24,7 @@ public class LoginWindow extends AbstractWindow{
 	private final IButton button;
 	private final IInputFieldBluePrint<String> userNameBp;
 	private final IInputField userName;
+	private final IUiThreadAccess uiThread;
 
 	public LoginWindow(final ILoginActions loginActions, final IApplicationLifecycle lifecycle){
 		super(false,new Dimension(230, 120), lifecycle);
@@ -44,6 +46,13 @@ public class LoginWindow extends AbstractWindow{
 			}
 		});
 
+		this.uiThread = Toolkit.getUiThreadAccess();
 		getFrame().setVisible(true);
 	}
+
+	public IUiThreadAccess getUiThread() {
+		return uiThread;
+	}
+
+
 }
