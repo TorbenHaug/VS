@@ -19,6 +19,16 @@
 			<version>${jowidgets.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>de.haw-hamburg.vs-ws2015</groupId>
+			<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.rest.servicerepository</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.6.0</version>
+		</dependency>
 	</dependencies>
 
 </project>

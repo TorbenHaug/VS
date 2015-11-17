@@ -6,8 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 
-public class ServiceRepository {
+public class ServiceRepository implements IServiceRepository {
 
+	/* (non-Javadoc)
+	 * @see de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository#getService(java.lang.String)
+	 */
+	@Override
 	public String getService(final String name) throws Exception{
 		SSLUtil.turnOffSslChecking();
 		final RestTemplate template = new RestTemplate();
