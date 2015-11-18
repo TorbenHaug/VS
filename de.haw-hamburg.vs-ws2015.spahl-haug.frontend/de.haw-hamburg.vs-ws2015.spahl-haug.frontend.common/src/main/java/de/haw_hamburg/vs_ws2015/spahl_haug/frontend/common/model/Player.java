@@ -58,6 +58,10 @@ public class Player {
 		final int prime = 31;
 		int result = 1;
 		result = (prime * result) + (int) (id ^ (id >>> 32));
+		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + ((place == null) ? 0 : place.hashCode());
+		result = (prime * result) + position;
+		result = (prime * result) + (ready ? 1231 : 1237);
 		return result;
 	}
 
@@ -76,8 +80,29 @@ public class Player {
 		if (id != other.id) {
 			return false;
 		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (place == null) {
+			if (other.place != null) {
+				return false;
+			}
+		} else if (!place.equals(other.place)) {
+			return false;
+		}
+		if (position != other.position) {
+			return false;
+		}
+		if (ready != other.ready) {
+			return false;
+		}
 		return true;
 	}
+
 
 
 

@@ -28,6 +28,7 @@ public class Game {
 		final int prime = 31;
 		int result = 1;
 		result = (prime * result) + (int) (gameid ^ (gameid >>> 32));
+		result = (prime * result) + ((players == null) ? 0 : players.hashCode());
 		return result;
 	}
 	@Override
@@ -45,8 +46,16 @@ public class Game {
 		if (gameid != other.gameid) {
 			return false;
 		}
+		if (players == null) {
+			if (other.players != null) {
+				return false;
+			}
+		} else if (!players.equals(other.players)) {
+			return false;
+		}
 		return true;
 	}
+
 
 
 
