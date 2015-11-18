@@ -20,4 +20,8 @@ public class Field {
     public List<Player> getPlayers() {
         return players;
     }
+
+    public void setPlayer(long playerId) {
+        players.add(new Player(playerId));
+    }
 }

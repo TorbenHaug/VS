@@ -77,15 +77,15 @@ public class Main {
         }
     }
 
-//    @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
-//        if (isGameIdValid(gameID)) {
-//            boardService.placePlayer(gameID, playerID);
-//        } else {
-//            throw new GameDoesntExistsException("Game does not Exists");
-//        }
-//    }
+    @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
+        if (isGameIdValid(gameID)) {
+            boardService.placePlayer(gameID, playerID);
+        } else {
+            throw new GameDoesntExistsException("Game does not Exists");
+        }
+    }
 
     // remove a player from the board has no affect on player pos in game at the moment
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")

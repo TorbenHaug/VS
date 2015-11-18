@@ -38,9 +38,13 @@ public class Board {
     public void addPositions(long playerId, int positionId) {
         if(isPositionOnBoard(positionId)) {
             positions.put(playerId, positionId);
+            for(Field f : fields) {
+                if (f.getPlace().getPosition() == positionId) {
+                    f.setPlayer(playerId);
+                }
+            }
         }
     }
-
 
     private boolean isPositionOnBoard(int position) {
         for (Place place : Place.values()){
