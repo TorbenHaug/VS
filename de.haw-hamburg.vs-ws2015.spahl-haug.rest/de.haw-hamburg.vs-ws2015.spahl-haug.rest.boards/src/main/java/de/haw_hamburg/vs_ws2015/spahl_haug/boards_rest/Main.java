@@ -6,6 +6,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GameDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import org.springframework.boot.*;
@@ -26,11 +27,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class Main {
 	private static BoardService boardService = new BoardService();
 	private final static String urlString = "http://192.168.99.100:4568";
-    private static RestTemplate restTemplate = new RestTemplate();
+	private static RestTemplate restTemplate = new RestTemplate();
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
 	public GamesDTO getGames() {
-		GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
+		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
 		return gamesDTO;
 	}
 
@@ -67,15 +68,15 @@ public class Main {
         }
     }
 
-    @RequestMapping(value = " /boards/{gameid}/players", method = RequestMethod.GET,  produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public void getPlayersPositionFromBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-        if (isGameIdValid(gameID)) {
-            boardService.deleteBoard(gameID);
-        } else {
-            throw new GameDoesntExistsException("Game does not Exists");
-        }
-    }
+//    @RequestMapping(value = " /boards/{gameid}/players", method = RequestMethod.GET,  produces = "application/json")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void getPlayersPositionFromBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
+//        if (isGameIdValid(gameID)) {
+//            boardService.deleteBoard(gameID);
+//        } else {
+//            throw new GameDoesntExistsException("Game does not Exists");
+//        }
+//    }
 
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
@@ -142,5 +143,6 @@ public class Main {
 		//		System.err.println(repo.getService("spahl_haug_games"));
 		SpringApplication.run(Main.class, args);
 	}
+
 
 }
