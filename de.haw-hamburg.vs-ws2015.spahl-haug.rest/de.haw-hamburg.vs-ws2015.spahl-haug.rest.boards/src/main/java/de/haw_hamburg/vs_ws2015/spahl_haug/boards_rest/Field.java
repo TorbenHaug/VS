@@ -24,4 +24,12 @@ public class Field {
     public void setPlayer(long playerId) {
         players.add(new Player(playerId));
     }
+
+    public void removePlayer(long playerID) {
+        for (Player player : players) {
+            if(player.getId() == playerID) {
+                players.remove(player);
+            }
+        }
+    }
 }

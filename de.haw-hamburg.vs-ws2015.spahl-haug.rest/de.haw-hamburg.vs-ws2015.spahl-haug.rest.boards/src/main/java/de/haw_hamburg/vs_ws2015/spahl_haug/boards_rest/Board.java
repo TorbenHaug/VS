@@ -40,6 +40,7 @@ public class Board {
             positions.put(playerId, positionId);
             for(Field f : fields) {
                 if (f.getPlace().getPosition() == positionId) {
+                    // duplikate noch nicht raus
                     f.setPlayer(playerId);
                 }
             }
@@ -56,7 +57,15 @@ public class Board {
     }
 
     public void removePlayer(long playerID){
-            positions.remove(playerID);
+        int position = positions.remove(playerID);
+//        System.err.println(position);
+        for (Field f : fields) {
+            if (f.getPlace().getPosition() == position) {
+                System.err.println(f.getPlace());
+                System.err.println(f.getPlace().getPosition());
+                f.removePlayer(playerID);
+            }
+        }
     }
 
     @Override

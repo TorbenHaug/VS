@@ -87,7 +87,6 @@ public class Main {
         }
     }
 
-    // remove a player from the board has no affect on player pos in game at the moment
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public void removePlayerFromBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
