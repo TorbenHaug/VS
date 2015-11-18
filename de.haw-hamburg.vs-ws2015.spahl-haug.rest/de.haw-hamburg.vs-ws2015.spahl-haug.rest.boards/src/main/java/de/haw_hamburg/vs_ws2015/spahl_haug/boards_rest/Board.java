@@ -14,11 +14,10 @@ public class Board {
     private Map<Long, Integer> positions;
 
     public Board() {
-        String los = "Los";
-        String einkommensteuer = "Einkommensteuer";
         List<Field> fieldList = new ArrayList<>();
-        fieldList.add(new Field(los));
-        fieldList.add(new Field(einkommensteuer));
+        for ( Place place : Place.values()) {
+            fieldList.add(new Field(place));
+        }
 
         this.fields = fieldList;
         this.positions = new HashMap<>();
@@ -37,7 +36,19 @@ public class Board {
     }
 
     public void addPositions(long playerId, int positionId) {
-        positions.put(playerId, positionId);
+        if(isPositionOnBoard(positionId)) {
+            positions.put(playerId, positionId);
+        }
+    }
+
+
+    private boolean isPositionOnBoard(int position) {
+        for (Place place : Place.values()){
+            if (position == place.getPosition()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void removePlayer(long playerID){

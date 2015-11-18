@@ -1,14 +1,17 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 
-public class Place {
-    private String name;
+public enum Place {
+    Los(0),
+    Einkommensteuer(1);
 
-    public Place(String name){
-        this.name = name;
+    private int position;
+
+    Place(int id){
+        this.position = id;
     }
 
-    public String getName() {
-        return name;
+    public int getPosition() {
+        return this.position;
     }
 }

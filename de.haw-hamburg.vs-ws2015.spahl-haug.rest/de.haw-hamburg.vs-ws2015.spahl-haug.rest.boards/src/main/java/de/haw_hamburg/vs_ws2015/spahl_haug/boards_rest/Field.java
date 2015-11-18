@@ -8,9 +8,9 @@ public class Field {
     private Place place;
     private List<Player> players;
 
-    public Field(String placeName) {
+    public Field(Place placeName) {
         players = new ArrayList<>();
-        place = new Place(placeName);
+        place = placeName;
     }
 
     public Place getPlace() {
