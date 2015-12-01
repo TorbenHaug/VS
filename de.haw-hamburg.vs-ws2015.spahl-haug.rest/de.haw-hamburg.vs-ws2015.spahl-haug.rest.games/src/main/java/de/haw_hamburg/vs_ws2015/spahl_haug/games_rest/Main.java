@@ -81,7 +81,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam("playerName") final String playerName, @RequestParam("playerURI") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException{
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam("name") final String playerName, @RequestParam("uri") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException{
 		gameService.addPlayerToGame(gameID, playerID, playerName, playerURI);
 	}
 
