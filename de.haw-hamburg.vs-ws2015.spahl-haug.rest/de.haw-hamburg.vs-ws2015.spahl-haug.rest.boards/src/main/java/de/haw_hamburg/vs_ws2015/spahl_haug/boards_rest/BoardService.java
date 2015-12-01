@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 public class BoardService {
-
+    // Map<gameId, Board>
 	private Map<Long, Board> boards;
 
 	public BoardService(){
@@ -26,7 +26,6 @@ public class BoardService {
 	public void createBoard(final long gameID) {
 		final Board board = new Board();
         this.boards.put(gameID, board);
-        System.err.println("this.boards" + this.boards);
     }
 
 	public Map<Long, Board> getBoards() {
@@ -49,7 +48,6 @@ public class BoardService {
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
         boards.get(gameID).setPlayer(playerID);
-//		boards.get(gameID).addPositions(playerID, 0);
 	}
 
 	public void removePlayerFromBoard(final long gameID, final String playerID) {
@@ -64,4 +62,8 @@ public class BoardService {
 	public Player getPlayer(final long gameID, final String playerID) throws PlayerDoesntExistsException {
 		return getBoard(gameID).getPlayer(playerID);
 	}
+
+    public List<Player> getPlayerFromBoard(long gameID) {
+        return boards.get(gameID).getPlayers();
+    }
 }

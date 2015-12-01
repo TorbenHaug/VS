@@ -6,6 +6,7 @@ import java.util.List;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardsDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GameDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GamesDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.PlayerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
@@ -29,126 +30,75 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableAutoConfiguration
 public class Main {
 	private static BoardService boardService = new BoardService();
-	//	private final static String urlString = "http://192.168.99.100:4568";
 	private static RestTemplate restTemplate = new RestTemplate();
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
 	public BoardsDTO getGames() {
-		//final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
 		return new BoardsDTO(new ArrayList<>(boardService.getBoards().values()));
 	}
 
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.GET,  produces = "application/json")
-	public ResponseEntity<Board> getBoardToGame(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-		//		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
-		if (isGameIdValid(gameID)) {
-			final Board board = boardService.getBoard(gameID);
-			return new ResponseEntity<>(board, HttpStatus.OK);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public ResponseEntity<Board> getBoardToGame(@PathVariable(value="gameid") final long gameID) {
+		final Board board = boardService.getBoard(gameID);
+		return new ResponseEntity<>(board, HttpStatus.OK);
 	}
 
+	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			boardService.createBoard(gameID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public void createBoard(@PathVariable(value="gameid") final long gameID) {
+		boardService.createBoard(gameID);
 	}
 
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.DELETE,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			//			final String url =  urlString + "games/" + gameID ;
-			//			restTemplate.delete(url);
-			boardService.deleteBoard(gameID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public void deleteBoard(@PathVariable(value="gameid") final long gameID) {
+		//			final String url =  urlString + "games/" + gameID ;
+		//			restTemplate.delete(url);
+		boardService.deleteBoard(gameID);
 	}
 
-	//    @RequestMapping(value = " /boards/{gameid}/players", method = RequestMethod.GET,  produces = "application/json")
-	//    @ResponseStatus(HttpStatus.OK)
-	//    public void getPlayersPositionFromBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-	//        if (isGameIdValid(gameID)) {
-	//            boardService.deleteBoard(gameID);
-	//        } else {
-	//            throw new GameDoesntExistsException("Game does not Exists");
-	//        }
-	//    }
+	@RequestMapping(value = " /boards/{gameid}/players", method = RequestMethod.GET,  produces = "application/json")
+	@ResponseStatus(HttpStatus.OK)
+	public List<Player> getPlayersPositionFromBoard(@PathVariable(value="gameid") final long gameID) {
+		return boardService.getPlayerFromBoard(gameID);
+	}
 
+	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PositionNoOnBoardException, PlayerDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			boardService.placePlayer(gameID, playerID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+		boardService.placePlayer(gameID, playerID);
 	}
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void removePlayerFromBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			boardService.removePlayerFromBoard(gameID, playerID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public void removePlayerFromBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) {
+		boardService.removePlayerFromBoard(gameID, playerID);
 	}
 
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public Player getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			return boardService.getPlayerPosition(gameID, playerID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public PlayerDTO getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
+        Player p = boardService.getPlayerPosition(gameID, playerID);
+        PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition());
+        return player;
 	}
 
 
 	@RequestMapping(value = " /boards/{gameid}/places", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public List<Place>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			return boardService.getPlaces(gameID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public List<Place>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
+		return boardService.getPlaces(gameID);
 	}
 
-
-	/**
-	 * Validate if gameID is a valid id of any game
-	 * @param gameID Id of a game
-	 * @return true if gameID is a valid id, false otherwise
-	 */
-	private boolean isGameIdValid(final long gameID) {
-		//		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
-		//		// check if gameid exists
-		//		for(final GameDTO game : gamesDTO.getGames()){
-		//			if(gameID == game.getGameid()) {
-		return true;
-		//			}
-		//		}
-		//		return false;
-	}
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public Player postRoll(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
-		if (isGameIdValid(gameID)) {
-			//TODO: Implement me
-			return boardService.getPlayer(gameID, playerID);
-		} else {
-			throw new GameDoesntExistsException("Game does not Exists");
-		}
+	public Player postRoll(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
+		//TODO: Implement me
+		return boardService.getPlayer(gameID, playerID);
 	}
 
 

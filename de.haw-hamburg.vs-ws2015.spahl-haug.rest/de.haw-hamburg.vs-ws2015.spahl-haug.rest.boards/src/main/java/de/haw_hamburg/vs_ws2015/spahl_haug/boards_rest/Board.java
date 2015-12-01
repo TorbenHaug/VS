@@ -11,7 +11,8 @@ import java.util.Map;
 public class Board {
 
 	private final List<Field> fields;
-	private Map<Integer, Player> players;
+    // Map<playerId, Player>
+	private Map<String, Player> players;
 
 	public Board() {
 		final List<Field> fieldList = new ArrayList<>();
@@ -40,6 +41,13 @@ public class Board {
                 f.setPlayer(player);
             }
         }
+        players.put(playerId, player);
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> returnList = new ArrayList<>();
+        returnList.addAll(players.values());
+        return returnList;
     }
 
 	public void addPositions(final String playerId, final int positionId) throws PositionNoOnBoardException, PlayerDoesntExistsException {
@@ -71,15 +79,15 @@ public class Board {
 
     public void removePlayer(final String playerID){
 		int position = players.get(playerID).getPosition();
-		players.remove(playerID);
         for (Field f : fields) {
             if (f.getPlace().getPosition() == position) {
-//                System.err.println(f.getPlace());
-//                System.err.println(f.getPlace().getPosition());
                 f.removePlayer(playerID);
             }
         }
+        players.remove(playerID);
     }
+
+
 
 	private Player playerOnBoard(String playerId) throws PlayerDoesntExistsException {
 		Player player = players.get(playerId);
