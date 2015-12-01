@@ -102,9 +102,9 @@ public class Main {
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
+	public Player getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
 		if (isGameIdValid(gameID)) {
-			boardService.getPlayerPosition(gameID, playerID);
+			return boardService.getPlayerPosition(gameID, playerID);
 		} else {
 			throw new GameDoesntExistsException("Game does not Exists");
 		}
@@ -138,7 +138,7 @@ public class Main {
 		return false;
 	}
 
-	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
+	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public Player postRoll(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
 		if (isGameIdValid(gameID)) {

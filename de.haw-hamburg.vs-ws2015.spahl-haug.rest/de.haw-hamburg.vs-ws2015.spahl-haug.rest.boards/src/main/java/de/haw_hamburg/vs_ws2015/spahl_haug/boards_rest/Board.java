@@ -52,11 +52,11 @@ public class Board {
 		return false;
 	}
 
-	public int getPosition(final String playerId) throws PlayerDoesntExistsException {
-		return playerOnBoard(playerId).getPosition();
+	public Player getPosition(final String playerId) throws PlayerDoesntExistsException {
+		return playerOnBoard(playerId);
 	}
 
-    public void removePlayer(String playerID){
+    public void removePlayer(final String playerID){
 		int position = players.get(playerID).getPosition();
 		players.remove(playerID);
         for (Field f : fields) {

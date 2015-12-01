@@ -47,20 +47,20 @@ public class BoardService {
 		return placesMap;
 	}
 
-	public void placePlayer(final long gameID, String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+	public void placePlayer(final long gameID, final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
 		boards.get(gameID).addPositions(playerID, 0);
 	}
 
-	public void removePlayerFromBoard(final long gameID, String playerID) {
+	public void removePlayerFromBoard(final long gameID, final String playerID) {
 		boards.get(gameID).removePlayer(playerID);
 	}
 
-	public int getPlayerPosition(final long gameID, String playerID) throws PlayerDoesntExistsException {
+	public Player getPlayerPosition(final long gameID, final String playerID) throws PlayerDoesntExistsException {
 		return boards.get(gameID).getPosition(playerID);
+	}
 
-}
 	@JsonIgnore
-	public Player getPlayer(final long gameID, String playerID) throws PlayerDoesntExistsException {
+	public Player getPlayer(final long gameID, final String playerID) throws PlayerDoesntExistsException {
 		return getBoard(gameID).getPlayer(playerID);
 	}
 }
