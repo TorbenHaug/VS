@@ -21,13 +21,13 @@ public class Field {
         return players;
     }
 
-    public void setPlayer(long playerId) {
-        players.add(new Player(playerId));
+    public void setPlayer(Player player) {
+        players.add(player);
     }
 
-    public void removePlayer(long playerID) {
+    public void removePlayer(String playerID) {
         for (Player player : players) {
-            if(player.getId() == playerID) {
+            if(player.getId().equals(playerID)) {
                 players.remove(player);
             }
         }

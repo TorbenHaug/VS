@@ -2,16 +2,31 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 
 public class Player {
-    private long id;
+    private String id;
+    private Place place;
+    private int position;
 
-    public Player(long id) {
+    public Player(String id) {
         this.id = id;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
+    public Place getPlace() {
+        return place;
+    }
 
+    public int getPosition() {
+        return position;
+    }
 
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
+    }
 }

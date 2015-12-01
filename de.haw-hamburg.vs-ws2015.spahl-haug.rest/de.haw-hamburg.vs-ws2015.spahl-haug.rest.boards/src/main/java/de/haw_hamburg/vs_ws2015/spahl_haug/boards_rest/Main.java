@@ -7,6 +7,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNoOnBoardException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import org.springframework.boot.*;
@@ -80,7 +81,7 @@ public class Main {
 
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
+    public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") String playerID) throws GameDoesntExistsException, PositionNoOnBoardException, PlayerDoesntExistsException {
         if (isGameIdValid(gameID)) {
             boardService.placePlayer(gameID, playerID);
         } else {
@@ -90,7 +91,7 @@ public class Main {
 
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void removePlayerFromBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
+    public void removePlayerFromBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") String playerID) throws GameDoesntExistsException {
         if (isGameIdValid(gameID)) {
             boardService.removePlayerFromBoard(gameID, playerID);
         } else {
@@ -101,7 +102,7 @@ public class Main {
 
     @RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final long playerID) throws GameDoesntExistsException {
+    public void getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
         if (isGameIdValid(gameID)) {
             boardService.getPlayerPosition(gameID, playerID);
         } else {
