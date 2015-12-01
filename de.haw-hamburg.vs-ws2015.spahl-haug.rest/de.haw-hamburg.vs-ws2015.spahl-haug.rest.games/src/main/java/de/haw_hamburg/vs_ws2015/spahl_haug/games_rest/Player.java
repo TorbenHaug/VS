@@ -1,16 +1,16 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 public class Player {
-	private final long id;
+	private final String id;
 	private final String name;
 	private boolean ready;
 
-	public Player(final String name, final long id){
+	public Player(final String name, final String id){
 		this.name = name;
 		this.id = id;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -30,7 +30,9 @@ public class Player {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + (int) (id ^ (id >>> 32));
+		result = (prime * result) + ((id == null) ? 0 : id.hashCode());
+		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
+		result = (prime * result) + (ready ? 1231 : 1237);
 		return result;
 	}
 
@@ -46,11 +48,27 @@ public class Player {
 			return false;
 		}
 		final Player other = (Player) obj;
-		if (id != other.id) {
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (ready != other.ready) {
 			return false;
 		}
 		return true;
 	}
+
+
 
 
 

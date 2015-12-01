@@ -54,7 +54,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.GET,  produces = "application/json")
-	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
+	public ResponseEntity<Player> getPlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException {
 		final Player player = gameService.getPlayerFromGame(gameID, playerID);
 		return new ResponseEntity<>(player, HttpStatus.OK);
 	}
@@ -78,22 +78,22 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException{
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException{
 		gameService.addPlayerToGame(gameID, playerID);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.DELETE,  produces = "application/json")
-	public void removePlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException{
+	public void removePlayerFromGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException{
 		gameService.removePlayerFromGame(gameID, playerID);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}/ready", method = RequestMethod.PUT,  produces = "application/json")
-	public void signalPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
+	public void signalPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
 		gameService.signalPlayerReady(gameID, playerID);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}/ready", method = RequestMethod.GET,  produces = "application/json")
-	public boolean getPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final long playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
+	public boolean getPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
 		return gameService.getPlayerReady(gameID, playerID);
 	}
 
@@ -110,8 +110,8 @@ public class Main {
 
 	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void putPlayerTurn(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException, MutexAllreadyAquiredException, MutexIsYoursException{
-		gameService.aquireMutex(gameID);
+	public void putPlayerTurn(@PathVariable(value="gameID") final long gameID, @RequestParam("player") final String playerId) throws GameDoesntExistsException, MutexAllreadyAquiredException, MutexIsYoursException, PlayerDoesntExistsException{
+		gameService.aquireMutex(gameID,playerId);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/turn", method = RequestMethod.DELETE,  produces = "application/json")
@@ -121,7 +121,7 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
-//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+		//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
 		SpringApplication.run(Main.class, args);
 	}
 

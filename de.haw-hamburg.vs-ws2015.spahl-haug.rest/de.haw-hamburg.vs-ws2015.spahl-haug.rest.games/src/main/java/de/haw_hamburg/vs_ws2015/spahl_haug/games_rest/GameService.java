@@ -49,7 +49,7 @@ public class GameService {
 		return game;
 	}
 
-	public Player getPlayerFromGame(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException{
+	public Player getPlayerFromGame(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException{
 		final Player player = getGame(gameID).getPlayer(playerID);
 		if (player == null){
 			throw new PlayerDoesntExistsException("Player " + playerID + " in Game " + gameID + " not found");
@@ -57,7 +57,7 @@ public class GameService {
 		return player;
 	}
 
-	public void addPlayerToGame(final long gameID, final long playerID) throws GameDoesntExistsException {
+	public void addPlayerToGame(final long gameID, final String playerID) throws GameDoesntExistsException {
 		final Player player = new Player("Name " + playerID, playerID);
 		final Game game = getGame(gameID);
 
@@ -65,7 +65,7 @@ public class GameService {
 
 	}
 
-	public void signalPlayerReady(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
+	public void signalPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
 		if(!getGame(gameID).isStarted()){
 			final Player player = getPlayerFromGame(gameID, playerID);
 			player.setReady(true);
@@ -81,7 +81,7 @@ public class GameService {
 		}
 	}
 
-	public boolean getPlayerReady(final long gameID, final long playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
+	public boolean getPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
 		return getPlayerFromGame(gameID, playerID).isReady();
 	}
 
@@ -89,7 +89,7 @@ public class GameService {
 		return new ArrayList<>(games.values());
 	}
 
-	public void removePlayerFromGame(final long gameID, final long playerID) throws GameDoesntExistsException {
+	public void removePlayerFromGame(final long gameID, final String playerID) throws GameDoesntExistsException {
 		getGame(gameID).removePlayer(playerID);
 	}
 
@@ -106,8 +106,8 @@ public class GameService {
 		return getGame(gameID).getMutex();
 	}
 
-	public void aquireMutex(final long gameID) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException {
-		getGame(gameID).aquireMutex();
+	public void aquireMutex(final long gameID, final String playerId) throws MutexAllreadyAquiredException, MutexIsYoursException, GameDoesntExistsException, PlayerDoesntExistsException {
+		getGame(gameID).aquireMutex(playerId);
 	}
 
 	public void releaseMutex(final long gameID) throws GameDoesntExistsException {

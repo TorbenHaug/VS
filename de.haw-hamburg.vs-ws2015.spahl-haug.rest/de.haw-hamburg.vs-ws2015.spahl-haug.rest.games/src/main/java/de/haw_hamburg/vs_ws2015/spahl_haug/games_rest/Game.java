@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 
 public class Game {
 
@@ -39,21 +40,21 @@ public class Game {
 	}
 
 	@JsonIgnore
-	public Player getPlayer(final long playerID) {
+	public Player getPlayer(final String playerID) throws PlayerDoesntExistsException {
 		for(final Player aPlayer: players){
-			if(aPlayer.getId() == playerID){
+			if(aPlayer.getId().equals(playerID)){
 				return aPlayer;
 			}
 		}
-		return null;
+		throw new PlayerDoesntExistsException("Player " + playerID + " not in Game");
 	}
 
-	public void removePlayer(final long playerID) {
+	public void removePlayer(final String playerID) {
 		players.removeIf(new Predicate<Player>() {
 
 			@Override
 			public boolean test(final Player t) {
-				return t.getId() == playerID;
+				return t.getId().equals(playerID);
 			}
 		});
 	}
@@ -80,15 +81,18 @@ public class Game {
 		}
 	}
 
-	public void aquireMutex() throws MutexAllreadyAquiredException, MutexIsYoursException {
-		if(mutexHolder != -1){
-			throw new MutexAllreadyAquiredException("The Mutex is aready aquired by Player " + players.get(mutexHolder));
-		} else if (mutexHolder == currentPlayer) {
+	public void aquireMutex(final String playerId) throws MutexAllreadyAquiredException, MutexIsYoursException, PlayerDoesntExistsException {
+		final Player player = this.getPlayer(playerId);
+		final int playerPosInList = this.getPlayers().indexOf(player);
+		if(mutexHolder == playerPosInList){
 			throw new MutexIsYoursException();
-		}else{
-			mutexHolder = currentPlayer;
 		}
-
+		else if(mutexHolder != -1){
+			throw new MutexAllreadyAquiredException("The Mutex is aready aquired by Player " + players.get(mutexHolder));
+		}
+		else {
+			mutexHolder = playerPosInList;
+		}
 	}
 
 	public void releaseMutex() {
