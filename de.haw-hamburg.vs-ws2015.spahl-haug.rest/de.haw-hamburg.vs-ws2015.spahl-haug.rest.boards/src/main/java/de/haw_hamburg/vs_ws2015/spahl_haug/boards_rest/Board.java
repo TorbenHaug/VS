@@ -4,6 +4,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsExcept
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNoOnBoardException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class Board {
 		}
 
 		this.fields = fieldList;
+		this.players = new HashMap<>();
 	}
 
 	public List<Field> getFields() {
@@ -28,6 +30,17 @@ public class Board {
 	public Player getPlayer(final String playerId) throws PlayerDoesntExistsException {
 		return playerOnBoard(playerId);
 	}
+
+    public void setPlayer(final String playerId) {
+        Player player = new Player(playerId);
+        for(final Field f : fields) {
+            if (f.getPlace().getPosition() == 0) {
+                player.setPosition(0);
+                player.setPlace(f.getPlace());
+                f.setPlayer(player);
+            }
+        }
+    }
 
 	public void addPositions(final String playerId, final int positionId) throws PositionNoOnBoardException, PlayerDoesntExistsException {
 		if(!isPositionOnBoard(positionId)) {
@@ -70,6 +83,7 @@ public class Board {
 
 	private Player playerOnBoard(String playerId) throws PlayerDoesntExistsException {
 		Player player = players.get(playerId);
+		System.err.println("player " + player);
 		if(player != null) {
 			return player;
 		} else {

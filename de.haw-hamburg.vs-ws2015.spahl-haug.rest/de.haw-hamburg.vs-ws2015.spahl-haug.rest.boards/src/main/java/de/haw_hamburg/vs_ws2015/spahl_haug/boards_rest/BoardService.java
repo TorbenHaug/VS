@@ -15,6 +15,7 @@ public class BoardService {
 	private Map<Long, Board> boards;
 
 	public BoardService(){
+        this.boards = new HashMap<>();
 	}
 
 	@JsonIgnore
@@ -24,10 +25,9 @@ public class BoardService {
 
 	public void createBoard(final long gameID) {
 		final Board board = new Board();
-		final Map<Long, Board> tmpMap = new HashMap<>();
-		tmpMap.put(gameID, board);
-		this.boards = tmpMap;
-	}
+        this.boards.put(gameID, board);
+        System.err.println("this.boards" + this.boards);
+    }
 
 	public Map<Long, Board> getBoards() {
 		return boards;
@@ -48,7 +48,8 @@ public class BoardService {
 	}
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
-		boards.get(gameID).addPositions(playerID, 0);
+        boards.get(gameID).setPlayer(playerID);
+//		boards.get(gameID).addPositions(playerID, 0);
 	}
 
 	public void removePlayerFromBoard(final long gameID, final String playerID) {
