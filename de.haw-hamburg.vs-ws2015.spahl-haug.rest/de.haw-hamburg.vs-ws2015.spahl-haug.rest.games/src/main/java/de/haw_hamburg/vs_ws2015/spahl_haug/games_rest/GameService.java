@@ -5,18 +5,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 
 
 public class GameService {
 	private long nextGameID = 0;
 	private final Map<Long, Game> games;
+	private final IServiceRepository serviceRepository;
+	private final String boardName = "boardsLT";
+	private final RestTemplate template = new RestTemplate();
 
-	public GameService(){
+	public GameService(final IServiceRepository serviceRepository){
+
+		this.serviceRepository = serviceRepository;
 		this.games = new ConcurrentHashMap<>();
 	}
 
@@ -27,11 +37,25 @@ public class GameService {
 		return this.nextGameID++;
 	}
 
-	private void addNewGame(final long id, final Game game){
+	private void addNewGame(final long id, final Game game) throws BoardServiceNotFoundException{
 		this.games.put(id, game);
+		String url = null;
+		try {
+			url = serviceRepository.getService(boardName) + "/" + id;
+			try {
+				template.put(url,null);
+			} catch (final Exception e) {
+				this.games.remove(id);
+				throw new BoardServiceNotFoundException("No BoardService found " + url + "/" + id);
+			}
+		} catch (final Exception e1) {
+			this.games.remove(id);
+			throw new BoardServiceNotFoundException(e1.getMessage());
+		}
+
 	}
 
-	public Game createNewGame(){
+	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
 		return game;
@@ -57,11 +81,20 @@ public class GameService {
 		return player;
 	}
 
-	public void addPlayerToGame(final long gameID, final String playerID) throws GameDoesntExistsException {
+	public void addPlayerToGame(final long gameID, final String playerID) throws GameDoesntExistsException, BoardServiceNotFoundException {
 		final Player player = new Player("Name " + playerID, playerID);
 		final Game game = getGame(gameID);
-
 		game.addPlayer(player);
+		try {
+			final String serviceCall = serviceRepository.getService(boardName) + "/" + gameID + "/players/" + playerID;
+			System.err.println(serviceCall);
+			template.put(serviceCall,null);
+		} catch (final Exception e) {
+			game.removePlayer(playerID);
+			throw new BoardServiceNotFoundException("Unable to add Player " + playerID + " to Board");
+		}
+
+
 
 	}
 

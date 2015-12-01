@@ -46,7 +46,7 @@ public class Game {
 				return aPlayer;
 			}
 		}
-		throw new PlayerDoesntExistsException("Player " + playerID + " not in Game");
+		return null;
 	}
 
 	public void removePlayer(final String playerID) {
@@ -83,6 +83,9 @@ public class Game {
 
 	public void aquireMutex(final String playerId) throws MutexAllreadyAquiredException, MutexIsYoursException, PlayerDoesntExistsException {
 		final Player player = this.getPlayer(playerId);
+		if(player == null){
+			throw new PlayerDoesntExistsException("Player " + playerId + " not in Game");
+		}
 		final int playerPosInList = this.getPlayers().indexOf(player);
 		if(mutexHolder == playerPosInList){
 			throw new MutexIsYoursException();

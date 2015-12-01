@@ -5,19 +5,20 @@ import java.util.List;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 
 
 @ComponentScan
@@ -27,7 +28,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 @EnableAutoConfiguration
 public class Main {
 
-	private static GameService gameService = new GameService();
+	private static GameService gameService;
 	private static String serviceID = null;
 
 	public static void setServiceID(final String id){
@@ -41,7 +42,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games", method = RequestMethod.POST,  produces = "application/json")
-	public ResponseEntity<Game> createGame() {
+	public ResponseEntity<Game> createGame() throws BoardServiceNotFoundException {
 		final Game game = gameService.createNewGame();
 		return new ResponseEntity<>(game , HttpStatus.CREATED);
 	}
@@ -78,7 +79,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException{
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, BoardServiceNotFoundException{
 		gameService.addPlayerToGame(gameID, playerID);
 	}
 
@@ -122,6 +123,15 @@ public class Main {
 
 	public static void main(final String[] args) throws Exception {
 		//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+		//final IServiceRepository serviceRepository = new ServiceRepository();
+		final IServiceRepository serviceRepository = new IServiceRepository() {
+
+			@Override
+			public String getService(final String name) throws Exception {
+				return "http://192.168.99.100:4569/boards";
+			}
+		};
+		gameService = new GameService(serviceRepository);
 		SpringApplication.run(Main.class, args);
 	}
 

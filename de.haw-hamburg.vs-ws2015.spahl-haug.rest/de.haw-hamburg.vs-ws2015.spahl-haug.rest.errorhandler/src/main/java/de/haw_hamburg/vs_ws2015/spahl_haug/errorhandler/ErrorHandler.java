@@ -14,6 +14,13 @@ public class ErrorHandler {
 		return new ErrorMessage(404, "Not Found", error.getMessage());
 	}
 
+	@ExceptionHandler(BoardServiceNotFoundException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ErrorMessage onBoardServiceNotFound(final GameDoesntExistsException error) {
+		return new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Not Found", error.getMessage());
+	}
+
 	@ExceptionHandler(PlayerDoesntExistsException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
