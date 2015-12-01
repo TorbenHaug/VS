@@ -3,10 +3,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardsDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GameDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.GamesDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.PlayerDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
@@ -89,8 +86,13 @@ public class Main {
 
 	@RequestMapping(value = " /boards/{gameid}/places", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public List<Place>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
-		return boardService.getPlaces(gameID);
+	public List<PlaceDTO>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
+        List<PlaceDTO> placeList = new ArrayList<>();
+        for(Place place : boardService.getPlaces(gameID)) {
+            PlaceDTO placeDTO = new PlaceDTO(place.toString());
+            placeList.add(placeDTO);
+        }
+		return placeList;
 	}
 
 
