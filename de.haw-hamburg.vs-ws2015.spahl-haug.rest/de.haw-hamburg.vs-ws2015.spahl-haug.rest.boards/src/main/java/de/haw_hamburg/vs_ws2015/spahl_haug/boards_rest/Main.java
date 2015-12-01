@@ -27,18 +27,18 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableAutoConfiguration
 public class Main {
 	private static BoardService boardService = new BoardService();
-	private final static String urlString = "http://192.168.99.100:4568";
+//	private final static String urlString = "http://192.168.99.100:4568";
 	private static RestTemplate restTemplate = new RestTemplate();
 
-	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
-	public GamesDTO getGames() {
-		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
-		return gamesDTO;
-	}
+//	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
+//	public GamesDTO getGames() {
+//		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
+//		return gamesDTO;
+//	}
 
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<Board> getBoardToGame(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
-		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
+//		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
 		if (isGameIdValid(gameID)) {
 			final Board board = boardService.getBoard(gameID);
 			return new ResponseEntity<>(board, HttpStatus.OK);
@@ -61,8 +61,8 @@ public class Main {
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteBoard(@PathVariable(value="gameid") final long gameID) throws GameDoesntExistsException {
 		if (isGameIdValid(gameID)) {
-			final String url =  urlString + "games/" + gameID ;
-			restTemplate.delete(url);
+//			final String url =  urlString + "games/" + gameID ;
+//			restTemplate.delete(url);
 			boardService.deleteBoard(gameID);
 		} else {
 			throw new GameDoesntExistsException("Game does not Exists");
@@ -128,14 +128,14 @@ public class Main {
 	 * @return true if gameID is a valid id, false otherwise
 	 */
 	private boolean isGameIdValid(final long gameID) {
-		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
-		// check if gameid exists
-		for(final GameDTO game : gamesDTO.getGames()){
-			if(gameID == game.getGameid()) {
+//		final GamesDTO gamesDTO = restTemplate.getForObject(urlString + "/games", GamesDTO.class);
+//		// check if gameid exists
+//		for(final GameDTO game : gamesDTO.getGames()){
+//			if(gameID == game.getGameid()) {
 				return true;
-			}
-		}
-		return false;
+//			}
+//		}
+//		return false;
 	}
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.GET,  produces = "application/json")
