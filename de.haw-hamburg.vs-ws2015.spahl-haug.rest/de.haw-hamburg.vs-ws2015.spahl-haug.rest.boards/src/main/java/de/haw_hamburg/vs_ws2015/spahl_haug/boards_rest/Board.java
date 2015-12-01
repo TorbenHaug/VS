@@ -50,10 +50,13 @@ public class Board {
         return returnList;
     }
 
-	public void addPositions(final String playerId, final int positionId) throws PositionNoOnBoardException, PlayerDoesntExistsException {
-		if(!isPositionOnBoard(positionId)) {
+	public void addPositions(final String playerId, final int numOfPosMoves) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+        int oldPos = players.get(playerId).getPosition();
+        int positionId = oldPos + numOfPosMoves ;
+        if(!isPositionOnBoard(positionId)) {
 			throw new PositionNoOnBoardException("Position is no position from board");
 		}
+
 		Player player = playerOnBoard(playerId);
 		for(final Field f : fields) {
 			if (f.getPlace().getPosition() == positionId) {

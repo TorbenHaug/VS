@@ -3,7 +3,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 public enum Place {
     Los(0),
-    Einkommensteuer(1);
+    Einkommensteuer(1),
+    Geld(2);
 
     private int position;
 

@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNoOnBoardException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import org.springframework.boot.*;
@@ -96,11 +93,20 @@ public class Main {
 	}
 
 
-	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.GET,  produces = "application/json")
+	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.POST,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public Player postRoll(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
+	public Player postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNoOnBoardException {
 		//TODO: Implement me
-		return boardService.getPlayer(gameID, playerID);
+        System.err.println("In MAIN: --> bodyContent " + roll);
+        int roll1 = roll.getRoll1().getNumber();
+        int roll2 = roll.getRoll2().getNumber();
+        if((roll1 < 1 || roll1 > 6) || (roll2 < 1 || roll2 > 6)) {
+            throw new RollnumberNotAcceptableException("The Roll numbers are not in the rage 1 to 6");
+        }
+        int rollSum = roll1 + roll2;
+        System.err.println("sum " + rollSum);
+        boardService.placePlayer(gameID, playerID, rollSum);
+        return boardService.getPlayer(gameID, playerID);
 	}
 
 

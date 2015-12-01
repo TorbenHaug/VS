@@ -48,7 +48,11 @@ public class BoardService {
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
         boards.get(gameID).setPlayer(playerID);
-	}
+    }
+
+    public void placePlayer(final long gameID, final String playerID, int numOfPosMoves) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+        boards.get(gameID).addPositions(playerID, numOfPosMoves);
+    }
 
 	public void removePlayerFromBoard(final long gameID, final String playerID) {
 		boards.get(gameID).removePlayer(playerID);
