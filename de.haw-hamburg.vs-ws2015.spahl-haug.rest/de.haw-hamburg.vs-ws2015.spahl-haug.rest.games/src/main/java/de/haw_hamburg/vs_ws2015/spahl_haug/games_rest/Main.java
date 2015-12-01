@@ -3,6 +3,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.ComponentScan;
@@ -79,8 +81,8 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, BoardServiceNotFoundException{
-		gameService.addPlayerToGame(gameID, playerID);
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam("name") final String playerName, @RequestParam("uri") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException{
+		gameService.addPlayerToGame(gameID, playerID, playerName, playerURI);
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.DELETE,  produces = "application/json")

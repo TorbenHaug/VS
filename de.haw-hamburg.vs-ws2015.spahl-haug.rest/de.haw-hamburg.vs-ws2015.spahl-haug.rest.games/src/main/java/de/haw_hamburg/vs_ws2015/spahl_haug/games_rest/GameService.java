@@ -81,8 +81,8 @@ public class GameService {
 		return player;
 	}
 
-	public void addPlayerToGame(final long gameID, final String playerID) throws GameDoesntExistsException, BoardServiceNotFoundException {
-		final Player player = new Player("Name " + playerID, playerID);
+	public void addPlayerToGame(final long gameID, final String playerID, final String playerName, final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException {
+		final Player player = new Player(playerName, playerID, playerURI);
 		final Game game = getGame(gameID);
 		game.addPlayer(player);
 		try {

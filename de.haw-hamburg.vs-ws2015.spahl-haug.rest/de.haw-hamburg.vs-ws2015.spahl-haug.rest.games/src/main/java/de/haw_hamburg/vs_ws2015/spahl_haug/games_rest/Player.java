@@ -4,10 +4,12 @@ public class Player {
 	private final String id;
 	private final String name;
 	private boolean ready;
+	private final String playerURI;
 
-	public Player(final String name, final String id){
+	public Player(final String name, final String id, final String playerURI){
 		this.name = name;
 		this.id = id;
+		this.playerURI = playerURI;
 	}
 
 	public String getId() {
@@ -26,49 +28,10 @@ public class Player {
 		this.ready = b;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((id == null) ? 0 : id.hashCode());
-		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
-		result = (prime * result) + (ready ? 1231 : 1237);
-		return result;
+
+	public String getPlayerURI() {
+		return playerURI;
 	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Player other = (Player) obj;
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (ready != other.ready) {
-			return false;
-		}
-		return true;
-	}
-
-
 
 
 
