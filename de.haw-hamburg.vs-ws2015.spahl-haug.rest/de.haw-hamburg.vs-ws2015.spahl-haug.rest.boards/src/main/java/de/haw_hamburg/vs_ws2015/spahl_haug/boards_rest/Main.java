@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.net.ssl.SSLEngineResult;
+
 
 @ComponentScan
 @EnableWebMvc
@@ -46,8 +48,6 @@ public class Main {
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.DELETE,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteBoard(@PathVariable(value="gameid") final long gameID) {
-		//			final String url =  urlString + "games/" + gameID ;
-		//			restTemplate.delete(url);
 		boardService.deleteBoard(gameID);
 	}
 
@@ -94,14 +94,27 @@ public class Main {
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.POST,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public Board postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNotOnBoardException {
+	public ResponseEntity<BoardsServiceDTO> postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNotOnBoardException {
         int roll1 = roll.getRoll1().getNumber();
         int roll2 = roll.getRoll2().getNumber();
         if((roll1 < 1 || roll1 > 6) || (roll2 < 1 || roll2 > 6)) {
             throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
         }
         int rollSum = roll1 + roll2;
-        return boardService.placePlayer(gameID, playerID, rollSum);
+        Board b = boardService.placePlayer(gameID, playerID, rollSum);
+        Player player = b.getPlayer(playerID);
+        List<Field> fields = b.getFields();
+        List<FieldDTO> f = new ArrayList<>();
+        for(Field field : fields) {
+            PlaceDTO pl = new PlaceDTO(field.getPlace().toString());
+            FieldDTO o = new FieldDTO(pl);
+            f.add(o);
+        }
+        BoardDTO bd = new BoardDTO(f);
+        PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
+        BoardsServiceDTO bs = new BoardsServiceDTO(playerDTO, bd);
+        return new ResponseEntity<>(bs, HttpStatus.OK);
+//        return boardService.placePlayer(gameID, playerID, rollSum);
 	}
 
 
