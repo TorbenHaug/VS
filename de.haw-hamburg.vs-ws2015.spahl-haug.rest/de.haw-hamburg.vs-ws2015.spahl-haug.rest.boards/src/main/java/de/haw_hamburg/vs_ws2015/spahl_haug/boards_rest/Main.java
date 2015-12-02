@@ -5,7 +5,6 @@ import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
-import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
@@ -61,7 +60,7 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException {
 		boardService.placePlayer(gameID, playerID);
 	}
 
@@ -95,18 +94,14 @@ public class Main {
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.POST,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public Player postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNoOnBoardException {
-		//TODO: Implement me
-        System.err.println("In MAIN: --> bodyContent " + roll);
+	public Board postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNotOnBoardException {
         int roll1 = roll.getRoll1().getNumber();
         int roll2 = roll.getRoll2().getNumber();
         if((roll1 < 1 || roll1 > 6) || (roll2 < 1 || roll2 > 6)) {
-            throw new RollnumberNotAcceptableException("The Roll numbers are not in the rage 1 to 6");
+            throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
         }
         int rollSum = roll1 + roll2;
-        System.err.println("sum " + rollSum);
-        boardService.placePlayer(gameID, playerID, rollSum);
-        return boardService.getPlayer(gameID, playerID);
+        return boardService.placePlayer(gameID, playerID, rollSum);
 	}
 
 

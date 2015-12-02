@@ -1,12 +1,9 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNoOnBoardException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Board {
 
@@ -19,7 +16,6 @@ public class Board {
 		for ( final Place place : Place.values()) {
 			fieldList.add(new Field(place));
 		}
-
 		this.fields = fieldList;
 		this.players = new HashMap<>();
 	}
@@ -34,7 +30,8 @@ public class Board {
 
     public void setPlayer(final String playerId) {
         Player player = new Player(playerId);
-        for(final Field f : fields) {
+        for(Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
+            Field f = iterator.next();
             if (f.getPlace().getPosition() == 0) {
                 player.setPosition(0);
                 player.setPlace(f.getPlace());
@@ -50,20 +47,29 @@ public class Board {
         return returnList;
     }
 
-	public void addPositions(final String playerId, final int numOfPosMoves) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+	public void placePlayerOnPos(final String playerId, final int numOfPosMoves) throws PositionNotOnBoardException, PlayerDoesntExistsException {
         int oldPos = players.get(playerId).getPosition();
         int positionId = oldPos + numOfPosMoves ;
         if(!isPositionOnBoard(positionId)) {
-			throw new PositionNoOnBoardException("Position is no position from board");
+			throw new PositionNotOnBoardException("Position is no position from board");
 		}
 
 		Player player = playerOnBoard(playerId);
-		for(final Field f : fields) {
-			if (f.getPlace().getPosition() == positionId) {
-				player.setPosition(positionId);
-				player.setPlace(f.getPlace());
-				f.setPlayer(player);
-			}
+
+        for ( Iterator<Field> iterator = fields.iterator(); iterator.hasNext(); ) {
+            Field f = iterator.next();
+            if (f.getPlace().getPosition() == positionId) {
+                player.setPosition(positionId);
+                player.setPlace(f.getPlace());
+                f.setPlayer(player);
+            }
+        }
+
+		for ( Iterator<Field> iterator = fields.iterator(); iterator.hasNext(); ) {
+            Field f = iterator.next();
+            if (f.getPlace().getPosition() == oldPos) {
+                f.removePlayer(playerId);
+            }
 		}
 	}
 
@@ -82,7 +88,8 @@ public class Board {
 
     public void removePlayer(final String playerID){
 		int position = players.get(playerID).getPosition();
-        for (Field f : fields) {
+        for(Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
+            Field f = iterator.next();
             if (f.getPlace().getPosition() == position) {
                 f.removePlayer(playerID);
             }
@@ -94,7 +101,6 @@ public class Board {
 
 	private Player playerOnBoard(String playerId) throws PlayerDoesntExistsException {
 		Player player = players.get(playerId);
-		System.err.println("player " + player);
 		if(player != null) {
 			return player;
 		} else {

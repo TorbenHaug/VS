@@ -2,7 +2,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNoOnBoardException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +46,14 @@ public class BoardService {
 		return placesMap;
 	}
 
-	public void placePlayer(final long gameID, final String playerID) throws PositionNoOnBoardException, PlayerDoesntExistsException {
+	public void placePlayer(final long gameID, final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException {
         boards.get(gameID).setPlayer(playerID);
     }
 
-    public void placePlayer(final long gameID, final String playerID, int numOfPosMoves) throws PositionNoOnBoardException, PlayerDoesntExistsException {
-        boards.get(gameID).addPositions(playerID, numOfPosMoves);
+    public Board placePlayer(final long gameID, final String playerID, int numOfPosMoves) throws PositionNotOnBoardException, PlayerDoesntExistsException {
+        Board board = boards.get(gameID);
+		board.placePlayerOnPos(playerID, numOfPosMoves);
+		return board;
     }
 
 	public void removePlayerFromBoard(final long gameID, final String playerID) {

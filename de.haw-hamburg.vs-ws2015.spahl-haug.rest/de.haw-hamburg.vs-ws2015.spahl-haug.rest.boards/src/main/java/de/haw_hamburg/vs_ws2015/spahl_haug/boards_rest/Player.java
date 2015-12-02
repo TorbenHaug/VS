@@ -29,4 +29,13 @@ public class Player {
     public void setPlace(Place place) {
         this.place = place;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id='" + id + '\'' +
+                ", place=" + place +
+                ", position=" + position +
+                '}';
+    }
 }
