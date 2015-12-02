@@ -101,20 +101,25 @@ public class Main {
             throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
         }
         int rollSum = roll1 + roll2;
-        Board b = boardService.placePlayer(gameID, playerID, rollSum);
-        Player player = b.getPlayer(playerID);
-        List<Field> fields = b.getFields();
+        Board board = boardService.placePlayer(gameID, playerID, rollSum);
+
+        Player player = board.getPlayer(playerID);
+        List<Field> fields = board.getFields();
         List<FieldDTO> f = new ArrayList<>();
         for(Field field : fields) {
-            PlaceDTO pl = new PlaceDTO(field.getPlace().toString());
-            FieldDTO o = new FieldDTO(pl);
-            f.add(o);
+            List<PlayerDTO> playerList = new ArrayList<>();
+            for(Player player1 : field.getPlayers()){
+                PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition());
+                playerList.add(playerDTO);
+            }
+            FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
+            f.add(fieldDTO);
         }
-        BoardDTO bd = new BoardDTO(f);
+        BoardDTO boardDTO = new BoardDTO(f);
         PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
-        BoardsServiceDTO bs = new BoardsServiceDTO(playerDTO, bd);
-        return new ResponseEntity<>(bs, HttpStatus.OK);
-//        return boardService.placePlayer(gameID, playerID, rollSum);
+        BoardsServiceDTO boardsServiceDTO = new BoardsServiceDTO(playerDTO, boardDTO);
+
+        return new ResponseEntity<>(boardsServiceDTO, HttpStatus.OK);
 	}
 
 
