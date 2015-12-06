@@ -8,10 +8,13 @@ import org.springframework.http.HttpStatus;
 
 public class ErrorHandler {
 
-	@ExceptionHandler(BrockerNotExistsException.class)
+	@ExceptionHandler({
+		BrockerNotExistsException.class,
+		PlaceNotFoundException.class
+	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ErrorMessage onBrockerNotExists(final BrockerNotExistsException error) {
+	public ErrorMessage NotFound(final Exception error) {
 		return new ErrorMessage(404, "Not Found", error.getMessage());
 	}
 

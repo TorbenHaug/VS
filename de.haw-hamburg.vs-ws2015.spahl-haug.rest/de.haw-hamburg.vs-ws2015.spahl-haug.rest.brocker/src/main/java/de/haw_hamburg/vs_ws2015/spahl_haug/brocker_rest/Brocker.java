@@ -35,5 +35,10 @@ public class Brocker {
 		return new ArrayList<>(places.values());
 	}
 
+	public Place getPlace(final String placeid) {
+		return places.get(placeid);
+
+	}
+
 
 }

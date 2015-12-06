@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.EstatesDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 
 import org.springframework.boot.*;
@@ -59,8 +60,8 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.GET,  produces = "application/json")
-	public void getPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.getPlace(gameId, placeid);
+	public ResponseEntity<Place> getPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) throws BrockerNotExistsException, PlaceNotFoundException {
+		return new ResponseEntity<>(brockerService.getPlace(gameId, placeid),HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.PUT,  produces = "application/json")
