@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrockerNotExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
 
 public class BrockerService {
@@ -52,8 +53,8 @@ public class BrockerService {
 
 	}
 
-	public void createPlace(final String gameId, final String placeid) {
-		throw new RuntimeException("Not yet Implemented");
+	public void createPlace(final String gameId, final String placeid, final Place place) throws PlaceAlreadyExistsExeption, BrockerNotExistsException {
+		getBrocker(gameId).createPlace(placeid,place);
 
 	}
 

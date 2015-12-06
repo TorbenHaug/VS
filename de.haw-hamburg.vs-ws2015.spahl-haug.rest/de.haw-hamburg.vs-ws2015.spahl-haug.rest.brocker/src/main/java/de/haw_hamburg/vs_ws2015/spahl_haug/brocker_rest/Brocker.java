@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 
 public class Brocker {
 
@@ -37,6 +38,14 @@ public class Brocker {
 
 	public Place getPlace(final String placeid) {
 		return places.get(placeid);
+
+	}
+
+	public void createPlace(final String placeid, final Place place) throws PlaceAlreadyExistsExeption {
+		if(getPlace(placeid) != null){
+			throw new PlaceAlreadyExistsExeption("Place " + placeid + " already Exists");
+		}
+		places.put(placeid, place);
 
 	}
 

@@ -40,7 +40,7 @@ public class Main {
 		return new ResponseEntity<Brocker>(brocker,HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
+	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json", consumes = "application/json")
 	public ResponseEntity<Brocker> putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) throws BrockerNotExistsException {
 		try {
 			return new ResponseEntity<Brocker>(brockerService.createBrocker(gameId, brockerDTO), HttpStatus.CREATED);
@@ -65,8 +65,8 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.createPlace(gameId, placeid);
+	public void putPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Place place) throws PlaceAlreadyExistsExeption, BrockerNotExistsException {
+		brockerService.createPlace(gameId, placeid, place);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.GET,  produces = "application/json")
