@@ -7,6 +7,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 
 public class ErrorHandler {
+
+	@ExceptionHandler(BrockerNotExistsException.class)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorMessage onBrockerNotExists(final BrockerNotExistsException error) {
+		return new ErrorMessage(404, "Not Found", error.getMessage());
+	}
+
 	@ExceptionHandler(GameDoesntExistsException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
