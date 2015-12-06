@@ -1,7 +1,5 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.EstatesDTO;
@@ -16,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import javax.net.ssl.SSLEngineResult;
 
 
 @ComponentScan
