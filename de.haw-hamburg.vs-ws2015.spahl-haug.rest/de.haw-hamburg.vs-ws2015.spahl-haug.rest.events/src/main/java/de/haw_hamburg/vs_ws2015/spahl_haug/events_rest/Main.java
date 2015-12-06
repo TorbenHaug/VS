@@ -39,8 +39,13 @@ public class Main {
     @RequestMapping(value = "/events", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     // Example = http://<ip address>:<port>/events?gameid=<variable>
-    public ResponseEntity<String> createEvent(@RequestParam("gameid") String gameid, @RequestBody EventDTO event){
+    public ResponseEntity<String> createEvent(@RequestParam("gameid") String gameid, @RequestBody EventDTO event) throws Exception {
         String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason());
+        List<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
+        for(String subscriber : subscriberList) {
+            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri);
+            restTemplate.postForEntity(subscriber, eventOutDTO, EventOutDTO.class);
+        }
         return new ResponseEntity<>(eventUri, HttpStatus.CREATED);
     }
 
@@ -63,25 +68,7 @@ public class Main {
         String gameId = subscription.getGameid();
         String uri = subscription.getUri();
         String eventType = subscription.getEvent().getType();
-        List<String> subscriberList = eventService.subscribe(gameId, uri, eventType);
-        System.err.println("list of subscriber " + subscriberList);
-
-        String name = null;
-        String reason = null;
-        String resource = null;
-        for(Map.Entry<Integer, Event> eventMap : eventService.getEvents(gameId).entrySet()) {
-            Event event = eventMap.getValue();
-            if(event.getType().equals(eventType)) {
-                name = event.getName();
-                reason = event.getReason();
-                resource= event.getResource();
-            }
-        }
-
-        for(String subscriber : subscriberList) {
-            EventOutDTO eventOutDTO = new EventOutDTO(eventType, name, reason, resource);
-            restTemplate.postForEntity(subscriber, eventOutDTO, EventOutDTO.class);
-        }
+        eventService.subscribe(gameId, uri, eventType);
     }
 
 

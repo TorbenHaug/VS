@@ -45,14 +45,16 @@ public class EventService {
         events.remove(gameId);
     }
 
-    public List<String> subscribe(String gameId, String uri, String eventType) throws Exception {
+    public void subscribe(String gameId, String uri, String eventType) throws Exception {
         for(Map.Entry<Integer, Event> entry : events.get(gameId).entrySet()) {
             Event event = entry.getValue();
             if(event.getType().equals(eventType)) {
                 event.addUri(uri);
             }
         }
+    }
 
+    public List<String> getSubscriber(String gameId, String eventType) throws Exception {
         for(Map.Entry<Integer, Event> entry : events.get(gameId).entrySet()) {
             Event event = entry.getValue();
             if (event.getType().equals(eventType)) {
@@ -61,4 +63,5 @@ public class EventService {
         }
         throw new Exception();
     }
+
 }
