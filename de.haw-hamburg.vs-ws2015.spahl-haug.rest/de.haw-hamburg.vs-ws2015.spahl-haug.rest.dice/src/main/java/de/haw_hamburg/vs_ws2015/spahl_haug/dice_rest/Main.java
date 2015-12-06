@@ -2,8 +2,12 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.dice_rest;
 
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+@ComponentScan
+@EnableWebMvc
 @RestController
 @RequestMapping("/")
 @EnableAutoConfiguration
