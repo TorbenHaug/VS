@@ -66,8 +66,8 @@ public class BrockerService {
 
 	}
 
-	public void changeOwner(final String gameId, final String placeid, final Player player) {
-		throw new RuntimeException("Not yet Implemented");
+	public void changeOwner(final String gameId, final String placeid, final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException {
+		getBrocker(gameId).changeOwner(placeid,player.getId());
 
 	}
 

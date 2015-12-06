@@ -76,7 +76,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.PUT,  produces = "application/json")
-	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) {
+	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException {
 		brockerService.changeOwner(gameId,placeid,player);
 	}
 
