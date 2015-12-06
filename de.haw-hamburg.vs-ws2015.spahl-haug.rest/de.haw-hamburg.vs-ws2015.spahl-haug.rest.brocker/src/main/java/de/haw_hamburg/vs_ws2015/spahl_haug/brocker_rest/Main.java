@@ -91,7 +91,7 @@ public class Main {
 		brockerService.deleteHypothecaryCredit(gameId,placeid);
 	}
 
-	@RequestMapping(value = "/broker/{gameId}/places/{placeid}/visit/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")
+	@RequestMapping(value = "/broker/{gameId}/places/{placeid}/visit/{playerid}", method = RequestMethod.POST,  produces = "application/json")
 	public void visit(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @PathVariable(value="playerid") final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
 		brockerService.visit(gameId,placeid,playerid);
 	}
