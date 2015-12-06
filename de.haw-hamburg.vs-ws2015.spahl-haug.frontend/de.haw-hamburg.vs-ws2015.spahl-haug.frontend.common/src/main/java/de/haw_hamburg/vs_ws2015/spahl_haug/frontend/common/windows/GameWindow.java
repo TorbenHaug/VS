@@ -217,6 +217,19 @@ public class GameWindow extends Frame{
 		return null;
 	}
 
+	private List<Player> getBoardPlayer(final String id){
+		try {
+			return template.getForObject(gameServiceAdress + "/" + id, ArrayList.class);
+		} catch (final RestClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private void addPlayers(final List<Player> newPlayers) {
 		for (final Player player: newPlayers){
 			//model.addBean(player, false);

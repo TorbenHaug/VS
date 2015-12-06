@@ -55,7 +55,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		dto.setService("dice");
 		try {
 			SSLUtil.turnOffSslChecking();
-			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games");
+			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/dice");
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,7 +67,8 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 			e.printStackTrace();
 		}
 		final RestTemplate restTemplate = new RestTemplate();
-		final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://vs-docker.informatik.haw-hamburg.de/ports/8053/services", dto, ResponseRegisterServiceDTO.class);
+		final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("http://172.17.0.2:4567/services", dto, ResponseRegisterServiceDTO.class);
+		System.out.println(registerServiceDTO.getBody().get_uri());
 		Main.setServiceID(registerServiceDTO.getBody().get_uri());
 	}
 	/**
