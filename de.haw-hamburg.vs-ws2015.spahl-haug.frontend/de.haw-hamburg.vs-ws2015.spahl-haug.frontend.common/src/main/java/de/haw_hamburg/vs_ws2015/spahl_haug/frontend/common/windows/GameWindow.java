@@ -1,5 +1,6 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +19,15 @@ import org.jowidgets.common.widgets.controller.IActionListener;
 import org.jowidgets.tools.controller.WindowAdapter;
 import org.jowidgets.tools.widgets.base.Frame;
 import org.jowidgets.tools.widgets.blueprint.BPF;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
-
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PostRollDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.RollDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class GameWindow extends Frame{
@@ -43,13 +47,15 @@ public class GameWindow extends Frame{
 	private final String boardServiceAdress;
 	private final String gameServiceAdress;
 	private final IUiThreadAccess uiThreadAccess;
+	private final String diceServiceAdress;
 
-	public GameWindow(final String userName, final String gameId, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress) {
+	public GameWindow(final String userName, final String gameId, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress) {
 		super("GameLobby - " + userName + " - " + gameId);
 		this.gameId = gameId;
 		this.lobbyActions = lobbyActions;
 		this.gameServiceAdress = gameServiceAdress;
 		this.boardServiceAdress = boardServiceAdress;
+		this.diceServiceAdress = diceServiceAdress;
 		game  = new Game();
 
 		setLayout(NullLayout.get());
@@ -72,7 +78,35 @@ public class GameWindow extends Frame{
 			@Override
 			public void actionPerformed() {
 				roll.setEnabled(false);
-				throw new RuntimeException("Not Yet Implemented");
+				final String turnAdress = gameServiceAdress + "/" + gameId + "/players/turn";
+				try {
+					System.out.println(turnAdress);
+					final ResponseEntity<String> mutex = template.exchange(turnAdress + "?player=" + userName, HttpMethod.PUT, null, String.class);
+				} catch(final RestClientException e) {
+					System.out.println("cannot aquire mutex");
+				}
+				try{
+					final String roolAdress = diceServiceAdress;
+					final ResponseEntity<RollDTO> roll1 = template.exchange(roolAdress, HttpMethod.GET, null, RollDTO.class);
+					final ResponseEntity<RollDTO> roll2 = template.exchange(roolAdress, HttpMethod.GET, null, RollDTO.class);
+					final PostRollDTO postRollDTO = new PostRollDTO(roll1.getBody(), roll2.getBody());
+					System.out.println(postRollDTO);
+					final String rollAdress = boardServiceAdress + "/"  + gameId + "/players/" + userName + "/roll";
+					template.postForLocation(rollAdress, postRollDTO);
+				}catch(final RestClientException e){
+					System.out.println("Somthing went wrong via rolling");
+				}
+				try{
+					final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
+					final String readyAdress = gameServiceAdress + "/" + gameId + "/players/" + userName + "/ready";
+					try{
+						template.put(readyAdress, null);
+					}catch(final RestClientException e){
+						System.out.println(e.getMessage() + " " + readyAdress);
+					}
+				}catch(final RestClientException e){
+					System.out.println("Cannot ReleaseMutex");
+				}
 
 			}
 		});
