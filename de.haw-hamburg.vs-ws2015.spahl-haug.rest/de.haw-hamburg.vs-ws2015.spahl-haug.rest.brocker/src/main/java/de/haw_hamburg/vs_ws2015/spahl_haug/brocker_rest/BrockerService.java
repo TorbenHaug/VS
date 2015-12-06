@@ -27,7 +27,7 @@ public class BrockerService {
 	}
 
 	public void removeBrocker(final String gameId) {
-		throw new RuntimeException("Not Yet Implemented");
+		brockers.remove(gameId);
 
 	}
 
