@@ -2,15 +2,18 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.events_rest;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameHasNoEventsException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import javax.swing.text.html.parser.Entity;
+import java.util.*;
 
 public class EventService {
     private Map<String, TreeMap<Integer, Event>> events;
 
     public EventService() {
         this.events = new HashMap<>();
+    }
+
+    public Event getEvent(String gameId, int eventId) {
+        return events.get(gameId).get(eventId);
     }
 
     public TreeMap<Integer, Event> getEvents(String gameId) throws GameHasNoEventsException {
@@ -38,7 +41,24 @@ public class EventService {
         }
     }
 
-    public void removeEvents(String gameid) {
-        events.remove(gameid);
+    public void removeEvents(String gameId) {
+        events.remove(gameId);
+    }
+
+    public List<String> subscribe(String gameId, String uri, String eventType) throws Exception {
+        for(Map.Entry<Integer, Event> entry : events.get(gameId).entrySet()) {
+            Event event = entry.getValue();
+            if(event.getType().equals(eventType)) {
+                event.addUri(uri);
+            }
+        }
+
+        for(Map.Entry<Integer, Event> entry : events.get(gameId).entrySet()) {
+            Event event = entry.getValue();
+            if (event.getType().equals(eventType)) {
+                return event.getUris();
+            }
+        }
+        throw new Exception();
     }
 }
