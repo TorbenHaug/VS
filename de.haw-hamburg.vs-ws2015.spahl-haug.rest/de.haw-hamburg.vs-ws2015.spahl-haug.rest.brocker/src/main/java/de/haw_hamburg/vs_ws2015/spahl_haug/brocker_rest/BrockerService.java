@@ -4,21 +4,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankRejectedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrockerNotExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotSoldException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
+	private final String bankServiceURI;
+	private final RestTemplate restTemplate = new RestTemplate();
 
-	public BrockerService() {
+	public BrockerService() throws Exception {
 		brockers = new ConcurrentHashMap<>();
+		final ServiceRepository serviceRepository = new ServiceRepository();
+		bankServiceURI = serviceRepository.getService("bank");
 	}
 
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
@@ -71,8 +81,11 @@ public class BrockerService {
 
 	}
 
-	public void buyPlace(final String gameId, final String placeid) {
-		throw new RuntimeException("Not yet Implemented");
+	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException {
+		final Place place = getPlace(gameId, placeid);
+		getBrocker(gameId).getPlayer(player.getId());
+		transferMoneyToBank(gameId, place.getValue(),player.getId(), "Buy a Street!");
+		changeOwner(gameId, placeid, player);
 
 	}
 
@@ -82,6 +95,19 @@ public class BrockerService {
 	}
 
 	public void deleteHypothecaryCredit(final String gameId, final String placeid) {
+		throw new RuntimeException("Not yet Implemented");
+
+	}
+
+	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException {
+		final ResponseEntity<String> transfer = restTemplate.postForEntity(bankServiceURI + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
+		if(transfer.getStatusCode() != HttpStatus.CREATED){
+			throw new BankRejectedException("Bank");
+		}
+
+	}
+
+	public void visit(final String gameId, final String placeid, final String playerid) {
 		throw new RuntimeException("Not yet Implemented");
 
 	}

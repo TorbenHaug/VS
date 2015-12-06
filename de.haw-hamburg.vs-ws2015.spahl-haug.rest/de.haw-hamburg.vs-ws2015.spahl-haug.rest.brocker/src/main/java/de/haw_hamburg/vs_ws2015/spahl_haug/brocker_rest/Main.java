@@ -31,7 +31,7 @@ public class Main {
 	private final BrockerService brockerService;
 
 
-	public Main() {
+	public Main() throws Exception {
 		this.brockerService = new BrockerService();
 	}
 
@@ -81,8 +81,8 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.POST,  produces = "application/json")
-	public void postOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.buyPlace(gameId,placeid);
+	public void postOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException {
+		brockerService.buyPlace(gameId,placeid,player);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/hypothecarycredit", method = RequestMethod.PUT,  produces = "application/json")
@@ -95,6 +95,10 @@ public class Main {
 		brockerService.deleteHypothecaryCredit(gameId,placeid);
 	}
 
+	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/visit/{playerid}", method = RequestMethod.DELETE,  produces = "application/json")
+	public void visit(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @PathVariable(value="playerid") final String playerid) {
+		brockerService.visit(gameId,placeid,playerid);
+	}
 
 	public static void main(final String[] args) throws Exception {
 		//		final ServiceRepository repo = new ServiceRepository();

@@ -69,10 +69,10 @@ public class Brocker {
 		return getPlayer(owner);
 	}
 
-	private Player getPlayer(final String owner) throws PlayerDoesntExistsException {
-		final Player player = players.get(owner);
+	public Player getPlayer(final String id) throws PlayerDoesntExistsException {
+		final Player player = players.get(id);
 		if(player == null){
-			throw new PlayerDoesntExistsException("There is no Player " + owner + " in game");
+			throw new PlayerDoesntExistsException("There is no Player " + id + " in game");
 		}
 		return player;
 	}
