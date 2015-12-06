@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
@@ -19,32 +18,21 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotSoldException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.RepositoryException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
-	private String bankServiceURI = null;
+	private final String bankServiceURI;
 	private final RestTemplate restTemplate = new RestTemplate();
 
-	public BrockerService(){
+	public BrockerService() throws Exception {
 		brockers = new ConcurrentHashMap<>();
-		//Uncommit for testing
-		//bankServiceURI = "http://192.168.99.100:4568/banks"
+//		final ServiceRepository serviceRepository = new ServiceRepository();
+//		bankServiceURI = serviceRepository.getService("bank");
+        bankServiceURI = "http://127.0.0.1:4568/banks";
 	}
 
-	private String getBankServiceURI() throws RepositoryException{
-		if(bankServiceURI==null){
-			final ServiceRepository serviceRepository = new ServiceRepository();
-			try {
-				bankServiceURI = serviceRepository.getService("bank");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find bank");
-			}
-		}
-		return bankServiceURI;
-	}
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
 		final Brocker brocker = brockers.get(gameId);
 		if(brocker == null){
@@ -95,7 +83,7 @@ public class BrockerService {
 
 	}
 
-	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException, RestClientException, RepositoryException {
+	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException {
 		final Place place = getPlace(gameId, placeid);
 		if(place.getOwner() != null){
 			throw new NotForSaleException("The Owner is " + place.getOwner());
@@ -116,28 +104,13 @@ public class BrockerService {
 
 	}
 
-	public void visit(final String gameId, final String placeid, final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
-		final Place place = getPlace(gameId, placeid);
-		final Player player = getBrocker(gameId).getPlayer(playerid);
-		player.setPlace(place);
-		if(place.getOwner() != null){
-			getBrocker(gameId).getPlayer(place.getOwner());
-			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
-		}
-
-
+	public void visit(final String gameId, final String placeid, final String playerid) {
+		throw new RuntimeException("Not yet Implemented");
 
 	}
 
-	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
-		final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
-		if(transfer.getStatusCode() != HttpStatus.CREATED){
-			throw new BankRejectedException("Bank");
-		}
-
-	}
-	private void transferMoneyFromPlayerToPlayer(final String gameId, final int value, final String playerIdFrom, final String playerIdTo, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
-		final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerIdFrom + "/to/" + playerIdTo + "/" + value, reason, String.class);
+	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException {
+		final ResponseEntity<String> transfer = restTemplate.postForEntity(bankServiceURI + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
 		if(transfer.getStatusCode() != HttpStatus.CREATED){
 			throw new BankRejectedException("Bank");
 		}
