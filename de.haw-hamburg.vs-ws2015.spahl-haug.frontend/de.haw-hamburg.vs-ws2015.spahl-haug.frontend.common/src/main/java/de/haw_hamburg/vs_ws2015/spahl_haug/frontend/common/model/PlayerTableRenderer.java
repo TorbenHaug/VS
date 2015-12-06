@@ -40,10 +40,10 @@ public final class PlayerTableRenderer implements IBeanTableRenderer<Player>, IT
 	@Override
 	public ITableCell getCell(final int rowIndex, final int columnIndex, final Player bean) {
 		if (columnIndex == 0) {
-			return new TableCell(bean.getName());
+			return new TableCell(bean.getId());
 		}
 		else if (columnIndex == 1) {
-			return new TableCell("" + bean.getId());
+			return new TableCell("" + bean.getName());
 		}
 		else if (columnIndex == 2) {
 			return new TableCell("" + bean.isReady());

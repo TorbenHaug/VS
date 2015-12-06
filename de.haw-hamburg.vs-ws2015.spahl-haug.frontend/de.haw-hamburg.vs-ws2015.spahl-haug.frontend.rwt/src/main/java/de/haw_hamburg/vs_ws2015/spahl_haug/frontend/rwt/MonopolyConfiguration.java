@@ -14,7 +14,7 @@ public final class MonopolyConfiguration implements ApplicationConfiguration {
 	public void configure(final Application application) {
 		application.setOperationMode(OperationMode.SWT_COMPATIBILITY);
 		final Map<String, String> properties = new HashMap<String, String>();
-		properties.put(WebClient.PAGE_TITLE, "Hello World");
+		properties.put(WebClient.PAGE_TITLE, "Monopoly");
 		application.addEntryPoint("/monopoly", MonopolyStarter.class, properties);
 	}
 }

@@ -45,12 +45,22 @@ public final class GameTableRenderer implements IBeanTableRenderer<Game>, ITable
 		else if (columnIndex == 1) {
 			return new TableCell("" + bean.getPlayers().size());
 		}
+		else if (columnIndex == 2) {
+			String players = "";
+			for(final Player player: bean.getPlayers()) {
+				players += ", " + player.getName();
+			}
+			if(players.length() > 0) {
+				players = players.substring(2);
+			}
+			return new TableCell(players);
+		}
 		return null;
 	}
 
 	@Override
 	public int getColumnCount() {
-		return 2;
+		return 3;
 	}
 
 	@Override
@@ -60,6 +70,9 @@ public final class GameTableRenderer implements IBeanTableRenderer<Game>, ITable
 		}
 		else if (columnIndex == 1) {
 			return new DefaultTableColumn("SpielerZahl");
+		}
+		else if (columnIndex == 2) {
+			return new DefaultTableColumn("Players");
 		}
 		return null;
 	}
