@@ -3,6 +3,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 
 import org.springframework.boot.*;
@@ -43,7 +44,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putBrocker(@PathVariable(value="gameId") final String gameId) {
+	public void putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) {
 		brockerService.createBrocker(gameId);
 	}
 
