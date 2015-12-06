@@ -1,17 +1,17 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model;
 
 public class Player {
-	private long id;
+	private String id;
 	private String name;
 	private int position = 0;
 	private String place = null;
 	private boolean ready;
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(final long id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -57,7 +57,7 @@ public class Player {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + (int) (id ^ (id >>> 32));
+		result = (prime * result) + ((id == null) ? 0 : id.hashCode());
 		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
 		result = (prime * result) + ((place == null) ? 0 : place.hashCode());
 		result = (prime * result) + position;
@@ -77,7 +77,11 @@ public class Player {
 			return false;
 		}
 		final Player other = (Player) obj;
-		if (id != other.id) {
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
 		}
 		if (name == null) {
@@ -102,8 +106,6 @@ public class Player {
 		}
 		return true;
 	}
-
-
 
 
 }

@@ -1,4 +1,4 @@
-package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
+package de.haw_hamburg.vs_ws2015.spahl_haug.dice_rest;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import ch.qos.logback.core.net.ssl.SSL;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.RegisterServiceDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ResponseRegisterServiceDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.SSLUtil;
 
 @Component
 public class ApplicationStartup implements ApplicationListener<ContextRefreshedEvent> {
@@ -49,9 +50,9 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_games");
-		dto.setDescription("GamesService von Louisa Spahl und Torben Haug");
-		dto.setService("gameslt");
+		dto.setName("spahl_haug_dice");
+		dto.setDescription("DiceService von Louisa Spahl und Torben Haug");
+		dto.setService("dice");
 		try {
 			SSLUtil.turnOffSslChecking();
 			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games");

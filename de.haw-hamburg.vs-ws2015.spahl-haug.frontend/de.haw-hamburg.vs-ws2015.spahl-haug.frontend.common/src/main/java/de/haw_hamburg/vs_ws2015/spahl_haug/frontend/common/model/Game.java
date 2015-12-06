@@ -1,12 +1,13 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class Game {
 
 	private long gameid;
-	private List<Player> players;
+	private List<Player> players = new ArrayList<Player>();
 	public long getGameid() {
 		return gameid;
 	}

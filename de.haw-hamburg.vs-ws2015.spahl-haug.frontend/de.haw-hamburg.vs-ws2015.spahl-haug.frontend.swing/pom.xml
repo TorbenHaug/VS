@@ -2,8 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.frontend.rwt</artifactId>
-	<packaging>war</packaging>
+	<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.frontend.swing</artifactId>
 
 	<parent>
 		<groupId>de.haw-hamburg.vs-ws2015</groupId>
@@ -11,37 +10,34 @@
 		<version>0.1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
+	
 	<dependencies>
 
+        <!-- The ui technology independend hello world module -->
 		<dependency>
 			<groupId>de.haw-hamburg.vs-ws2015</groupId>
 			<artifactId>de.haw-hamburg.vs-ws2015.spahl-haug.frontend.common</artifactId>
 			<version>0.1.0</version>
 		</dependency>
 
+        <!-- The default implementation of the jowidgets api -->
 		<dependency>
 			<groupId>org.jowidgets</groupId>
 			<artifactId>org.jowidgets.impl</artifactId>
 			<version>${jowidgets.version}</version>
 		</dependency>
 
+        <!-- The Swing implementation of the jowidgets spi -->
 		<dependency>
 			<groupId>org.jowidgets</groupId>
-			<artifactId>org.jowidgets.spi.impl.rwt</artifactId>
+			<artifactId>org.jowidgets.spi.impl.swing</artifactId>
 			<version>${jowidgets.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.rap.rwt</artifactId>
-			<version>2.0.0.20130205-1612</version>
 		</dependency>
 
 	</dependencies>
 
-	<build>
-		<finalName>MonopolyRWT</finalName>
+<build>
+		<finalName>MonopolySwing</finalName>
 	</build>
 
 </project>

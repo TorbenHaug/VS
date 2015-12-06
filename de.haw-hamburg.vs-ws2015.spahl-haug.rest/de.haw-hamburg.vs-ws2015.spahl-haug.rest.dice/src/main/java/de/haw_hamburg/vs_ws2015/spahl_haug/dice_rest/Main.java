@@ -9,13 +9,25 @@ import org.springframework.web.bind.annotation.*;
 @EnableAutoConfiguration
 public class Main {
 
-    @RequestMapping(value = "/dice", method = RequestMethod.GET,  produces = "application/json")
-    public Roll dice() {
-    	System.out.println("Anfrage");
-        return new Roll();
-    }
+	private static String serviceId;
 
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(Main.class, args);
-    }
+	@RequestMapping(value = "/dice", method = RequestMethod.GET,  produces = "application/json")
+	public Roll dice() {
+		System.out.println("Anfrage");
+		return new Roll();
+	}
+
+	public static void main(final String[] args) throws Exception {
+		SpringApplication.run(Main.class, args);
+	}
+
+	public static void setServiceID(final String serviceId) {
+		System.out.println("Registred as " + serviceId);
+		Main.serviceId = serviceId;
+
+	}
+
+	public static String getServiceID() {
+		return Main.serviceId;
+	}
 }
