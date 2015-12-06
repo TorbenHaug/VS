@@ -20,7 +20,8 @@ public class ErrorHandler {
 
 	@ExceptionHandler({
 		PlaceAlreadyExistsExeption.class,
-		NotSoldException.class
+		NotSoldException.class,
+		NotForSaleException.class
 	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CONFLICT)

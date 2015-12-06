@@ -81,7 +81,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.POST,  produces = "application/json")
-	public void postOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException {
+	public void postOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException {
 		brockerService.buyPlace(gameId,placeid,player);
 	}
 

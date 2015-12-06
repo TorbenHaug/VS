@@ -13,6 +13,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankRejectedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrockerNotExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotForSaleException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotSoldException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
@@ -81,8 +82,11 @@ public class BrockerService {
 
 	}
 
-	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException {
+	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException {
 		final Place place = getPlace(gameId, placeid);
+		if(place.getOwner() != null){
+			throw new NotForSaleException("The Owner is " + place.getOwner());
+		}
 		getBrocker(gameId).getPlayer(player.getId());
 		transferMoneyToBank(gameId, place.getValue(),player.getId(), "Buy a Street!");
 		changeOwner(gameId, placeid, player);
@@ -99,16 +103,16 @@ public class BrockerService {
 
 	}
 
+	public void visit(final String gameId, final String placeid, final String playerid) {
+		throw new RuntimeException("Not yet Implemented");
+
+	}
+
 	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException {
 		final ResponseEntity<String> transfer = restTemplate.postForEntity(bankServiceURI + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
 		if(transfer.getStatusCode() != HttpStatus.CREATED){
 			throw new BankRejectedException("Bank");
 		}
-
-	}
-
-	public void visit(final String gameId, final String placeid, final String playerid) {
-		throw new RuntimeException("Not yet Implemented");
 
 	}
 
