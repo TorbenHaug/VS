@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.EstatesDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 
 import org.springframework.boot.*;
@@ -33,18 +36,13 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.GET,  produces = "application/json")
-	public ResponseEntity<Brocker> getBrocker(@PathVariable(value="gameId") final String gameId) {
+	public ResponseEntity<Brocker> getBrocker(@PathVariable(value="gameId") final String gameId) throws BrockerNotExistsException {
 		final Brocker brocker = brockerService.getBrocker(gameId);
-		if(brocker == null){
-			return new ResponseEntity<Brocker>(HttpStatus.NOT_FOUND);
-		}
-		else{
-			return new ResponseEntity<Brocker>(brocker,HttpStatus.OK);
-		}
+		return new ResponseEntity<Brocker>(brocker,HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
-	public ResponseEntity<Brocker> putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) {
+	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json", consumes = "application/json")
+	public ResponseEntity<Brocker> putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) throws BrockerNotExistsException {
 		try {
 			return new ResponseEntity<Brocker>(brockerService.createBrocker(gameId, brockerDTO), HttpStatus.CREATED);
 		} catch (final Exception e) {
@@ -58,28 +56,28 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places", method = RequestMethod.GET,  produces = "application/json")
-	public void getPlaces(@PathVariable(value="gameId") final String gameId) {
-		brockerService.getAllPlaces(gameId);
+	public ResponseEntity<EstatesDTO> getPlaces(@PathVariable(value="gameId") final String gameId) throws BrockerNotExistsException {
+		return new ResponseEntity<EstatesDTO>(new EstatesDTO(brockerService.getAllPlaces(gameId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.GET,  produces = "application/json")
-	public void getPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.getPlace(gameId, placeid);
+	public ResponseEntity<Place> getPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) throws BrockerNotExistsException, PlaceNotFoundException {
+		return new ResponseEntity<>(brockerService.getPlace(gameId, placeid),HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.createPlace(gameId, placeid);
+	public void putPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Place place) throws PlaceAlreadyExistsExeption, BrockerNotExistsException {
+		brockerService.createPlace(gameId, placeid, place);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.GET,  produces = "application/json")
-	public void getOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.getOwner(gameId,placeid);
+	public ResponseEntity<Player> getOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) throws PlaceNotFoundException, BrockerNotExistsException, NotSoldException, PlayerDoesntExistsException {
+		return new ResponseEntity<>(brockerService.getOwner(gameId,placeid), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.PUT,  produces = "application/json")
-	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
-		brockerService.changeOwner(gameId,placeid);
+	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException {
+		brockerService.changeOwner(gameId,placeid,player);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.POST,  produces = "application/json")

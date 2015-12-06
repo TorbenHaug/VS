@@ -7,6 +7,27 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 
 public class ErrorHandler {
+
+	@ExceptionHandler({
+		BrockerNotExistsException.class,
+		PlaceNotFoundException.class
+	})
+	@ResponseBody
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorMessage NotFound(final Exception error) {
+		return new ErrorMessage(404, "Not Found", error.getMessage());
+	}
+
+	@ExceptionHandler({
+		PlaceAlreadyExistsExeption.class,
+		NotSoldException.class
+	})
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorMessage alreadyExists(final Exception error) {
+		return new ErrorMessage(HttpStatus.CONFLICT.value(), "Confict", error.getMessage());
+	}
+
 	@ExceptionHandler(GameDoesntExistsException.class)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
