@@ -3,6 +3,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
+
 public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
@@ -16,8 +18,11 @@ public class BrockerService {
 
 	}
 
-	public void createBrocker(final String gameId) {
-		throw new RuntimeException("Not Yet Implemented");
+	public Brocker createBrocker(final String gameId, final BrockerDTO brockerDTO) throws Exception {
+		if(brockers.containsKey(gameId)){
+			throw new Exception("Brocker already exists");
+		}
+		return brockers.put(gameId, new Brocker(gameId, brockerDTO));
 
 	}
 

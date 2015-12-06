@@ -44,8 +44,12 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) {
-		brockerService.createBrocker(gameId);
+	public ResponseEntity<Brocker> putBrocker(@PathVariable(value="gameId") final String gameId, @RequestBody final BrockerDTO brockerDTO) {
+		try {
+			return new ResponseEntity<Brocker>(brockerService.createBrocker(gameId, brockerDTO), HttpStatus.CREATED);
+		} catch (final Exception e) {
+			return new ResponseEntity<Brocker>(brockerService.getBrocker(gameId), HttpStatus.ALREADY_REPORTED);
+		}
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.DELETE,  produces = "application/json")
