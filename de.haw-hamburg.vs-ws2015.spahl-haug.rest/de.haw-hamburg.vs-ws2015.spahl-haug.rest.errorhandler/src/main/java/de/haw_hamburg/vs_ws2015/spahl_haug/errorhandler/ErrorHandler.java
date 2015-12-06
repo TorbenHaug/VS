@@ -10,7 +10,8 @@ public class ErrorHandler {
 
 	@ExceptionHandler({
 		BrockerNotExistsException.class,
-		PlaceNotFoundException.class
+		PlaceNotFoundException.class,
+		RepositoryException.class
 	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
