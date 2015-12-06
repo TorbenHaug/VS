@@ -19,12 +19,13 @@ public class ErrorHandler {
 	}
 
 	@ExceptionHandler({
-		PlaceAlreadyExistsExeption.class
+		PlaceAlreadyExistsExeption.class,
+		NotSoldException.class
 	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public ErrorMessage alreadyExists(final Exception error) {
-		return new ErrorMessage(HttpStatus.CONFLICT.value(), "Not Found", error.getMessage());
+		return new ErrorMessage(HttpStatus.CONFLICT.value(), "Confict", error.getMessage());
 	}
 
 	@ExceptionHandler(GameDoesntExistsException.class)
