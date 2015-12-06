@@ -24,7 +24,7 @@ public class Main {
     @RequestMapping(value = "/events", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     // Example = http://<ip address>:<port>/events?gameid=<variable>
-    public String createEvent(@RequestParam("gameid") String gameid){
+    public String createEvent(@RequestParam("gameid") String gameid, @RequestBody String name){
         return gameid;
     }
 
