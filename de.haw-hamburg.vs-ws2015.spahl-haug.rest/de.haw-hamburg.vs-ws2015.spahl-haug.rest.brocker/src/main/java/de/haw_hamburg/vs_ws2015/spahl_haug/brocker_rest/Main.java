@@ -24,59 +24,66 @@ import javax.net.ssl.SSLEngineResult;
 @EnableAutoConfiguration
 public class Main {
 
+	private final BrockerService brockerService;
+
+
+	public Main() {
+		this.brockerService = new BrockerService();
+	}
+
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.GET,  produces = "application/json")
-	public void getBrocker() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void getBrocker(@PathVariable(value="gameId") final String gameId) {
+		brockerService.getBrocker(gameId);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putBrocker() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void putBrocker(@PathVariable(value="gameId") final String gameId) {
+		brockerService.createBrocker(gameId);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.DELETE,  produces = "application/json")
-	public void deleteBrocker() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void deleteBrocker(@PathVariable(value="gameId") final String gameId) {
+		brockerService.removeBrocker(gameId);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places", method = RequestMethod.GET,  produces = "application/json")
-	public void getPlaces() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void getPlaces(@PathVariable(value="gameId") final String gameId) {
+		brockerService.getAllPlaces(gameId);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.GET,  produces = "application/json")
-	public void getPlace() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void getPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.getPlace(gameId, placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}", method = RequestMethod.PUT,  produces = "application/json")
-	public void putPlace() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void putPlace(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.createPlace(gameId, placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.GET,  produces = "application/json")
-	public void getOwner() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void getOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.getOwner(gameId,placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.PUT,  produces = "application/json")
-	public void putOwner() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.changeOwner(gameId,placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/owner", method = RequestMethod.POST,  produces = "application/json")
-	public void postOwner() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void postOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.buyPlace(gameId,placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/hypothecarycredit", method = RequestMethod.PUT,  produces = "application/json")
-	public void putCredit() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void putCredit(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.hypothecaryCredit(gameId,placeid);
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}/places/{placeid}/hypothecarycredit", method = RequestMethod.DELETE,  produces = "application/json")
-	public void deleteCredit() {
-		throw new RuntimeException("Not Yet Implemented");
+	public void deleteCredit(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid) {
+		brockerService.deleteHypothecaryCredit(gameId,placeid);
 	}
 
 
