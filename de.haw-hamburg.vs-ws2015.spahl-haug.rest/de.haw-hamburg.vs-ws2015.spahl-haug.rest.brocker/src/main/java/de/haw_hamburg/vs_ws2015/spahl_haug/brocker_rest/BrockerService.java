@@ -1,10 +1,18 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class BrockerService {
 
-	public void getBrocker(final String gameId) {
+	private final Map<String, Brocker> brockers;
 
-		throw new RuntimeException("Not Yet Implemented");
+	public BrockerService() {
+		brockers = new ConcurrentHashMap<>();
+	}
+
+	public Brocker getBrocker(final String gameId) {
+		return brockers.get(gameId);
 
 	}
 

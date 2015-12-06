@@ -32,8 +32,14 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.GET,  produces = "application/json")
-	public void getBrocker(@PathVariable(value="gameId") final String gameId) {
-		brockerService.getBrocker(gameId);
+	public ResponseEntity<Brocker> getBrocker(@PathVariable(value="gameId") final String gameId) {
+		final Brocker brocker = brockerService.getBrocker(gameId);
+		if(brocker == null){
+			return new ResponseEntity<Brocker>(HttpStatus.NOT_FOUND);
+		}
+		else{
+			return new ResponseEntity<Brocker>(brocker,HttpStatus.OK);
+		}
 	}
 
 	@RequestMapping(value = "/brocker/{gameId}", method = RequestMethod.PUT,  produces = "application/json")
