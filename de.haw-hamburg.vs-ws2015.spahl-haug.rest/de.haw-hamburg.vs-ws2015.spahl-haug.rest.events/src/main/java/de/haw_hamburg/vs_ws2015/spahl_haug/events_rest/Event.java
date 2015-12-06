@@ -1,14 +1,26 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.events_rest;
 
 public class Event {
+    private int id;
+    private String type; // Event Type e.g. bank transfer, rent, got to jail, estate transfer
     private String name;
     private String reason;
     private String resource;
 
-    public Event(String name, String reason) {
+    public Event(String type, String name, String reason, int id) {
+        this.type = type;
         this.name = name;
         this.reason = reason;
-        this.resource = "/events/";
+        this.id = id;
+        this.resource = "/events/" + id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getName() {
@@ -26,7 +38,9 @@ public class Event {
     @Override
     public String toString() {
         return "Event{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
                 ", reason='" + reason + '\'' +
                 ", resource='" + resource + '\'' +
                 '}';
