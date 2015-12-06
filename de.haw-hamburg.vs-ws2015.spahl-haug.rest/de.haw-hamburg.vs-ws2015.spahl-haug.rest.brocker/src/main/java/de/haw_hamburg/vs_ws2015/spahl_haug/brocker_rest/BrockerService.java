@@ -66,7 +66,7 @@ public class BrockerService {
 
 	}
 
-	public void changeOwner(final String gameId, final String placeid) {
+	public void changeOwner(final String gameId, final String placeid, final Player player) {
 		throw new RuntimeException("Not yet Implemented");
 
 	}

@@ -77,5 +77,11 @@ public class Brocker {
 		return player;
 	}
 
+	public void changeOwner(final String placeid, final String id) throws PlaceNotFoundException, PlayerDoesntExistsException {
+		getPlayer(id);
+		final Place place = getPlace(placeid);
+		place.setOwner(id);
+	}
+
 
 }
