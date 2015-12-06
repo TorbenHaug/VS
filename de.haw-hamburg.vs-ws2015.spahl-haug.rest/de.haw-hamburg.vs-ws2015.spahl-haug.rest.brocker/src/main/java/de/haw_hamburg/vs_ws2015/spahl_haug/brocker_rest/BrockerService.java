@@ -116,14 +116,14 @@ public class BrockerService {
 
     }
 
-    public void visit(final String gameId, final String placeid, final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
-        final Place place = getPlace(gameId, placeid);
-        final Player player = getBrocker(gameId).getPlayer(playerid);
-        player.setPlace(place);
-        if(place.getOwner() != null){
-            getBrocker(gameId).getPlayer(place.getOwner());
-            transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
-        }
+	public void visit(final String gameId, final String placeid, final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
+		final Place place = getPlace(gameId, placeid);
+		final Player player = getBrocker(gameId).getPlayer(playerid);
+		player.setPlace(place);
+		if((place.getOwner() != null) && !place.getOwner().equals(playerid)){
+			getBrocker(gameId).getPlayer(place.getOwner());
+			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
+		}
 
 
 
