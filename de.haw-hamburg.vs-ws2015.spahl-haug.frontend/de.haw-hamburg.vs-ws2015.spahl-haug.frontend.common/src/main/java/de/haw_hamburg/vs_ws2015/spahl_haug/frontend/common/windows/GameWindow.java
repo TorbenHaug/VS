@@ -121,7 +121,12 @@ public class GameWindow extends Frame{
 			@Override
 			public void actionPerformed() {
 				refreshThread.interrupt();
-				GameWindow.this.lobbyActions.closeWindow();
+				try {
+					GameWindow.this.lobbyActions.closeWindow();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
