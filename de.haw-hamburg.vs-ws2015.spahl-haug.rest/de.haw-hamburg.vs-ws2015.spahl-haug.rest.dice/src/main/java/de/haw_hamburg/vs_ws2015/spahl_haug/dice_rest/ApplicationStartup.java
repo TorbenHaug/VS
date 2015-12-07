@@ -69,7 +69,6 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		}
 		final RestTemplate restTemplate = new RestTemplate();
 		final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://vs-docker.informatik.haw-hamburg.de/ports/8053/services", dto, ResponseRegisterServiceDTO.class);
-		//final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://172.17.0.2:4567/services", dto, ResponseRegisterServiceDTO.class);
 		System.out.println(registerServiceDTO.getBody().get_uri());
 		Main.setServiceID(registerServiceDTO.getBody().get_uri());
 
