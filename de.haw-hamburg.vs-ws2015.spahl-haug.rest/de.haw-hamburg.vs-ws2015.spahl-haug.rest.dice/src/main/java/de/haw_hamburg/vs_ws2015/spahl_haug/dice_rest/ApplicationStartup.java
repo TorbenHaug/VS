@@ -49,6 +49,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
+
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
 		dto.setName("spahl_haug_dice");
 		dto.setDescription("DiceService von Louisa Spahl und Torben Haug");
@@ -71,6 +72,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		//final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://172.17.0.2:4567/services", dto, ResponseRegisterServiceDTO.class);
 		System.out.println(registerServiceDTO.getBody().get_uri());
 		Main.setServiceID(registerServiceDTO.getBody().get_uri());
+
 	}
 	/**
 	 * Returns an <code>InetAddress</code> object encapsulating what is most likely the machine's LAN IP address.

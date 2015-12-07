@@ -2,17 +2,18 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 
 public enum Place {
-    Los(0),
-    Einkommensteuer(1),
-    Geld(2);
+	GO(0),
+	OLDKENTROAD(1),
+	COMMUNITIYCHEST1(2),
+	WHITECHAPPELROAD(3);
 
-    private int position;
+	private int position;
 
-    Place(int id){
-        this.position = id;
-    }
+	Place(final int id){
+		this.position = id;
+	}
 
-    public int getPosition() {
-        return this.position;
-    }
+	public int getPosition() {
+		return this.position;
+	}
 }

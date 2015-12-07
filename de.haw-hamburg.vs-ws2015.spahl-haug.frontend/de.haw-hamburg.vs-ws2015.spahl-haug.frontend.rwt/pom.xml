@@ -41,7 +41,43 @@
 	</dependencies>
 
 	<build>
-		<finalName>MonopolyRWT</finalName>
+		<finalName>monopolyrwt</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.3.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<imageName>${project.build.finalName}</imageName>
+					<baseImage>tomcat:8-jre8</baseImage>
+					<entryPoint>["catalina.sh", "run"]</entryPoint>
+					<!-- copy the service's jar file from target into the root directory of the image -->
+					<exposes>
+						<expose>${server.port}</expose>
+					</exposes>
+					<resources>
+						<resource>
+							<targetPath>/usr/local/tomcat/webapps/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.war</include>
+						</resource>
+						<resource>
+							<targetPath>/usr/local/tomcat/conf/</targetPath>
+							<directory>${project.basedir}</directory>
+							<include>server.xml</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

@@ -9,7 +9,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.restservice.RestService;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
@@ -26,17 +25,43 @@ public class WindowManager {
 	private GameWindow gameWindow;
 	private String gamesService;
 	private String boardsService;
+	private String diceService;
 
 	public WindowManager(final IApplicationLifecycle lifecycle, final ServiceRepository serviceRepository) {
 		this.lifecycle = lifecycle;
 		this.serviceRepository = serviceRepository;
-		try {
-			this.gamesService = serviceRepository.getService("gamesldt");
-			this.boardsService = serviceRepository.getService("boardsldt");
-		} catch (final Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	}
+	private String getBoardsService() throws RepositoryException{
+		if(boardsService==null){
+			try {
+				boardsService = serviceRepository.getService("boardsldt");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find Board");
+			}
 		}
+		return boardsService;
+	}
+
+	private String getGamesService() throws RepositoryException{
+		if(gamesService==null){
+			try {
+				gamesService = serviceRepository.getService("gamesldt");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find Game");
+			}
+		}
+		return gamesService;
+	}
+
+	private String getDiceService() throws RepositoryException{
+		if(diceService==null){
+			try {
+				diceService = serviceRepository.getService("spahl_haug_dice");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find Dice");
+			}
+		}
+		return diceService;
 	}
 
 	public void startWindowing(){
@@ -145,14 +170,19 @@ public class WindowManager {
 
 			@Override
 			public void startGame(final String gameId) {
-				showGameWindow(gameId);
+				try {
+					showGameWindow(gameId);
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			}
 		}, serviceRepository);
 
 	}
 
-	protected void showGameWindow(final String gameId) {
+	protected void showGameWindow(final String gameId) throws RepositoryException {
 		disposeAll();
 		System.out.println("showit");
 		gameWindow = new GameWindow(userName, gameId, new IGameActions() {
@@ -171,7 +201,7 @@ public class WindowManager {
 				showLobbyWindow();
 
 			}
-		}, gamesService, boardsService);
+		}, getGamesService(), getBoardsService(), getDiceService());
 
 	}
 
