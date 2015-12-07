@@ -38,12 +38,12 @@ public class LobbyWindow extends Frame{
 	private final Thread refreshThread;
 	private GameList gameList = new GameList();
 	private final RestTemplate template = new RestTemplate();
-	private final ServiceRepository serviceRepository;
+	private final String gameService;
 
-	public LobbyWindow(final String userName, final ILobbyActions lobbyActions, final ServiceRepository serviceRepository) {
+	public LobbyWindow(final String userName, final ILobbyActions lobbyActions, final String gameService) {
 		super("Lobby - " + userName);
 		this.lobbyActions = lobbyActions;
-		this.serviceRepository = serviceRepository;
+		this.gameService = gameService;
 
 		setLayout(NullLayout.get());
 		setSize(1024, 768);
@@ -90,7 +90,12 @@ public class LobbyWindow extends Frame{
 			@Override
 			public void actionPerformed() {
 				refreshThread.interrupt();
-				LobbyWindow.this.lobbyActions.closeWindow();
+				try {
+					LobbyWindow.this.lobbyActions.closeWindow();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -115,7 +120,7 @@ public class LobbyWindow extends Frame{
 							@Override
 							public void run() {
 								try {
-									final GameList games = template.getForObject(LobbyWindow.this.serviceRepository.getService("gamesldt"), GameList.class);
+									final GameList games = template.getForObject(gameService, GameList.class);
 									if(games != null) {
 										updateGames(games);
 									}

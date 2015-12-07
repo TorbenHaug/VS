@@ -65,7 +65,7 @@ public class WindowManager {
 	private String getGamesService() throws RepositoryException{
 		if(gamesService==null){
 			try {
-				gamesService = serviceRepository.getService("gamesldt");
+				gamesService = getGamesService();
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Game");
 			}
@@ -76,7 +76,7 @@ public class WindowManager {
 	private String getDiceService() throws RepositoryException{
 		if(diceService==null){
 			try {
-				diceService = serviceRepository.getService("spahl_haug_dice");
+				diceService = getDiceService();
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Dice");
 			}
@@ -93,7 +93,7 @@ public class WindowManager {
 		loginWindow = new LoginWindow(new ILoginActions() {
 
 			@Override
-			public void onLogin(final String userName) {
+			public void onLogin(final String userName) throws RepositoryException {
 				setUsername(userName);
 				RestService.registerPlayerService(userName, WindowManager.this);
 				showLobbyWindow();
@@ -109,7 +109,7 @@ public class WindowManager {
 	}
 
 
-	protected void showLobbyWindow() {
+	protected void showLobbyWindow() throws RepositoryException {
 		disposeAll();
 		lobbyWindow = new LobbyWindow(userName, new ILobbyActions() {
 
@@ -132,7 +132,7 @@ public class WindowManager {
 
 				try {
 					final UriComponents uriComponents = UriComponentsBuilder
-							.fromHttpUrl(serviceRepository.getService("gamesldt") +"/"+ gameId + "/players/" + userName)
+							.fromHttpUrl(getGamesService() +"/"+ gameId + "/players/" + userName)
 							.queryParams(params)
 							.build();
 					System.out.println(uriComponents.toString());
@@ -151,7 +151,7 @@ public class WindowManager {
 			@Override
 			public void createGame() {
 				try {
-					final Game game = template.postForObject(serviceRepository.getService("gamesldt"), null, Game.class);
+					final Game game = template.postForObject(getGamesService(), null, Game.class);
 					enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
@@ -162,19 +162,19 @@ public class WindowManager {
 				}
 
 			}
-		},serviceRepository);
+		},getGamesService());
 
 	}
 
-	protected void showGameLobby(final String gameId) {
+	protected void showGameLobby(final String gameId) throws RepositoryException {
 		disposeAll();
 		gameLobbyWindow = new GameLobbyWindow(userName, gameId, new IGameLobbyActions() {
 
 			@Override
-			public void closeWindow() {
+			public void closeWindow() throws RepositoryException {
 				String url;
 				try {
-					url = serviceRepository.getService("gamesldt") + "/" + gameId + "/players/" + userName;
+					url = getGamesService() + "/" + gameId + "/players/" + userName;
 					template.delete(url);
 				} catch (final Exception e) {
 					// TODO Auto-generated catch block
@@ -188,7 +188,7 @@ public class WindowManager {
 			public void ready(final String gameId) {
 				final String url;
 				try {
-					url = serviceRepository.getService("gamesldt") + "/" + gameId + "/players/" + userName + "/ready";
+					url = getGamesService() + "/" + gameId + "/players/" + userName + "/ready";
 					new Thread(){
 						@Override
 						public void run() {
@@ -212,7 +212,7 @@ public class WindowManager {
 				}
 
 			}
-		}, serviceRepository);
+		}, getGamesService());
 
 	}
 
@@ -222,10 +222,10 @@ public class WindowManager {
 		gameWindow = new GameWindow(userName, gameId, new IGameActions() {
 
 			@Override
-			public void closeWindow() {
+			public void closeWindow() throws RepositoryException {
 				String url;
 				try {
-					url = serviceRepository.getService("gamesldt") + "/" + gameId + "/players/" + userName;
+					url = getGamesService() + "/" + gameId + "/players/" + userName;
 					template.delete(url);
 				} catch (final Exception e) {
 					// TODO Auto-generated catch block
@@ -289,7 +289,7 @@ public class WindowManager {
 		if(gameWindow == null){
 			throw new RuntimeException("No Game available.");
 		}
-		gameWindow.anounceTurn();;
+		//gameWindow.anounceTurn();;
 
 	}
 
