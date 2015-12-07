@@ -65,7 +65,7 @@ public class WindowManager {
 	private String getGamesService() throws RepositoryException{
 		if(gamesService==null){
 			try {
-				gamesService = getGamesService();
+				gamesService = serviceRepository.getService("gamesldt");
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Game");
 			}
@@ -76,7 +76,7 @@ public class WindowManager {
 	private String getDiceService() throws RepositoryException{
 		if(diceService==null){
 			try {
-				diceService = getDiceService();
+				diceService = serviceRepository.getService("spahl_haug_dice");
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Dice");
 			}
