@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -98,7 +97,7 @@ public class GameService {
 
 	}
 
-	public void signalPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
+	public void signalPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException, GameNotStartedException {
 		if(!getGame(gameID).isStarted()){
 			final Player player = getPlayerFromGame(gameID, playerID);
 			player.setReady(true);
@@ -108,10 +107,28 @@ public class GameService {
 			}
 			if(gameStartable){
 				getGame(gameID).start();
+				final Player firstPlayer = getCurrentPlayer(gameID);
+				anouncePlayerTurn(firstPlayer);
 			}
 		}else {
-			getGame(gameID).nextTurn();
+			final Player player = getGame(gameID).nextTurn();
+			anouncePlayerTurn(player);
 		}
+	}
+
+	private void anouncePlayerTurn(final Player player) throws PlayerDoesntExistsException{
+		new Thread(){
+			@Override
+			public void run() {
+				try{
+					template.postForLocation(player.getPlayerURI() + "/player/turn", null);
+				}catch(final RestClientException e){
+					System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!Something went wrong in Player anouncement!\n" + e.getStackTrace());
+					//throw new PlayerDoesntExistsException("Something went wrong in Player anouncement!.");
+				}
+			}
+		}.start();
+
 	}
 
 	public boolean getPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {

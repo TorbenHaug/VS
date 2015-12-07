@@ -277,20 +277,16 @@ public class GameWindow extends Frame{
 	}
 
 	public void anounceTurn() {
-		try {
-			uiThreadAccess.invokeAndWait(new Runnable() {
+		uiThreadAccess.invokeLater(new Runnable() {
 
-				@Override
-				public void run() {
-					roll.setEnabled(true);
+			@Override
+			public void run() {
+				System.out.println("EnableRollButton");
+				roll.setEnabled(true);
 
-				}
-			});
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
+			}
+		});
 	}
+
+
 }

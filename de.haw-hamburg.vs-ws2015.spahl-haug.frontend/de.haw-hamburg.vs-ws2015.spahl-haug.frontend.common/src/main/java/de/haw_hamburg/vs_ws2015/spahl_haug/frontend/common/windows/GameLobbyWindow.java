@@ -40,6 +40,7 @@ public class GameLobbyWindow extends Frame{
 	private final ServiceRepository serviceRepository;
 	private final String gameId;
 	private Game game;
+	private final IUiThreadAccess uiThreadAccess;
 
 	public GameLobbyWindow(final String userName, final String gameId, final IGameLobbyActions lobbyActions, final ServiceRepository serviceRepository) {
 		super("GameLobby - " + userName + " - " + gameId);
@@ -91,7 +92,7 @@ public class GameLobbyWindow extends Frame{
 		table.setPosition(200, 50);
 		table.setSize(800, 750);
 
-		final IUiThreadAccess uiThreadAccess = Toolkit.getUiThreadAccess();
+		uiThreadAccess = Toolkit.getUiThreadAccess();
 
 		refreshThread = new Thread(){
 			@Override
@@ -179,7 +180,21 @@ public class GameLobbyWindow extends Frame{
 	}
 
 	public void anounceStartGame() {
-		lobbyActions.startGame(gameId);
+		new Thread(){
+			@Override
+			public void run() {
+				uiThreadAccess.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						refreshThread.interrupt();
+						lobbyActions.startGame(gameId);
+
+					}
+				});
+			}
+		}.start();
+
+
 
 	}
 }

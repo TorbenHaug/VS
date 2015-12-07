@@ -25,11 +25,17 @@ public class RestService {
 	@POST
 	@Path("{name}/player/turn")
 	public Response turn(@PathParam("name") final String name){
+		System.out.println("anounce" + name);
 		final WindowManager manager = playerServices.get(name);
 		if(manager == null){
 			return Response.status(Response.Status.NOT_FOUND).entity("Not Found").build();
 		}
-		manager.anounceTurn();
+		new Thread(){
+			@Override
+			public void run() {
+				manager.anounceTurn();
+			}
+		}.start();
 		return Response.ok().build();
 	}
 
