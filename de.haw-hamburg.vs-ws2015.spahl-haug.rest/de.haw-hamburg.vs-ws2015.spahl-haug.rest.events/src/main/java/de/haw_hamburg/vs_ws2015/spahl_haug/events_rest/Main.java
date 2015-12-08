@@ -25,6 +25,7 @@ import java.util.TreeMap;
 @EnableAutoConfiguration
 public class Main {
 
+    private static String serviceId;
     private EventService eventService = new EventService();
     private static RestTemplate restTemplate = new RestTemplate();
 
@@ -74,6 +75,17 @@ public class Main {
 
     public static void main(final String[] args) throws Exception {
         SpringApplication.run(Main.class, args);
+    }
+
+
+    public static void setServiceID(final String serviceId) {
+        System.out.println("Registred as " + serviceId);
+        Main.serviceId = serviceId;
+
+    }
+
+    public static String getServiceID() {
+        return Main.serviceId;
     }
 
 

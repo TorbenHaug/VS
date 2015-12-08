@@ -24,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableAutoConfiguration
 public class Main {
 
+    private static String serviceId;
 	private final BrockerService brockerService;
 
 
@@ -100,6 +101,16 @@ public class Main {
 		//		final ServiceRepository repo = new ServiceRepository();
 		//		System.err.println(repo.getService("spahl_haug_games"));
 		SpringApplication.run(Main.class, args);
+	}
+
+	public static void setServiceID(final String serviceId) {
+		System.out.println("Registred as " + serviceId);
+		Main.serviceId = serviceId;
+
+	}
+
+	public static String getServiceID() {
+		return Main.serviceId;
 	}
 
 
