@@ -54,7 +54,7 @@ public class WindowManager {
 	private String getBoardsService() throws RepositoryException{
 		if(boardsService==null){
 			try {
-				boardsService = serviceRepository.getService("boardsldt");
+				boardsService = serviceRepository.getService("spahl_haug_boards");
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Board");
 			}
@@ -65,7 +65,7 @@ public class WindowManager {
 	private String getGamesService() throws RepositoryException{
 		if(gamesService==null){
 			try {
-				gamesService = serviceRepository.getService("gamesldt");
+				gamesService = serviceRepository.getService("spahl_haug_games");
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find Game");
 			}

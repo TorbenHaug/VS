@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameFullException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
@@ -81,7 +82,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam(value="name") final String playerName, @RequestParam(value="uri") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException{
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam(value="name") final String playerName, @RequestParam(value="uri") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException, GameFullException{
 		gameService.addPlayerToGame(gameID, playerID, playerName, playerURI);
 	}
 
