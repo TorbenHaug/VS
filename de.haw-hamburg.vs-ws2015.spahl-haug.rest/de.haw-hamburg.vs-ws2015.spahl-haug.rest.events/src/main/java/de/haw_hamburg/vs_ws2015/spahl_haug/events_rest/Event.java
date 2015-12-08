@@ -1,6 +1,7 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.events_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.PlayerDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,16 @@ public class Event {
     private String resource;
     @JsonIgnore
     private List<String> uris;
+    private PlayerDTO player;
 
-    public Event(String type, String name, String reason, int id) {
+    public Event(String type, String name, String reason, int id, PlayerDTO player) {
         this.type = type;
         this.name = name;
         this.reason = reason;
         this.id = id;
         this.resource = "/events/" + id;
         this.uris = new ArrayList<>();
+        this.player = player;
     }
 
     public int getId() {
@@ -48,6 +51,10 @@ public class Event {
         return uris;
     }
 
+    public PlayerDTO getPlayer() {
+        return player;
+    }
+
     public void addUri(String uri) {
         uris.add(uri);
     }
@@ -60,6 +67,8 @@ public class Event {
                 ", name='" + name + '\'' +
                 ", reason='" + reason + '\'' +
                 ", resource='" + resource + '\'' +
+                ", uris=" + uris +
+                ", player=" + player +
                 '}';
     }
 }

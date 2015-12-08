@@ -41,10 +41,10 @@ public class Main {
     @ResponseStatus(HttpStatus.CREATED)
     // Example = http://<ip address>:<port>/events?gameid=<variable>
     public ResponseEntity<String> createEvent(@RequestParam("gameid") String gameid, @RequestBody EventDTO event) throws Exception {
-        String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason());
+        String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getPlayer());
         List<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
         for(String subscriber : subscriberList) {
-            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri);
+            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri, event.getPlayer());
             restTemplate.postForEntity(subscriber, eventOutDTO, EventOutDTO.class);
         }
         return new ResponseEntity<>(eventUri, HttpStatus.CREATED);
