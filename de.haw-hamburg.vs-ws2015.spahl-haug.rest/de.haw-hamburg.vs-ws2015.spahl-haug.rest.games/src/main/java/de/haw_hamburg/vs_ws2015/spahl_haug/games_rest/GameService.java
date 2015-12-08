@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameFullException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
@@ -28,6 +29,13 @@ public class GameService {
 		this.serviceRepository = serviceRepository;
 		this.games = new ConcurrentHashMap<>();
 	}
+	private String getBoardService() throws BoardServiceNotFoundException{
+		try{
+			return serviceRepository.getService("spahl_haug_boards");
+		}catch(final Exception e){
+			throw new BoardServiceNotFoundException("No BoardService found");
+		}
+	}
 
 	private long getNextGameID(){
 		while(games.get(this.nextGameID) != null){
@@ -40,12 +48,12 @@ public class GameService {
 		this.games.put(id, game);
 		String url = null;
 		try {
-			url = serviceRepository.getService(boardName) + "/" + id;
+			url = getBoardService() + "/" + id;
 			try {
 				template.put(url,null);
 			} catch (final Exception e) {
 				this.games.remove(id);
-				throw new BoardServiceNotFoundException("No BoardService found " + url + "/" + id);
+				throw new BoardServiceNotFoundException("No BoardService found");
 			}
 		} catch (final Exception e1) {
 			this.games.remove(id);
@@ -80,7 +88,7 @@ public class GameService {
 		return player;
 	}
 
-	public void addPlayerToGame(final long gameID, final String playerID, final String playerName, final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException {
+	public void addPlayerToGame(final long gameID, final String playerID, final String playerName, final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException, GameFullException {
 		final Player player = new Player(playerName, playerID, playerURI);
 		final Game game = getGame(gameID);
 		game.addPlayer(player);

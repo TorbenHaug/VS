@@ -51,7 +51,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
 		dto.setName("spahl_haug_games");
 		dto.setDescription("GamesService von Louisa Spahl und Torben Haug");
-		dto.setService("gameslt");
+		dto.setService("games");
 		try {
 			SSLUtil.turnOffSslChecking();
 			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games");

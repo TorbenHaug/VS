@@ -52,10 +52,13 @@ public class ErrorHandler {
 	}
 
 
-	@ExceptionHandler(GameNotStartedException.class)
+	@ExceptionHandler({
+		GameNotStartedException.class,
+		GameFullException.class
+	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.FORBIDDEN)
-	public ErrorMessage onGameNotStarted(final GameNotStartedException error) {
+	public ErrorMessage onForbidden(final Exception error) {
 		return new ErrorMessage(403, "Forbidden", error.getMessage());
 	}
 

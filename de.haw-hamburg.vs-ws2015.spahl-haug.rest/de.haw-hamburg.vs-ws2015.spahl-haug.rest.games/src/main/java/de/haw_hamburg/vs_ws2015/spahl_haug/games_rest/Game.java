@@ -1,5 +1,6 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameFullException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 
 import java.util.ArrayList;
@@ -33,8 +34,11 @@ public class Game {
 		return this.gameid;
 	}
 
-	public void addPlayer(final Player player) {
+	public void addPlayer(final Player player) throws GameFullException {
 		if(!players.contains(player)){
+			if(players.size()>=6){
+				throw new GameFullException("More tham 6 Players are not allowed in Game " + getGameid());
+			}
 			players.add(player);
 		}
 	}
