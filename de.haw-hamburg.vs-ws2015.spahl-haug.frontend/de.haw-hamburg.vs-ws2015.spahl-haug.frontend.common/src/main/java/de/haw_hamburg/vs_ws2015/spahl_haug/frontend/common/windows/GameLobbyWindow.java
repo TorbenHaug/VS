@@ -37,15 +37,17 @@ public class GameLobbyWindow extends Frame{
 	private final IButton exitGame;
 	private final Thread refreshThread;
 	private final RestTemplate template = new RestTemplate();
-	private final ServiceRepository serviceRepository;
 	private final String gameId;
 	private Game game;
+	private final IUiThreadAccess uiThreadAccess;
+	private final String gameService;
 
-	public GameLobbyWindow(final String userName, final String gameId, final IGameLobbyActions lobbyActions, final ServiceRepository serviceRepository) {
+	public GameLobbyWindow(final String userName, final String gameId, final IGameLobbyActions lobbyActions, final String gameService) {
 		super("GameLobby - " + userName + " - " + gameId);
 		this.gameId = gameId;
 		this.lobbyActions = lobbyActions;
-		this.serviceRepository = serviceRepository;
+		this.gameService = gameService;
+
 		game  = new Game();
 
 		setLayout(NullLayout.get());
@@ -80,7 +82,12 @@ public class GameLobbyWindow extends Frame{
 			@Override
 			public void actionPerformed() {
 				refreshThread.interrupt();
-				GameLobbyWindow.this.lobbyActions.closeWindow();
+				try {
+					GameLobbyWindow.this.lobbyActions.closeWindow();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -91,7 +98,7 @@ public class GameLobbyWindow extends Frame{
 		table.setPosition(200, 50);
 		table.setSize(800, 750);
 
-		final IUiThreadAccess uiThreadAccess = Toolkit.getUiThreadAccess();
+		uiThreadAccess = Toolkit.getUiThreadAccess();
 
 		refreshThread = new Thread(){
 			@Override
@@ -155,7 +162,7 @@ public class GameLobbyWindow extends Frame{
 
 	private Game getGame(final String Id){
 		try {
-			return template.getForObject(serviceRepository.getService("gamesldt") + "/" + Id, Game.class);
+			return template.getForObject(gameService + "/" + Id, Game.class);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -179,7 +186,21 @@ public class GameLobbyWindow extends Frame{
 	}
 
 	public void anounceStartGame() {
-		lobbyActions.startGame(gameId);
+		new Thread(){
+			@Override
+			public void run() {
+				uiThreadAccess.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						refreshThread.interrupt();
+						lobbyActions.startGame(gameId);
+
+					}
+				});
+			}
+		}.start();
+
+
 
 	}
 }

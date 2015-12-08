@@ -18,10 +18,12 @@ public class PlayerInfo extends CompositeControl{
 	private final IIcon imageIcon;
 	private final ITextLabel idLabel;
 	private int pos = 0;
+	private final String color;
 
 	public PlayerInfo(final IContainer parent, final String playerId, final String color) {
 		super(parent);
 		this.playerId = playerId;
+		this.color = color;
 		final IComposite composite = getComposite();
 		composite.setLayout(NullLayout.get());
 		setSize(80, 20);
@@ -41,6 +43,10 @@ public class PlayerInfo extends CompositeControl{
 
 	public void setPos(final int pos) {
 		this.pos = pos;
+	}
+
+	public String getColor() {
+		return color;
 	}
 
 

@@ -91,7 +91,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}/ready", method = RequestMethod.PUT,  produces = "application/json")
-	public void signalPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException{
+	public void signalPlayerReady(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID) throws GameDoesntExistsException, PlayerDoesntExistsException, GameNotStartedException{
 		gameService.signalPlayerReady(gameID, playerID);
 	}
 

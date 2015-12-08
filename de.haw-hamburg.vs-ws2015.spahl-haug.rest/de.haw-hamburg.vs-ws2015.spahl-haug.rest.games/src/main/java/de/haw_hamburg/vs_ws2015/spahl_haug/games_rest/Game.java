@@ -107,7 +107,8 @@ public class Game {
 		return started;
 	}
 
-	public void nextTurn() {
+	public Player nextTurn() throws GameNotStartedException {
 		currentPlayer = (currentPlayer + 1) % players.size();
+		return getCurrentPlayer();
 	}
 }

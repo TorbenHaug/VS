@@ -25,7 +25,12 @@ public class LoginWindow extends Frame{
 
 			@Override
 			public void windowClosed() {
-				loginActions.closeWindow();
+				try {
+					loginActions.closeWindow();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -39,7 +44,12 @@ public class LoginWindow extends Frame{
 		button.addActionListener(new IActionListener() {
 			@Override
 			public void actionPerformed() {
-				loginActions.onLogin(userName.getText());
+				try {
+					loginActions.onLogin(userName.getText());
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		button.setSize(110, 30);

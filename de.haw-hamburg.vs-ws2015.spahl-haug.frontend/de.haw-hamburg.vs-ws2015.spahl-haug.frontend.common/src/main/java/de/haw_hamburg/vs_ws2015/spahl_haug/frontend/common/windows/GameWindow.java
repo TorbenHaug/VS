@@ -5,6 +5,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import org.jowidgets.api.image.IImage;
 import org.jowidgets.api.image.ImageFactory;
@@ -24,8 +27,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.sun.jersey.core.impl.provider.header.NewCookieProvider;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PostRollDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.RollDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
@@ -40,8 +46,8 @@ public class GameWindow extends Frame{
 	private final RestTemplate template = new RestTemplate();
 	private final String gameId;
 	private final List<PlayerPosition> players = new ArrayList<PlayerPosition>();
-	private final List<PlayerInfo> playerInfos = new ArrayList<PlayerInfo>();
-	private Game game;
+	private final Map<String, PlayerInfo> playerInfos = new ConcurrentHashMap<String,PlayerInfo>();
+	private PlayersDTO boardPlayer;
 	private final IIcon gamefield;
 	private final List<String> colors = new ArrayList<String>(Arrays.asList("black", "blue", "green", "purple","red","yellow"));
 	private final String boardServiceAdress;
@@ -56,7 +62,7 @@ public class GameWindow extends Frame{
 		this.gameServiceAdress = gameServiceAdress;
 		this.boardServiceAdress = boardServiceAdress;
 		this.diceServiceAdress = diceServiceAdress;
-		game  = new Game();
+		boardPlayer  = new PlayersDTO();
 
 		setLayout(NullLayout.get());
 		setSize(1024, 768);
@@ -121,9 +127,16 @@ public class GameWindow extends Frame{
 			@Override
 			public void actionPerformed() {
 				refreshThread.interrupt();
-				GameWindow.this.lobbyActions.closeWindow();
+				try {
+					GameWindow.this.lobbyActions.closeWindow();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
+
+		createPlayerPositions();
 
 		int playerInfoY = 170;
 		final Game initialGame = getGame(gameId);
@@ -132,10 +145,13 @@ public class GameWindow extends Frame{
 			playerInfo.setPosition(0, playerInfoY);
 			playerInfo.setVisible(true);
 			playerInfoY += 30;
-			playerInfos.add(playerInfo);
+			playerInfos.put(player.getId(),playerInfo);
+			playerInfo.setPos(0);
+
+			setPlayerFromTo(playerInfo.getColor(), playerInfo.getPos(), playerInfo.getPos());
 		}
 
-		createPlayerPositions();
+
 
 		final URL gamefieldurl = GameWindow.class.getClassLoader().getResource("gamefield.jpg");
 		final IImage gamefieldImage= ImageFactory.createImage(gamefieldurl);
@@ -156,7 +172,7 @@ public class GameWindow extends Frame{
 
 							@Override
 							public void run() {
-								updateGames();
+								updatePositions();
 							}
 						});
 					} catch (final InterruptedException e1) {
@@ -168,6 +184,33 @@ public class GameWindow extends Frame{
 
 		setVisible(true);
 		refreshThread.start();
+	}
+
+	private void setPlayerFromTo(final String color, final int oldPos, final int newPos) {
+		if(color.equals("black")){
+			players.get(oldPos).setBlackVisible(false);
+			players.get(newPos).setBlackVisible(true);
+		}
+		else if(color.equals("blue")){
+			players.get(oldPos).setBlueVisible(false);
+			players.get(newPos).setBlueVisible(true);
+		}
+		else if(color.equals("green")){
+			players.get(oldPos).setGreenVisible(false);
+			players.get(newPos).setGreenVisible(true);
+		}
+		else if(color.equals("purple")){
+			players.get(oldPos).setPurpleVisible(false);
+			players.get(newPos).setPurpleVisible(true);
+		}
+		else if(color.equals("red")){
+			players.get(oldPos).setRedVisible(false);
+			players.get(newPos).setRedVisible(true);
+		}
+		else if(color.equals("yellow")){
+			players.get(oldPos).setYellowVisible(false);
+			players.get(newPos).setYellowVisible(true);
+		}
 	}
 
 	private void createPlayerPositions() {
@@ -226,15 +269,17 @@ public class GameWindow extends Frame{
 		return position;
 	}
 
-	protected void updateGames(){
-		final Game tmpGame = getGame(gameId);
-		final List<Player> oldPlayers = new ArrayList<Player>(game.getPlayers());
-		oldPlayers.removeAll(tmpGame.getPlayers());
-		final List<Player> newPlayers = new ArrayList<Player>(tmpGame.getPlayers());
-		newPlayers.removeAll(game.getPlayers());
-		removePlayers(oldPlayers);
-		addPlayers(newPlayers);
-		game = tmpGame;
+	protected void updatePositions(){
+		final PlayersDTO tmpPlayers = getBoardPlayer(gameId);
+		System.out.println(tmpPlayers);
+		for(final Player newPlayer: tmpPlayers.getPlayers()){
+			final PlayerInfo playerInfo = playerInfos.get(newPlayer.getId());
+			if(playerInfo.getPos() != newPlayer.getPosition()){
+				setPlayerFromTo(playerInfo.getColor(),playerInfo.getPos(), newPlayer.getPosition());
+				playerInfo.setPos(newPlayer.getPosition());
+			}
+		}
+		boardPlayer = tmpPlayers;
 
 	}
 
@@ -251,9 +296,9 @@ public class GameWindow extends Frame{
 		return null;
 	}
 
-	private List<Player> getBoardPlayer(final String id){
+	private PlayersDTO getBoardPlayer(final String id){
 		try {
-			return template.getForObject(gameServiceAdress + "/" + id, ArrayList.class);
+			return template.getForObject(boardServiceAdress + "/" + id, PlayersDTO.class);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -264,33 +309,18 @@ public class GameWindow extends Frame{
 		return null;
 	}
 
-	private void addPlayers(final List<Player> newPlayers) {
-		for (final Player player: newPlayers){
-			//model.addBean(player, false);
-		}
-	}
-
-	private void removePlayers(final List<Player> oldPlayers) {
-		for (final Player player: oldPlayers){
-			//model.removeBean(player);
-		}
-	}
 
 	public void anounceTurn() {
-		try {
-			uiThreadAccess.invokeAndWait(new Runnable() {
+		uiThreadAccess.invokeLater(new Runnable() {
 
-				@Override
-				public void run() {
-					roll.setEnabled(true);
+			@Override
+			public void run() {
+				System.out.println("EnableRollButton");
+				roll.setEnabled(true);
 
-				}
-			});
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
+			}
+		});
 	}
+
+
 }
