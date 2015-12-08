@@ -22,6 +22,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsExcept
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 
 @ComponentScan
@@ -127,13 +128,15 @@ public class Main {
 	public static void main(final String[] args) throws Exception {
 		//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
 		//final IServiceRepository serviceRepository = new ServiceRepository();
-		final IServiceRepository serviceRepository = new IServiceRepository() {
-
-			@Override
-			public String getService(final String name) throws Exception {
-				return "http://192.168.99.100:4569/boards";
-			}
-		};
+		final IServiceRepository serviceRepository = new ServiceRepository()
+				//		{
+				//
+				//			@Override
+				//			public String getService(final String name) throws Exception {
+				//				return "http://192.168.99.100:4569/boards";
+				//			}
+				//		}
+				;
 		gameService = new GameService(serviceRepository);
 		SpringApplication.run(Main.class, args);
 	}
