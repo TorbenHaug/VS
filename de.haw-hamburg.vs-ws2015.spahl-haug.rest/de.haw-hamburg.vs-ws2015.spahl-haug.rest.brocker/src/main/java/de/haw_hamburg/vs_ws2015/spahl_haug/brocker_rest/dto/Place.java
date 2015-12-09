@@ -3,7 +3,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto;
 import java.util.List;
 
 public class Place {
-	private String place;
+	private String name;
 	private String owner;
 	private int value;
 	private List<Integer> rent;
@@ -12,12 +12,12 @@ public class Place {
 
 	public Place() {}
 
-	public String getPlace() {
-		return place;
+	public String getName() {
+		return name;
 	}
 
-	public void setPlace(final String place) {
-		this.place = place;
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public String getOwner() {

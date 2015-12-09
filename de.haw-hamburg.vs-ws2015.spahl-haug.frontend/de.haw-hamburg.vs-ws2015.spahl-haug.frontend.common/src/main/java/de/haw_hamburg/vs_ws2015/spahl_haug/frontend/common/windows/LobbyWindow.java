@@ -76,9 +76,11 @@ public class LobbyWindow extends Frame{
 
 			@Override
 			public void actionPerformed() {
-				LobbyWindow.this.lobbyActions.enterGame("" + model.getSelectedBean().getGameid());
-
+				if(model.getSelectedBean() != null){
+					LobbyWindow.this.lobbyActions.enterGame("" + model.getSelectedBean().getGameid());
+				}
 			}
+
 		});
 
 		exitGameBp = BPF.button().setText("Exit Game");
