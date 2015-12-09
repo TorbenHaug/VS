@@ -21,7 +21,7 @@ public class GameService {
 	private long nextGameID = 0;
 	private final Map<Long, Game> games;
 	private final IServiceRepository serviceRepository;
-	private final String boardName = "boardsLT";
+	private final String boardName = "spahl_haug_boards";
 	private final RestTemplate template = new RestTemplate();
 
 	public GameService(final IServiceRepository serviceRepository){

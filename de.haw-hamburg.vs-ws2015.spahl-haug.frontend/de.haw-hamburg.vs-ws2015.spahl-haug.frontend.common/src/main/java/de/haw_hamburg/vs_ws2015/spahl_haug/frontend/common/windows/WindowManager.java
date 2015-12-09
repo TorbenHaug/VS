@@ -34,7 +34,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class WindowManager {
 
-	protected static final int SERVER_PORT = 8080;
+	protected static final int SERVER_PORT = 4567;
 	LoginWindow loginWindow;
 	private final IApplicationLifecycle lifecycle;
 	private String userName;
