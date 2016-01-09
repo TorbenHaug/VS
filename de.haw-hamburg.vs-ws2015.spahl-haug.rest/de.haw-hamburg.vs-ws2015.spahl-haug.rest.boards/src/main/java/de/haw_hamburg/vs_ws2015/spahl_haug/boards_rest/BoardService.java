@@ -2,9 +2,14 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.EventDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +20,25 @@ import java.util.Map;
 public class BoardService {
 	// Map<gameId, Board>
 	private final Map<Long, Board> boards;
+    private final RestTemplate template = new RestTemplate();
+    private final IServiceRepository serviceRepository;
+    private String eventService;
 
-	public BoardService(){
+	public BoardService(final IServiceRepository serviceRepository){
+        this.serviceRepository = serviceRepository;
 		this.boards = new HashMap<>();
 	}
+
+    private String getEventService() throws EventServiceNotFoundException{
+        try{
+            if(eventService == null) {
+                eventService = serviceRepository.getService("spahl_haug_event");
+            }
+            return eventService;
+        }catch(final Exception e){
+            throw new EventServiceNotFoundException("No EventService found");
+        }
+    }
 
 	@JsonIgnore
 	public Board getBoard(final long gameID) {
@@ -58,12 +78,22 @@ public class BoardService {
 			throw new GameDoesntExistsException("Board cant find Game");
 		}
 		board.placePlayerOnPos(playerID, numOfPosMoves);
-        placePlacerEvent();
+        placePlacerEvent(String.valueOf(gameID), playerID);
 		return board;
 	}
 
-    private void placePlacerEvent() {
-        
+    private void placePlacerEvent(String gameID, String playerID) {
+        final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
+                } catch (RestClientException | EventServiceNotFoundException e) {
+                    e.printStackTrace();
+                }
+            };
+        }.start();
     }
 
     public void removePlayerFromBoard(final long gameID, final String playerID) {
