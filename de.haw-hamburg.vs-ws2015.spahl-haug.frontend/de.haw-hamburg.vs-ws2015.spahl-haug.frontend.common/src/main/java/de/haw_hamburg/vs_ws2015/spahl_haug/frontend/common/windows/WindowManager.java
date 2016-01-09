@@ -46,6 +46,7 @@ public class WindowManager {
 	private String gamesService;
 	private String boardsService;
 	private String diceService;
+	private String eventService;
 
 	public WindowManager(final IApplicationLifecycle lifecycle, final ServiceRepository serviceRepository) {
 		this.lifecycle = lifecycle;
@@ -82,6 +83,17 @@ public class WindowManager {
 			}
 		}
 		return diceService;
+	}
+
+	private String getEventService() throws RepositoryException{
+		if(eventService==null){
+			try {
+				eventService = serviceRepository.getService("spahl_haug_event");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find Event");
+			}
+		}
+		return eventService;
 	}
 
 	public void startWindowing(){
@@ -131,13 +143,13 @@ public class WindowManager {
 
 
 				try {
-					final UriComponents uriComponents = UriComponentsBuilder
+					final UriComponents putPlayerURI = UriComponentsBuilder
 							.fromHttpUrl(getGamesService() +"/"+ gameId + "/players/" + userName)
 							.queryParams(params)
 							.build();
-					System.out.println(uriComponents.toString());
+					System.out.println(putPlayerURI.toString());
 					System.out.println(params);
-					template.put(uriComponents.toUriString(), null);
+					template.put(putPlayerURI.toUriString(), null);
 					showGameLobby(gameId);
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
@@ -163,6 +175,23 @@ public class WindowManager {
 
 			}
 		},getGamesService());
+
+		final MultiValueMap<String,String> params = new LinkedMultiValueMap<String, String>();
+		params.add("gameId", "nullGame");
+
+		final UriComponents postRegisterEvents = UriComponentsBuilder
+				.fromHttpUrl(getGamesService())
+				.queryParams(params)
+				.build();
+		try {
+			template.postForLocation(postRegisterEvents.toUriString(), "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/event");
+		} catch (final RestClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -264,32 +293,26 @@ public class WindowManager {
 	}
 
 	public void anounceTurn() {
-		System.out.println("EnableRollButton2");
-		if((gameWindow == null) && (gameLobbyWindow != null)){
-			gameLobbyWindow.anounceStartGame();
-		}
-
-		try {
-			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(gameWindow == null){
-			throw new RuntimeException("No Game available.");
-		}
-		System.out.println("EnableRollButton1");
-		gameWindow.anounceTurn();
+		//		System.out.println("EnableRollButton2");
+		//		if((gameWindow == null) && (gameLobbyWindow != null)){
+		//			gameLobbyWindow.anounceStartGame();
+		//		}
+		//
+		//		try {
+		//			Thread.sleep(1000);
+		//		} catch (final InterruptedException e) {
+		//			// TODO Auto-generated catch block
+		//			e.printStackTrace();
+		//		}
+		//		if(gameWindow == null){
+		//			throw new RuntimeException("No Game available.");
+		//		}
+		//		System.out.println("EnableRollButton1");
+		//		gameWindow.anounceTurn();
 	}
 
-	public void anounceEvent() {
-		if((gameWindow == null) && (gameLobbyWindow != null)){
-			gameLobbyWindow.anounceStartGame();
-		}
-		if(gameWindow == null){
-			throw new RuntimeException("No Game available.");
-		}
-		//gameWindow.anounceTurn();;
+	public void anounceEvent(final String uri) {
+		System.err.println(uri);
 
 	}
 

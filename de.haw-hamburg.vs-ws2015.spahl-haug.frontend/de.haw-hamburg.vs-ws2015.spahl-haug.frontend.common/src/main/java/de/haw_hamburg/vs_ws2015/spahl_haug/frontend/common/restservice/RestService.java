@@ -9,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.springframework.web.bind.annotation.RequestBody;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows.WindowManager;
 
 @Path("/")
@@ -41,12 +43,12 @@ public class RestService {
 
 	@POST
 	@Path("{name}/player/event")
-	public Response event(@PathParam("name") final String name){
+	public Response event(@PathParam("name") final String name,@RequestBody final String uri){
 		final WindowManager manager = playerServices.get(name);
 		if(manager == null){
 			return Response.status(Response.Status.NOT_FOUND).entity("Not Found").build();
 		}
-		manager.anounceEvent();
+		manager.anounceEvent(uri);
 		return Response.ok().build();
 	}
 }
