@@ -6,6 +6,8 @@ import java.util.List;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,7 +28,7 @@ import javax.net.ssl.SSLEngineResult;
 public class Main {
 
 	private static String serviceId;
-	private static BoardService boardService = new BoardService();
+	private static BoardService boardService = new BoardService(new ServiceRepository());
 	private static RestTemplate restTemplate = new RestTemplate();
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
