@@ -8,12 +8,14 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameFullException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 
 
@@ -23,19 +25,37 @@ public class GameService {
 	private final IServiceRepository serviceRepository;
 	private final String boardName = "spahl_haug_boards";
 	private final RestTemplate template = new RestTemplate();
+	private String boardService = null;
+	private String eventService;
 
 	public GameService(final IServiceRepository serviceRepository){
 
 		this.serviceRepository = serviceRepository;
 		this.games = new ConcurrentHashMap<>();
 	}
+
 	private String getBoardService() throws BoardServiceNotFoundException{
 		try{
-			return serviceRepository.getService("spahl_haug_boards");
+			if(boardService == null) {
+				boardService = serviceRepository.getService("spahl_haug_boards");
+			}
+			return boardService;
 		}catch(final Exception e){
 			throw new BoardServiceNotFoundException("No BoardService found");
 		}
 	}
+
+	private String getEventService() throws EventServiceNotFoundException{
+		try{
+			if(eventService == null) {
+				eventService = serviceRepository.getService("spahl_haug_boards");
+			}
+			return eventService;
+		}catch(final Exception e){
+			throw new EventServiceNotFoundException("No EventService found");
+		}
+	}
+
 
 	private long getNextGameID(){
 		while(games.get(this.nextGameID) != null){
@@ -65,6 +85,17 @@ public class GameService {
 	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", Main.uri + "/" + game.getGameid(), "CreateNewGame", null);
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					template.postForLocation(getEventService(), gameCreatedEvent);
+				} catch (RestClientException | EventServiceNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
 		return game;
 	}
 
