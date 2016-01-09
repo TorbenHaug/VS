@@ -58,10 +58,15 @@ public class BoardService {
 			throw new GameDoesntExistsException("Board cant find Game");
 		}
 		board.placePlayerOnPos(playerID, numOfPosMoves);
+        placePlacerEvent();
 		return board;
 	}
 
-	public void removePlayerFromBoard(final long gameID, final String playerID) {
+    private void placePlacerEvent() {
+        
+    }
+
+    public void removePlayerFromBoard(final long gameID, final String playerID) {
 		boards.get(gameID).removePlayer(playerID);
 	}
 
