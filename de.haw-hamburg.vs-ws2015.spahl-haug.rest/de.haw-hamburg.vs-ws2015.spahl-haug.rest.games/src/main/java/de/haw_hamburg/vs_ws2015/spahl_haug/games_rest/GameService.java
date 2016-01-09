@@ -85,7 +85,7 @@ public class GameService {
 	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", Main.uri + "/" + game.getGameid(), "CreateNewGame", null);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "games/" + game.getGameid(), "CreateNewGame", null);
 		new Thread(){
 			@Override
 			public void run() {
