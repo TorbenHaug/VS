@@ -9,7 +9,7 @@ public class EventDTO {
 
 	public EventDTO() {}
 
-	public EventDTO(final String type, final String name, final String reason,final String resource, final String player) {
+	public EventDTO(final String type, final String name, final String reason, final String resource, final String player) {
 		this.type = type;
 		this.name = name;
 		this.reason = reason;

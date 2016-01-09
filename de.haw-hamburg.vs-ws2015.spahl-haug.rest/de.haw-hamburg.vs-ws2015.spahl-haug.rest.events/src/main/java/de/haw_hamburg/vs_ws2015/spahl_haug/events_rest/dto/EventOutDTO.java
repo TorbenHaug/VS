@@ -7,11 +7,11 @@ public class EventOutDTO {
     private String name;
     private String reason;
     private String resource;
-    private PlayerDTO player;
+    private String player;
 
     public EventOutDTO() {}
 
-    public EventOutDTO(String type, String name, String reason, String resource, PlayerDTO player) {
+    public EventOutDTO(String type, String name, String reason, String resource, String player) {
         this.type = type;
         this.name = name;
         this.reason = reason;
@@ -35,7 +35,7 @@ public class EventOutDTO {
         return resource;
     }
 
-    public PlayerDTO getPlayer() {
+    public String getPlayer() {
         return player;
     }
 }

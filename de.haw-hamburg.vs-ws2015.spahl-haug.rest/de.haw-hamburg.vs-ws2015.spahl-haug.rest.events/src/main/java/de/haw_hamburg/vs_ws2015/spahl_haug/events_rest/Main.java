@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,20 +33,27 @@ public class Main {
     @RequestMapping(value = "/events", method = RequestMethod.GET, produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     // Example = http://<ip address>:<port>/events?gameid=<variable>
-    public ResponseEntity<TreeMap<Integer, Event>> getEvents(@RequestParam("gameid") String gameid) throws GameHasNoEventsException {
+    public ResponseEntity<List<String>> getEvents(@RequestParam("gameid") String gameid) throws GameHasNoEventsException {
         TreeMap<Integer, Event> events = eventService.getEvents(gameid);
-        return new ResponseEntity<>(events, HttpStatus.OK);
+        List<String> eventsList = new ArrayList<>();
+
+        for(Map.Entry<Integer,Event> entry : events.entrySet()) {
+            Event value = entry.getValue();
+            eventsList.add(value.getEventUri());
+        }
+
+        return new ResponseEntity<>(eventsList, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/events", method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     // Example = http://<ip address>:<port>/events?gameid=<variable>
     public ResponseEntity<String> createEvent(@RequestParam("gameid") String gameid, @RequestBody EventDTO event) throws Exception {
-        String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getPlayer());
+        String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getResource(), event.getPlayer());
         List<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
         for(String subscriber : subscriberList) {
-            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri, event.getPlayer());
-            restTemplate.postForEntity(subscriber, eventOutDTO, EventOutDTO.class);
+//            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri, event.getPlayer());
+            restTemplate.postForEntity(subscriber, eventUri, EventOutDTO.class);
         }
         return new ResponseEntity<>(eventUri, HttpStatus.CREATED);
     }

@@ -1,10 +1,11 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.events_rest;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameHasNoEventsException;
-import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.PlayerDTO;
 
-import javax.swing.text.html.parser.Entity;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EventService {
     private Map<String, TreeMap<Integer, Event>> events;
@@ -25,20 +26,20 @@ public class EventService {
         return events.get(gameId);
     }
 
-    public String createEvent(String gameId, String type, String name, String reason, PlayerDTO player){
+    public String createEvent(String gameId, String type, String name, String reason, String resource, String player){
         if(events.containsKey(gameId)) {
             TreeMap<Integer, Event> eventMap = events.get(gameId);
             int highestId = eventMap.lastKey();
             int newId = highestId + 1;
-            Event event = new Event(type, name, reason, newId, player);
+            Event event = new Event(type, name, reason, resource, newId, player);
             eventMap.put(newId, event);
-            return event.getResource();
+            return event.getEventUri();
         } else {
             TreeMap<Integer, Event> newEventMap = new TreeMap<>();
-            Event event = new Event(type, name, reason, 1, player);
+            Event event = new Event(type, name, reason, resource, 1, player);
             newEventMap.put(1, event);
             events.put(gameId, newEventMap);
-            return event.getResource();
+            return event.getEventUri();
         }
     }
 
