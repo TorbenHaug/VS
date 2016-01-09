@@ -28,8 +28,8 @@ import javax.net.ssl.SSLEngineResult;
 public class Main {
 
 	private static String serviceId;
-	private static BoardService boardService = new BoardService(new ServiceRepository());
-	private static RestTemplate restTemplate = new RestTemplate();
+	private static BoardService boardService;
+//	private static RestTemplate restTemplate = new RestTemplate();
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
 	public BoardsDTO getGames() {
@@ -130,6 +130,7 @@ public class Main {
 	public static void main(final String[] args) throws Exception {
 		//		final ServiceRepository repo = new ServiceRepository();
 		//		System.err.println(repo.getService("spahl_haug_games"));
+        boardService = new BoardService(new ServiceRepository());
 		SpringApplication.run(Main.class, args);
 	}
 
