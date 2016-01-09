@@ -36,7 +36,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PostRollDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.RollDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
-public class GameWindow extends Frame{
+public class GameWindow extends Frame implements IMyFrame{
 	private final IButtonBluePrint rollBp;
 	private final IButton roll;
 	private final IGameActions lobbyActions;
@@ -320,6 +320,11 @@ public class GameWindow extends Frame{
 
 			}
 		});
+	}
+
+	@Override
+	public IUiThreadAccess getUIThread() {
+		return uiThreadAccess;
 	}
 
 

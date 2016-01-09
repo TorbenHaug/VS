@@ -56,7 +56,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		dto.setService("games");
 		try {
 			SSLUtil.turnOffSslChecking();
-			final String uri = "http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games";
+			final String uri = "http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort();
 			Main.setOwnURI(uri);
 			dto.setUri(uri);
 		} catch (final UnknownHostException e) {

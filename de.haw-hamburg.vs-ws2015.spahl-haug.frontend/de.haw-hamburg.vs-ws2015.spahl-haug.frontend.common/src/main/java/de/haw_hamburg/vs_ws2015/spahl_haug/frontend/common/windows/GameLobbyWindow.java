@@ -26,7 +26,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PlayerTableRenderer;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
-public class GameLobbyWindow extends Frame{
+public class GameLobbyWindow extends Frame implements IMyFrame{
 	private final IButtonBluePrint readyBp;
 	private final IButton ready;
 	private final BeanTableModel<Player> model;
@@ -37,14 +37,14 @@ public class GameLobbyWindow extends Frame{
 	private final IButton exitGame;
 	private final Thread refreshThread;
 	private final RestTemplate template = new RestTemplate();
-	private final String gameId;
+	private final String gameURI;
 	private Game game;
 	private final IUiThreadAccess uiThreadAccess;
 	private final String gameService;
 
-	public GameLobbyWindow(final String userName, final String gameId, final IGameLobbyActions lobbyActions, final String gameService) {
-		super("GameLobby - " + userName + " - " + gameId);
-		this.gameId = gameId;
+	public GameLobbyWindow(final String userName, final String gameURI, final IGameLobbyActions lobbyActions, final String gameService) {
+		super("GameLobby - " + userName + " - " + gameURI);
+		this.gameURI = gameURI;
 		this.lobbyActions = lobbyActions;
 		this.gameService = gameService;
 
@@ -68,7 +68,7 @@ public class GameLobbyWindow extends Frame{
 
 			@Override
 			public void actionPerformed() {
-				GameLobbyWindow.this.lobbyActions.ready(gameId);
+				GameLobbyWindow.this.lobbyActions.ready(gameURI);
 
 			}
 		});
@@ -126,7 +126,7 @@ public class GameLobbyWindow extends Frame{
 	}
 
 	protected void updateGames(){
-		final Game tmpGame = getGame(gameId);
+		final Game tmpGame = getGame(gameURI);
 		final List<Player> oldPlayers = new ArrayList<Player>(game.getPlayers());
 		oldPlayers.removeAll(tmpGame.getPlayers());
 		final List<Player> newPlayers = new ArrayList<Player>(tmpGame.getPlayers());
@@ -147,7 +147,7 @@ public class GameLobbyWindow extends Frame{
 
 						@Override
 						public void run() {
-							lobbyActions.startGame(gameId);
+							lobbyActions.startGame(gameURI);
 
 						}
 					});
@@ -193,7 +193,7 @@ public class GameLobbyWindow extends Frame{
 					@Override
 					public void run() {
 						refreshThread.interrupt();
-						lobbyActions.startGame(gameId);
+						lobbyActions.startGame(gameURI);
 
 					}
 				});
@@ -202,5 +202,10 @@ public class GameLobbyWindow extends Frame{
 
 
 
+	}
+
+	@Override
+	public IUiThreadAccess getUIThread() {
+		return uiThreadAccess;
 	}
 }

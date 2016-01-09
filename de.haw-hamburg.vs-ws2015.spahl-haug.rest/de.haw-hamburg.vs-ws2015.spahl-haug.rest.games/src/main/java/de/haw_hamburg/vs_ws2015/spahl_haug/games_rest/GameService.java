@@ -127,6 +127,28 @@ public class GameService {
 			final String serviceCall = serviceRepository.getService(boardName) + "/" + gameID + "/players/" + playerID;
 			System.err.println(serviceCall);
 			template.put(serviceCall,null);
+			final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", "games/" + game.getGameid(), playerID);
+			new Thread(){
+				@Override
+				public void run() {
+					try {
+						template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
+					} catch (RestClientException | EventServiceNotFoundException e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
+
+			new Thread(){
+				@Override
+				public void run() {
+					try {
+						template.postForLocation(getEventService() + "/events?gameid=nullGame", event);
+					} catch (RestClientException | EventServiceNotFoundException e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
 		} catch (final Exception e) {
 			game.removePlayer(playerID);
 			throw new BoardServiceNotFoundException("Unable to add Player " + playerID + " to Board");

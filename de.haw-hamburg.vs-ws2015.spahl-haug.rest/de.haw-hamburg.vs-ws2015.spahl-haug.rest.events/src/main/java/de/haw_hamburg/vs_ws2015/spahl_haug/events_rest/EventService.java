@@ -5,20 +5,22 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundExce
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameHasNoEventsException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.events.EventException;
 
 public class EventService {
 	//GameID,EventTyp,ResponseURIs
-	Map<String,Map<String,Set<String>>> subscribers = new HashMap<>();
-	Map<Integer,Event> events = new HashMap<>();
-	Map<String, List<Integer>> gameEventIds = new HashMap<>();
+	Map<String,Map<String,Set<String>>> subscribers = new ConcurrentHashMap<>();
+	Map<Integer,Event> events = new ConcurrentHashMap<>();
+	Map<String, List<Integer>> gameEventIds = new ConcurrentHashMap<>();
 	private int nextNr = 0;
 
 	public void subscribe(final String gameId, final String uri, final String eventType) {
@@ -31,7 +33,7 @@ public class EventService {
 		final Map<String,Set<String>> gamesubscribers = getSubscribers(gameId);
 		Set<String> eventSubscribers = gamesubscribers.get(eventType);
 		if(eventSubscribers == null){
-			eventSubscribers = new HashSet<>();
+			eventSubscribers = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
 			gamesubscribers.put(eventType, eventSubscribers);
 		}
 		return eventSubscribers;
@@ -40,7 +42,7 @@ public class EventService {
 	private Map<String, Set<String>> getSubscribers(final String gameId) {
 		Map<String,Set<String>> gamesubscribers = subscribers.get(gameId);
 		if(gamesubscribers == null){
-			gamesubscribers = new HashMap<>();
+			gamesubscribers = new ConcurrentHashMap<>();
 			subscribers.put(gameId, gamesubscribers);
 		}
 		return gamesubscribers;
@@ -61,7 +63,7 @@ public class EventService {
 	private List<Integer> getEventIdsforGame(final String gameid) {
 		List<Integer> eventIdsforGame = gameEventIds.get(gameid);
 		if(eventIdsforGame == null){
-			eventIdsforGame = new ArrayList<>();
+			eventIdsforGame = Collections.synchronizedList(new ArrayList<>());
 			gameEventIds.put(gameid, eventIdsforGame);
 		}
 		return eventIdsforGame;

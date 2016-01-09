@@ -1,6 +1,8 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.windows;
 
 import org.jowidgets.api.layout.NullLayout;
+import org.jowidgets.api.threads.IUiThreadAccess;
+import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IButton;
 import org.jowidgets.api.widgets.IInputField;
 import org.jowidgets.api.widgets.blueprint.IButtonBluePrint;
@@ -10,15 +12,16 @@ import org.jowidgets.tools.controller.WindowAdapter;
 import org.jowidgets.tools.widgets.base.Frame;
 import org.jowidgets.tools.widgets.blueprint.BPF;
 
-public class LoginWindow extends Frame{
+public class LoginWindow extends Frame implements IMyFrame{
 	private final IButtonBluePrint buttonBp;
 	private final IButton button;
 	private final IInputFieldBluePrint<String> userNameBp;
 	private final IInputField<String> userName;
+	private final IUiThreadAccess uiThreadAccess;
 
 	public LoginWindow(final ILoginActions loginActions) {
 		super("Login");
-
+		uiThreadAccess = Toolkit.getUiThreadAccess();
 		setLayout(NullLayout.get());
 		setSize(300, 125);
 		addWindowListener(new WindowAdapter(){
@@ -55,5 +58,10 @@ public class LoginWindow extends Frame{
 		button.setSize(110, 30);
 		button.setPosition(20, 85);
 		setVisible(true);
+	}
+
+	@Override
+	public IUiThreadAccess getUIThread() {
+		return uiThreadAccess;
 	}
 }

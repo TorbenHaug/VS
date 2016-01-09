@@ -20,6 +20,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.apache.catalina.Server;
+import org.jowidgets.api.threads.IUiThreadAccess;
 import org.jowidgets.api.widgets.IFrame;
 import org.jowidgets.common.application.IApplicationLifecycle;
 import org.springframework.util.LinkedMultiValueMap;
@@ -51,6 +52,7 @@ public class WindowManager {
 	private String boardsService;
 	private String diceService;
 	private String eventService;
+	IUiThreadAccess uiThreadAccess;
 
 	public WindowManager(final IApplicationLifecycle lifecycle, final ServiceRepository serviceRepository) {
 		this.lifecycle = lifecycle;
@@ -103,6 +105,7 @@ public class WindowManager {
 
 	public void startWindowing(){
 		showLoginWindow();
+		uiThreadAccess = loginWindow.getUIThread();
 	}
 
 	private void showLoginWindow(){
@@ -136,7 +139,7 @@ public class WindowManager {
 			}
 
 			@Override
-			public void enterGame(final String gameId) {
+			public void enterGame(final String gameURI) {
 				final MultiValueMap<String,String> params = new LinkedMultiValueMap<String, String>();
 				params.add("name", userName);
 				try {
@@ -149,13 +152,13 @@ public class WindowManager {
 
 				try {
 					final UriComponents putPlayerURI = UriComponentsBuilder
-							.fromHttpUrl(getGamesService() +"/"+ gameId + "/players/" + userName)
+							.fromHttpUrl(getGamesService() +"/"+ gameURI + "/players/" + userName)
 							.queryParams(params)
 							.build();
 					System.out.println(putPlayerURI.toString());
 					System.out.println(params);
 					template.put(putPlayerURI.toUriString(), null);
-					showGameLobby(gameId);
+					//showGameLobby(gameURI);
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -168,7 +171,7 @@ public class WindowManager {
 			@Override
 			public void createGame() {
 				try {
-					final Game game = template.postForObject(getGamesService(), null, Game.class);
+					final Game game = template.postForObject(getGamesService() + "/games", null, Game.class);
 					//enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
@@ -182,7 +185,9 @@ public class WindowManager {
 		},getGamesService());
 
 		try {
-			final SubscriptionDTO subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("CreateNewGame"));
+			SubscriptionDTO subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("CreateNewGame"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerEnterGame"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
@@ -194,53 +199,65 @@ public class WindowManager {
 
 	}
 
-	protected void showGameLobby(final String gameId) throws RepositoryException {
+	protected void showGameLobby(final String gameURI) throws RepositoryException {
 		disposeAll();
-		gameLobbyWindow = new GameLobbyWindow(userName, gameId, new IGameLobbyActions() {
+		uiThreadAccess.invokeLater(new Runnable() {
 
 			@Override
-			public void closeWindow() throws RepositoryException {
-				String url;
+			public void run() {
 				try {
-					url = getGamesService() + "/" + gameId + "/players/" + userName;
-					template.delete(url);
-				} catch (final Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					gameLobbyWindow = new GameLobbyWindow(userName, gameURI, new IGameLobbyActions() {
 
-				showLobbyWindow();
-			}
-
-			@Override
-			public void ready(final String gameId) {
-				final String url;
-				try {
-					url = getGamesService() + "/" + gameId + "/players/" + userName + "/ready";
-					new Thread(){
 						@Override
-						public void run() {
-							template.put( url, String.class);
+						public void closeWindow() throws RepositoryException {
+							String url;
+							try {
+								url = getGamesService() + "/" + gameURI + "/players/" + userName;
+								template.delete(url);
+							} catch (final Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+							showLobbyWindow();
 						}
-					}.start();
-				} catch (final Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-			}
+						@Override
+						public void ready(final String gameId) {
+							final String url;
+							try {
+								url = getGamesService() + "/" + gameId + "/players/" + userName + "/ready";
+								new Thread(){
+									@Override
+									public void run() {
+										template.put( url, String.class);
+									}
+								}.start();
+							} catch (final Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 
-			@Override
-			public void startGame(final String gameId) {
-				try {
-					showGameWindow(gameId);
+						}
+
+						@Override
+						public void startGame(final String gameId) {
+							try {
+								showGameWindow(gameId);
+							} catch (final RepositoryException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+						}
+					}, getGamesService());
 				} catch (final RepositoryException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 			}
-		}, getGamesService());
+		});
+
 
 	}
 
@@ -282,11 +299,19 @@ public class WindowManager {
 		gameWindow = null;
 	}
 
-	private void disposeWindow(final IFrame frame) {
-		if((frame != null) && !frame.isDisposed()) {
-			System.out.println("Dispose: " + frame);
-			frame.setVisible(false);
-			frame.dispose();
+	private void disposeWindow(final IMyFrame frame) {
+		if(frame != null){
+			frame.getUIThread().invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					if(!frame.isDisposed()) {
+						System.out.println("Dispose: " + frame);
+						frame.setVisible(false);
+						frame.dispose();
+					}
+				}
+			});
 		}
 
 	}
@@ -313,8 +338,16 @@ public class WindowManager {
 	synchronized public void anounceEvent(final String uri) {
 		try {
 			final EventDTO event = template.getForObject(getEventService() + uri, EventDTO.class);
+			System.err.println("Event for Player '" + userName + "': " + event);
 			if(event.getType().equals("CreateNewGame") && (lobbyWindow != null)){
 				lobbyWindow.update();
+			}else if(event.getType().equals("PlayerEnterGame") && (lobbyWindow != null)){
+				if((event.getPlayer() != null) && event.getPlayer().equals(userName)){
+					showGameLobby(event.getResource());
+				}
+				else {
+					lobbyWindow.update();
+				}
 			}
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
