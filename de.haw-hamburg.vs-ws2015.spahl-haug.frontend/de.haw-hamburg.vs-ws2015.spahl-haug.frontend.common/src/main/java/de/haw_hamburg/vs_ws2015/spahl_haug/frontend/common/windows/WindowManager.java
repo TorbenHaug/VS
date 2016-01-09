@@ -28,6 +28,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionEventDTO;
@@ -308,8 +310,19 @@ public class WindowManager {
 		//		gameWindow.anounceTurn();
 	}
 
-	public void anounceEvent(final String uri) {
-		System.err.println("AnounceEventTest" + uri);
+	synchronized public void anounceEvent(final String uri) {
+		try {
+			final EventDTO event = template.getForObject(getEventService() + uri, EventDTO.class);
+			if(event.getType().equals("CreateNewGame") && (lobbyWindow != null)){
+				lobbyWindow.update();
+			}
+		} catch (final RestClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

@@ -144,6 +144,7 @@ public class LobbyWindow extends Frame{
 		//		};
 
 		setVisible(true);
+		update();
 		//		refreshThread.start();
 	}
 
