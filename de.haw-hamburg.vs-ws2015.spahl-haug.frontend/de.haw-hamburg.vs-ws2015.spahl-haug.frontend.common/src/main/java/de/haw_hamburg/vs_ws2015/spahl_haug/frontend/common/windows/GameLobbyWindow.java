@@ -35,7 +35,7 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 	private final IGameLobbyActions lobbyActions;
 	private final IButtonBluePrint exitGameBp;
 	private final IButton exitGame;
-	private final Thread refreshThread;
+	//	private final Thread refreshThread;
 	private final RestTemplate template = new RestTemplate();
 	private final String gameURI;
 	private Game game;
@@ -56,7 +56,7 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 		addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowClosed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				//GameLobbyWindow.this.lobbyActions.closeWindow();
 			}
 		});
@@ -81,7 +81,7 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 
 			@Override
 			public void actionPerformed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				try {
 					GameLobbyWindow.this.lobbyActions.closeWindow();
 				} catch (final RepositoryException e) {
@@ -100,29 +100,30 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 
 		uiThreadAccess = Toolkit.getUiThreadAccess();
 
-		refreshThread = new Thread(){
-			@Override
-			public void run() {
-
-				while(!isInterrupted()){
-					try {
-						Thread.sleep(1000);
-						uiThreadAccess.invokeLater(new Runnable() {
-
-							@Override
-							public void run() {
-								updateGames();
-							}
-						});
-					} catch (final InterruptedException e1) {
-						interrupt();
-					}
-				}
-			}
-		};
+		//		refreshThread = new Thread(){
+		//			@Override
+		//			public void run() {
+		//
+		//				while(!isInterrupted()){
+		//					try {
+		//						Thread.sleep(1000);
+		//						uiThreadAccess.invokeLater(new Runnable() {
+		//
+		//							@Override
+		//							public void run() {
+		//								updateGames();
+		//							}
+		//						});
+		//					} catch (final InterruptedException e1) {
+		//						interrupt();
+		//					}
+		//				}
+		//			}
+		//		};
 
 		setVisible(true);
-		refreshThread.start();
+		//		refreshThread.start();
+		update();
 	}
 
 	protected void updateGames(){
@@ -192,7 +193,7 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 				uiThreadAccess.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						refreshThread.interrupt();
+						//						refreshThread.interrupt();
 						lobbyActions.startGame(gameURI);
 
 					}
@@ -207,5 +208,15 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 	@Override
 	public IUiThreadAccess getUIThread() {
 		return uiThreadAccess;
+	}
+
+	public void update() {
+		uiThreadAccess.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				updateGames();
+			}
+		});
 	}
 }
