@@ -90,7 +90,7 @@ public class GameService {
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService(), gameCreatedEvent);
+					template.postForLocation(getEventService() + "/events?gameid=nullGame", gameCreatedEvent);
 				} catch (RestClientException | EventServiceNotFoundException e) {
 					e.printStackTrace();
 				}
