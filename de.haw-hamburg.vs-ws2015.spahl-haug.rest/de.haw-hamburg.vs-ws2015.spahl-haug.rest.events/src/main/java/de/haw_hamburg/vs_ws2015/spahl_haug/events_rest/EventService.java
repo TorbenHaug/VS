@@ -105,6 +105,10 @@ public class EventService {
 		getSubscriber(gameId, eventType).remove(uri);
 	}
 
+	public Map<String, Map<String, Set<String>>> getAllSubscribtions() {
+		return subscribers;
+	}
+
 	// Map<gameId, TrreMap<eventId, Event>>
 	//    private Map<String, TreeMap<Integer, Event>> events;
 	//

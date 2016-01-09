@@ -50,6 +50,7 @@ public class Main {
 		final String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getResource(), event.getPlayer());
 		final Set<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
 		System.out.println("Announce for Game " + gameid + ": " + event);
+		//		System.out.println(eventService.getAllSubscribtions());
 		new Thread(){
 			@Override
 			public void run() {

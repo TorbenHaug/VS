@@ -265,7 +265,7 @@ public class WindowManager {
 			System.err.println(gameId);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerEnterGame"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
-			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerisReady"));
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerIsReady"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("GameHasStarted"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
