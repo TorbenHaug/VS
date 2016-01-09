@@ -85,7 +85,7 @@ public class GameService {
 	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", "games/" + game.getGameid(), "sadsadas");
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", "games/" + game.getGameid(), null);
 		new Thread(){
 			@Override
 			public void run() {
@@ -162,19 +162,51 @@ public class GameService {
 		if(!getGame(gameID).isStarted()){
 			final Player player = getPlayerFromGame(gameID, playerID);
 			player.setReady(true);
+			signalPlayerReadyEvent(gameID, playerID);
 			boolean gameStartable = true;
-			for(final Player aPlayer: getplayersFromGame(gameID)){
-				gameStartable = gameStartable && aPlayer.isReady();
-			}
-			if(gameStartable){
-				getGame(gameID).start();
-				final Player firstPlayer = getCurrentPlayer(gameID);
-				anouncePlayerTurn(firstPlayer);
+			if(getplayersFromGame(gameID).size() > 1){
+				for(final Player aPlayer: getplayersFromGame(gameID)){
+					gameStartable = gameStartable && aPlayer.isReady();
+				}
+				if(gameStartable){
+					getGame(gameID).start();
+					final Player firstPlayer = getCurrentPlayer(gameID);
+					anouncePlayerTurn(firstPlayer);
+					signalStartGameEvent(gameID);
+				}
 			}
 		}else {
 			final Player player = getGame(gameID).nextTurn();
 			anouncePlayerTurn(player);
 		}
+	}
+
+	private void signalPlayerReadyEvent(final long gameID, final String playerID) {
+		final EventDTO event = new EventDTO("PlayerIsReady", "In Game with the ID " + gameID + " the Player " + playerID + " is ready", "PlayerIsReady", "games/" + gameID, playerID);
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
+				} catch (RestClientException | EventServiceNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
+	}
+
+	private void signalStartGameEvent(final long gameID) {
+		final EventDTO event = new EventDTO("GameHasStarted", "The Game with the ID " + gameID + " has started", "GameHasStarted", "games/" + gameID, null);
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
+				} catch (RestClientException | EventServiceNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
 	}
 
 	private void anouncePlayerTurn(final Player player) throws PlayerDoesntExistsException{

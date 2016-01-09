@@ -348,6 +348,8 @@ public class WindowManager {
 				else {
 					lobbyWindow.update();
 				}
+			}else if(event.getType().equals("PlayerEnterGame") && (gameLobbyWindow != null)){
+				gameLobbyWindow.update();
 			}
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
