@@ -99,6 +99,10 @@ public class EventService {
 		return retVal;
 	}
 
+	public void removeSubscribtion(final String gameId, final String uri, final String eventType) {
+		getSubscriber(gameId, eventType).remove(uri);
+	}
+
 	// Map<gameId, TrreMap<eventId, Event>>
 	//    private Map<String, TreeMap<Integer, Event>> events;
 	//

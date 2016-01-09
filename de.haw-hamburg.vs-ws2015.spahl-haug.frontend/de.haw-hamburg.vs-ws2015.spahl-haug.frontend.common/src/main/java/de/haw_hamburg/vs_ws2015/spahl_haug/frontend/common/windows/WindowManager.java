@@ -167,7 +167,7 @@ public class WindowManager {
 			public void createGame() {
 				try {
 					final Game game = template.postForObject(getGamesService(), null, Game.class);
-					enterGame("" + game.getGameid());
+					//enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -179,13 +179,6 @@ public class WindowManager {
 			}
 		},getGamesService());
 
-		final MultiValueMap<String,String> params = new LinkedMultiValueMap<String, String>();
-		params.add("gameId", "nullGame");
-
-		final UriComponents postRegisterEvents = UriComponentsBuilder
-				.fromHttpUrl(getGamesService() + "/events")
-				.queryParams(params)
-				.build();
 		try {
 			final SubscriptionDTO subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("CreateNewGame"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);

@@ -7,12 +7,14 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.EventOutDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.EventsOutDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.events_rest.dto.SubscriptionDTO;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -48,11 +50,21 @@ public class Main {
 		final String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getResource(), event.getPlayer());
 		final Set<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
 		System.out.println("Announce: " + event);
-		for(final String subscriber : subscriberList) {
-			//            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri, event.getPlayer());
-			System.out.println("Announcing: " + subscriber);
-			restTemplate.postForEntity(subscriber, eventUri, String.class);
-		}
+		new Thread(){
+			@Override
+			public void run() {
+				for(final String subscriber : subscriberList) {
+					//            EventOutDTO eventOutDTO = new EventOutDTO(event.getType(), event.getName(), event.getReason(), eventUri, event.getPlayer());
+					System.out.println("Announcing: " + subscriber);
+					try{
+						restTemplate.postForEntity(subscriber, eventUri, String.class);
+					}catch(final RestClientException e){
+						eventService.removeSubscribtion(gameid, subscriber, event.getType());
+					}
+				}
+			};
+		}.start();
+
 		return new ResponseEntity<>(eventUri, HttpStatus.CREATED);
 	}
 
@@ -76,6 +88,15 @@ public class Main {
 		final String uri = subscription.getUri();
 		final String eventType = subscription.getEvent().getType();
 		eventService.subscribe(gameId, uri, eventType);
+	}
+
+	@RequestMapping(value = "/events/subscriptions", method = RequestMethod.DELETE, produces = "application/json")
+	@ResponseStatus(HttpStatus.OK)
+	public void removeSubscribtion(@RequestBody final SubscriptionDTO subscription) throws Exception {
+		final String gameId = subscription.getGameid();
+		final String uri = subscription.getUri();
+		final String eventType = subscription.getEvent().getType();
+		eventService.removeSubscribtion(gameId, uri, eventType);
 	}
 
 	@RequestMapping(value = "/events/subscriptions", method = RequestMethod.GET, produces = "application/json")

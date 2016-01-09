@@ -35,10 +35,11 @@ public class LobbyWindow extends Frame{
 	private final ILobbyActions lobbyActions;
 	private final IButtonBluePrint exitGameBp;
 	private final IButton exitGame;
-	private final Thread refreshThread;
+	//	private final Thread refreshThread;
 	private GameList gameList = new GameList();
 	private final RestTemplate template = new RestTemplate();
 	private final String gameService;
+	private final IUiThreadAccess uiThreadAccess;
 
 	public LobbyWindow(final String userName, final ILobbyActions lobbyActions, final String gameService) {
 		super("Lobby - " + userName);
@@ -51,7 +52,7 @@ public class LobbyWindow extends Frame{
 		addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowClosed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				//LobbyWindow.this.lobbyActions.closeWindow();
 			}
 		});
@@ -91,7 +92,7 @@ public class LobbyWindow extends Frame{
 
 			@Override
 			public void actionPerformed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				try {
 					LobbyWindow.this.lobbyActions.closeWindow();
 				} catch (final RepositoryException e) {
@@ -108,42 +109,63 @@ public class LobbyWindow extends Frame{
 		table.setPosition(200, 50);
 		table.setSize(800, 700);
 
-		final IUiThreadAccess uiThreadAccess = Toolkit.getUiThreadAccess();
+		uiThreadAccess = Toolkit.getUiThreadAccess();
 
-		refreshThread = new Thread(){
-			@Override
-			public void run() {
-
-				while(!isInterrupted()){
-					try {
-						Thread.sleep(1000);
-						uiThreadAccess.invokeLater(new Runnable() {
-
-							@Override
-							public void run() {
-								try {
-									final GameList games = template.getForObject(gameService, GameList.class);
-									if(games != null) {
-										updateGames(games);
-									}
-								} catch (final RestClientException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (final Exception e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						});
-					} catch (final InterruptedException e1) {
-						interrupt();
-					}
-				}
-			}
-		};
+		//		refreshThread = new Thread(){
+		//			@Override
+		//			public void run() {
+		//
+		//				while(!isInterrupted()){
+		//					try {
+		//						Thread.sleep(1000);
+		//						uiThreadAccess.invokeLater(new Runnable() {
+		//
+		//							@Override
+		//							public void run() {
+		//								try {
+		//									final GameList games = template.getForObject(gameService, GameList.class);
+		//									if(games != null) {
+		//										updateGames(games);
+		//									}
+		//								} catch (final RestClientException e) {
+		//									// TODO Auto-generated catch block
+		//									e.printStackTrace();
+		//								} catch (final Exception e) {
+		//									// TODO Auto-generated catch block
+		//									e.printStackTrace();
+		//								}
+		//							}
+		//						});
+		//					} catch (final InterruptedException e1) {
+		//						interrupt();
+		//					}
+		//				}
+		//			}
+		//		};
 
 		setVisible(true);
-		refreshThread.start();
+		//		refreshThread.start();
+	}
+
+	public void update(){
+		uiThreadAccess.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					final GameList games = template.getForObject(gameService, GameList.class);
+					if(games != null) {
+						updateGames(games);
+					}
+				} catch (final RestClientException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (final Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	protected void updateGames(final GameList games){
