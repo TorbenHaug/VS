@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameFullException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
@@ -34,6 +36,7 @@ public class Main {
 
 	private static GameService gameService;
 	private static String serviceID = null;
+	static String uri;
 
 	public static void setServiceID(final String id){
 		serviceID = id;
@@ -143,6 +146,11 @@ public class Main {
 
 	public static String getServiceID() {
 		return serviceID;
+	}
+
+	public static void setOwnURI(final String uri) {
+		Main.uri = uri;
+
 	}
 
 }
