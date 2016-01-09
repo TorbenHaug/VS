@@ -25,7 +25,7 @@ import javax.net.ssl.SSLEngineResult;
 @EnableAutoConfiguration
 public class Main {
 
-    private static String serviceId;
+	private static String serviceId;
 	private static BoardService boardService = new BoardService();
 	private static RestTemplate restTemplate = new RestTemplate();
 
@@ -76,52 +76,52 @@ public class Main {
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public PlayerDTO getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
-        Player p = boardService.getPlayerPosition(gameID, playerID);
-        PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition());
-        return player;
+		final Player p = boardService.getPlayerPosition(gameID, playerID);
+		final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition());
+		return player;
 	}
 
 
 	@RequestMapping(value = " /boards/{gameid}/places", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public List<PlaceDTO>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
-        List<PlaceDTO> placeList = new ArrayList<>();
-        for(Place place : boardService.getPlaces(gameID)) {
-            PlaceDTO placeDTO = new PlaceDTO(place.toString());
-            placeList.add(placeDTO);
-        }
+		final List<PlaceDTO> placeList = new ArrayList<>();
+		for(final Place place : boardService.getPlaces(gameID)) {
+			final PlaceDTO placeDTO = new PlaceDTO(place.toString());
+			placeList.add(placeDTO);
+		}
 		return placeList;
 	}
 
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.POST,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<BoardsServiceDTO> postRoll(@RequestBody RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNotOnBoardException {
-        int roll1 = roll.getRoll1().getNumber();
-        int roll2 = roll.getRoll2().getNumber();
-        if((roll1 < 1 || roll1 > 6) || (roll2 < 1 || roll2 > 6)) {
-            throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
-        }
-        int rollSum = roll1 + roll2;
-        Board board = boardService.placePlayer(gameID, playerID, rollSum);
+	public ResponseEntity<BoardsServiceDTO> postRoll(@RequestBody final RollsDTO roll, @PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException, RollnumberNotAcceptableException, PositionNotOnBoardException, GameDoesntExistsException {
+		final int roll1 = roll.getRoll1().getNumber();
+		final int roll2 = roll.getRoll2().getNumber();
+		if(((roll1 < 1) || (roll1 > 6)) || ((roll2 < 1) || (roll2 > 6))) {
+			throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
+		}
+		final int rollSum = roll1 + roll2;
+		final Board board = boardService.placePlayer(gameID, playerID, rollSum);
 
-        Player player = board.getPlayer(playerID);
-        List<Field> fields = board.getFields();
-        List<FieldDTO> f = new ArrayList<>();
-        for(Field field : fields) {
-            List<PlayerDTO> playerList = new ArrayList<>();
-            for(Player player1 : field.getPlayers()){
-                PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition());
-                playerList.add(playerDTO);
-            }
-            FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
-            f.add(fieldDTO);
-        }
-        BoardDTO boardDTO = new BoardDTO(f);
-        PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
-        BoardsServiceDTO boardsServiceDTO = new BoardsServiceDTO(playerDTO, boardDTO);
+		final Player player = board.getPlayer(playerID);
+		final List<Field> fields = board.getFields();
+		final List<FieldDTO> f = new ArrayList<>();
+		for(final Field field : fields) {
+			final List<PlayerDTO> playerList = new ArrayList<>();
+			for(final Player player1 : field.getPlayers()){
+				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition());
+				playerList.add(playerDTO);
+			}
+			final FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
+			f.add(fieldDTO);
+		}
+		final BoardDTO boardDTO = new BoardDTO(f);
+		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
+		final BoardsServiceDTO boardsServiceDTO = new BoardsServiceDTO(playerDTO, boardDTO);
 
-        return new ResponseEntity<>(boardsServiceDTO, HttpStatus.OK);
+		return new ResponseEntity<>(boardsServiceDTO, HttpStatus.OK);
 	}
 
 

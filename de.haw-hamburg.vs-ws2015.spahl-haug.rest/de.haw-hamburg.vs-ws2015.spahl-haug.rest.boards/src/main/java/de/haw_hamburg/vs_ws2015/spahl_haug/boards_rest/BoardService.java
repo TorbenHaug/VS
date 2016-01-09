@@ -1,6 +1,8 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
 
@@ -11,11 +13,11 @@ import java.util.Map;
 
 
 public class BoardService {
-    // Map<gameId, Board>
-	private Map<Long, Board> boards;
+	// Map<gameId, Board>
+	private final Map<Long, Board> boards;
 
 	public BoardService(){
-        this.boards = new HashMap<>();
+		this.boards = new HashMap<>();
 	}
 
 	@JsonIgnore
@@ -25,8 +27,8 @@ public class BoardService {
 
 	public void createBoard(final long gameID) {
 		final Board board = new Board();
-        this.boards.put(gameID, board);
-    }
+		this.boards.put(gameID, board);
+	}
 
 	public Map<Long, Board> getBoards() {
 		return boards;
@@ -47,14 +49,17 @@ public class BoardService {
 	}
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException {
-        boards.get(gameID).setPlayer(playerID);
-    }
+		boards.get(gameID).setPlayer(playerID);
+	}
 
-    public Board placePlayer(final long gameID, final String playerID, int numOfPosMoves) throws PositionNotOnBoardException, PlayerDoesntExistsException {
-        Board board = boards.get(gameID);
+	public Board placePlayer(final long gameID, final String playerID, final int numOfPosMoves) throws PositionNotOnBoardException, PlayerDoesntExistsException, GameDoesntExistsException {
+		final Board board = boards.get(gameID);
+		if(board == null){
+			throw new GameDoesntExistsException("Board cant find Game");
+		}
 		board.placePlayerOnPos(playerID, numOfPosMoves);
 		return board;
-    }
+	}
 
 	public void removePlayerFromBoard(final long gameID, final String playerID) {
 		boards.get(gameID).removePlayer(playerID);
@@ -69,7 +74,7 @@ public class BoardService {
 		return getBoard(gameID).getPlayer(playerID);
 	}
 
-    public List<Player> getPlayerFromBoard(long gameID) {
-        return boards.get(gameID).getPlayers();
-    }
+	public List<Player> getPlayerFromBoard(final long gameID) {
+		return boards.get(gameID).getPlayers();
+	}
 }

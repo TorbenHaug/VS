@@ -85,7 +85,7 @@ public class Game {
 		}
 	}
 
-	public void aquireMutex(final String playerId) throws MutexAllreadyAquiredException, MutexIsYoursException, PlayerDoesntExistsException {
+	synchronized public void aquireMutex(final String playerId) throws MutexAllreadyAquiredException, MutexIsYoursException, PlayerDoesntExistsException {
 		final Player player = this.getPlayer(playerId);
 		if(player == null){
 			throw new PlayerDoesntExistsException("Player " + playerId + " not in Game");
