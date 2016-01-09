@@ -16,6 +16,8 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -68,7 +70,11 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 			e.printStackTrace();
 		}
 		final RestTemplate restTemplate = new RestTemplate();
-		final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://vs-docker.informatik.haw-hamburg.de/ports/8053/services", dto, ResponseRegisterServiceDTO.class);
+		final String base64Creds = "YWJxMzI5OkRLR1JIZDIwMTUy";
+		final HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Basic " + base64Creds);
+		final HttpEntity<RegisterServiceDTO> request = new HttpEntity<RegisterServiceDTO>(dto,headers);
+		final ResponseEntity<ResponseRegisterServiceDTO> registerServiceDTO = restTemplate.postForEntity("https://vs-docker.informatik.haw-hamburg.de/ports/8053/services", request, ResponseRegisterServiceDTO.class);
 		Main.setServiceID(registerServiceDTO.getBody().get_uri());
 	}
 	/**

@@ -80,6 +80,12 @@ public class Main {
         eventService.subscribe(gameId, uri, eventType);
     }
 
+    @RequestMapping(value = "/events/subscriptions", method = RequestMethod.GET, produces = "application/json")
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    public void getSubscribtions() {
+
+    }
+
 
     public static void main(final String[] args) throws Exception {
         SpringApplication.run(Main.class, args);

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class EventService {
+    // Map<gameId, TrreMap<eventId, Event>>
     private Map<String, TreeMap<Integer, Event>> events;
 
     public EventService() {
