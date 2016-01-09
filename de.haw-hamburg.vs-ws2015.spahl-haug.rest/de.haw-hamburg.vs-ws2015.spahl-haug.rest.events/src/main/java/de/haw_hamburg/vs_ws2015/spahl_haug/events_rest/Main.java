@@ -49,7 +49,7 @@ public class Main {
 	public ResponseEntity<String> createEvent(@RequestParam("gameid") final String gameid, @RequestBody final EventDTO event) throws Exception {
 		final String eventUri = eventService.createEvent(gameid, event.getType(), event.getName(), event.getReason(), event.getResource(), event.getPlayer());
 		final Set<String> subscriberList = eventService.getSubscriber(gameid, event.getType());
-		System.out.println("Announce: " + event);
+		System.out.println("Announce for Game " + gameid + ": " + event);
 		new Thread(){
 			@Override
 			public void run() {
@@ -59,6 +59,7 @@ public class Main {
 					try{
 						restTemplate.postForEntity(subscriber, eventUri, String.class);
 					}catch(final RestClientException e){
+						System.out.println("Cant find " + subscriber);
 						eventService.removeSubscribtion(gameid, subscriber, event.getType());
 					}
 				}

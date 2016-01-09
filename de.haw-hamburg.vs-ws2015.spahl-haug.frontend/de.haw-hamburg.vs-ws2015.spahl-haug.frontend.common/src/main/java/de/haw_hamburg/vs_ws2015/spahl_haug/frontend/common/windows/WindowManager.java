@@ -258,6 +258,23 @@ public class WindowManager {
 			}
 		});
 
+		SubscriptionDTO subscriptionDTO;
+		try {
+			final String[] split = gameURI.split("/");
+			final String gameId = split[split.length-1];
+			System.err.println(gameId);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerEnterGame"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerisReady"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("GameHasStarted"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+		} catch (final UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 
 	}
 
@@ -348,8 +365,11 @@ public class WindowManager {
 				else {
 					lobbyWindow.update();
 				}
-			}else if(event.getType().equals("PlayerEnterGame") && (gameLobbyWindow != null)){
+			}else if((event.getType().equals("PlayerEnterGame") || event.getType().equals("PlayerIsReady")) && (gameLobbyWindow != null)){
 				gameLobbyWindow.update();
+			}
+			else if((event.getType().equals("GameHasStarted")) && (gameLobbyWindow != null)){
+				showGameWindow(event.getResource());
 			}
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block

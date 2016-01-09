@@ -37,4 +37,12 @@ public class EventDTO {
 		return resource;
 	}
 
+	@Override
+	public String toString() {
+		return "EventDTO [type=" + type + ", name=" + name + ", reason=" + reason + ", player=" + player + ", resource="
+				+ resource + "]";
+	}
+
+
+
 }
