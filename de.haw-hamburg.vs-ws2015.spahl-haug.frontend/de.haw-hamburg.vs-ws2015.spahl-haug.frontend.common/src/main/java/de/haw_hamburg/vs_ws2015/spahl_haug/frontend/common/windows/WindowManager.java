@@ -29,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionEventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.restservice.RestService;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
@@ -68,6 +70,7 @@ public class WindowManager {
 			try {
 				gamesService = serviceRepository.getService("spahl_haug_games");
 			} catch (final Exception e) {
+				e.printStackTrace();
 				throw new RepositoryException("Cannot find Game");
 			}
 		}
@@ -180,11 +183,12 @@ public class WindowManager {
 		params.add("gameId", "nullGame");
 
 		final UriComponents postRegisterEvents = UriComponentsBuilder
-				.fromHttpUrl(getGamesService())
+				.fromHttpUrl(getGamesService() + "/events")
 				.queryParams(params)
 				.build();
 		try {
-			template.postForLocation(postRegisterEvents.toUriString(), "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/event");
+			final SubscriptionDTO subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("CreateNewGame"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -312,7 +316,7 @@ public class WindowManager {
 	}
 
 	public void anounceEvent(final String uri) {
-		System.err.println(uri);
+		System.err.println("AnounceEventTest" + uri);
 
 	}
 

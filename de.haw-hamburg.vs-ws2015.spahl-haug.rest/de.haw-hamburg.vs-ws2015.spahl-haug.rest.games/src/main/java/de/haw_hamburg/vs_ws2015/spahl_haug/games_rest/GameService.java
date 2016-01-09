@@ -48,7 +48,7 @@ public class GameService {
 	private String getEventService() throws EventServiceNotFoundException{
 		try{
 			if(eventService == null) {
-				eventService = serviceRepository.getService("spahl_haug_boards");
+				eventService = serviceRepository.getService("spahl_haug_event");
 			}
 			return eventService;
 		}catch(final Exception e){
@@ -85,7 +85,7 @@ public class GameService {
 	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "games/" + game.getGameid(), "CreateNewGame", null);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", "games/" + game.getGameid(), "sadsadas");
 		new Thread(){
 			@Override
 			public void run() {
