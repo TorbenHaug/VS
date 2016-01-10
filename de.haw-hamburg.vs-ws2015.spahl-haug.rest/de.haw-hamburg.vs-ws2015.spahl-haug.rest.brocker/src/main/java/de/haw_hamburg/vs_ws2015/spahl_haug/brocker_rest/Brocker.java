@@ -7,9 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotForSaleException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotSoldException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
@@ -18,15 +22,16 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsExcept
 public class Brocker {
 
 	private final String gameId;
-	private final Map<String, Player> players;
+	private final String players;
 	private final Map<String, Place> places;
+	private final RestTemplate restTemplate;
+	private final String boardServiceURI;
 
-	public Brocker(final String gameId, final BrockerDTO brockerDTO) {
+	public Brocker(final String gameId, final BrockerDTO brockerDTO, final RestTemplate restTemplate, final String boardServiceURI) {
 		this.gameId = gameId;
-		this.players = new ConcurrentHashMap<>();
-		for(final Player player: brockerDTO.getPlayers()){
-			players.put(player.getId(), player);
-		}
+		this.restTemplate = restTemplate;
+		this.boardServiceURI = boardServiceURI;
+		this.players = brockerDTO.getPlayers();
 		this.places = new ConcurrentHashMap<>();
 	}
 
@@ -34,8 +39,8 @@ public class Brocker {
 		return gameId;
 	}
 
-	public List<Player> getPlayers() {
-		return new ArrayList<Player>(players.values());
+	public String getPlayers() {
+		return players;
 	}
 
 	public List<Place> getPlaces() {
@@ -70,16 +75,21 @@ public class Brocker {
 	}
 
 	public Player getPlayer(final String id) throws PlayerDoesntExistsException {
-		final Player player = players.get(id);
-		if(player == null){
+		System.out.println("getPlayer " + id);
+		try{
+			final Player player = restTemplate.getForObject(boardServiceURI + "/" + getPlayers() + "/" + id, Player.class);
+			return player;
+		}catch(final RestClientException e){
 			throw new PlayerDoesntExistsException("There is no Player " + id + " in game");
 		}
-		return player;
 	}
 
-	public void changeOwner(final String placeid, final String id) throws PlaceNotFoundException, PlayerDoesntExistsException {
+	public void changeOwner(final String placeid, final String id) throws PlaceNotFoundException, PlayerDoesntExistsException, NotForSaleException {
 		getPlayer(id);
 		final Place place = getPlace(placeid);
+		if (place.getOwner().equals("NotForSale")){
+			throw new NotForSaleException("Not for sale");
+		}
 		place.setOwner(id);
 	}
 

@@ -27,6 +27,7 @@ public class BrockerService {
 	private final Map<String, Brocker> brockers;
 	private String bankServiceURI = null;
 	private final RestTemplate restTemplate = new RestTemplate();
+	private String boardServiceURI;
 
 	public BrockerService(){
 		brockers = new ConcurrentHashMap<>();
@@ -45,6 +46,19 @@ public class BrockerService {
 		}
 		return bankServiceURI;
 	}
+
+	private String getBoardServiceURI() throws RepositoryException{
+		if(boardServiceURI==null){
+			final ServiceRepository serviceRepository = new ServiceRepository();
+			try {
+				boardServiceURI = serviceRepository.getService("spahl_haug_boards");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find board");
+			}
+		}
+		return boardServiceURI;
+	}
+
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
 		final Brocker brocker = brockers.get(gameId);
 		if(brocker == null){
@@ -58,7 +72,7 @@ public class BrockerService {
 		if(brockers.containsKey(gameId)){
 			throw new Exception("Brocker already exists");
 		}
-		return brockers.put(gameId, new Brocker(gameId, brockerDTO));
+		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getBoardServiceURI()));
 
 	}
 
@@ -90,14 +104,14 @@ public class BrockerService {
 
 	}
 
-	public void changeOwner(final String gameId, final String placeid, final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException {
+	public void changeOwner(final String gameId, final String placeid, final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException, NotForSaleException {
 		getBrocker(gameId).changeOwner(placeid,player.getId());
 
 	}
 
 	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException, RestClientException, RepositoryException {
 		final Place place = getPlace(gameId, placeid);
-		if(place.getOwner() != null){
+		if((place.getOwner() != null) || place.getOwner().equals("NotForSale")){
 			throw new NotForSaleException("The Owner is " + place.getOwner());
 		}
 		getBrocker(gameId).getPlayer(player.getId());
@@ -118,15 +132,10 @@ public class BrockerService {
 
 	public void visit(final String gameId, final String placeid, final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
 		final Place place = getPlace(gameId, placeid);
-		final Player player = getBrocker(gameId).getPlayer(playerid);
-		player.setPlace(place);
-		if((place.getOwner() != null) && !place.getOwner().equals(playerid)){
+		if((place.getOwner() != null) && !place.getOwner().equals("NotForSale") && !place.getOwner().equals(playerid)){
 			getBrocker(gameId).getPlayer(place.getOwner());
 			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
 		}
-
-
-
 	}
 
 	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException, RestClientException, RepositoryException {

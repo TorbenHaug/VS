@@ -2,6 +2,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrockerDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrokerPlaceDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.CreateBankAccountDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankServiceNotFoundException;
@@ -72,12 +74,8 @@ public class BoardService {
 		return boards.get(gameID);
 	}
 
-	public void createBoard(final long gameID) throws BankServiceNotFoundException {
-		try {
-			template.put(getBrokerService() + "/" + gameID, null);
-		} catch (RestClientException | BrokerServiceNotFoundException e) {
-			throw new BankServiceNotFoundException(e.getMessage());
-		}
+	public void createBoard(final long gameID) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
+
 
 		try {
 			template.put(getBankService() + "/" + gameID, null);
@@ -88,7 +86,24 @@ public class BoardService {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			throw new BankServiceNotFoundException(e.getMessage());
+			throw new BrokerServiceNotFoundException(e.getMessage());
+		}
+
+		try {
+			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), "game/" + gameID, "boards/" + gameID + "/players");
+			System.out.println(getBrokerService() + "/" + gameID);
+			template.put(getBrokerService() + "/" + gameID, brockerDTO);
+		} catch (RestClientException | BrokerServiceNotFoundException e) {
+			throw new BrokerServiceNotFoundException(e.getMessage());
+		}
+		for(final Place place: Place.values()){
+			final BrokerPlaceDTO brokerPlaceDTO = new BrokerPlaceDTO(place.name(), place.getOwner(), place.getValue(), place.getRent(), place.getCost(), place.getHouses());
+			try {
+				template.put(getBrokerService() + "/" + gameID + "/places/" + place.getPosition(), brokerPlaceDTO);
+			} catch (RestClientException | BrokerServiceNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		final Board board = new Board();

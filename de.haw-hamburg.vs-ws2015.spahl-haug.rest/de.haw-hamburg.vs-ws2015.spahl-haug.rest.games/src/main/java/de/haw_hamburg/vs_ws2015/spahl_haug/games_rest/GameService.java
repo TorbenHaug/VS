@@ -66,20 +66,6 @@ public class GameService {
 
 	private void addNewGame(final long id, final Game game) throws BoardServiceNotFoundException{
 		this.games.put(id, game);
-		String url = null;
-		try {
-			url = getBoardService() + "/" + id;
-			try {
-				template.put(url,null);
-			} catch (final Exception e) {
-				this.games.remove(id);
-				throw new BoardServiceNotFoundException("No BoardService found");
-			}
-		} catch (final Exception e1) {
-			this.games.remove(id);
-			throw new BoardServiceNotFoundException(e1.getMessage());
-		}
-
 	}
 
 	public Game createNewGame() throws BoardServiceNotFoundException{
@@ -123,62 +109,76 @@ public class GameService {
 		final Player player = new Player(playerName, playerID, playerURI);
 		final Game game = getGame(gameID);
 		game.addPlayer(player);
-		try {
-			final String serviceCall = serviceRepository.getService(boardName) + "/" + gameID + "/players/" + playerID;
-			System.err.println(serviceCall);
-			template.put(serviceCall,null);
-			final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", "games/" + game.getGameid(), playerID);
-			new Thread(){
-				@Override
-				public void run() {
-					try {
-						template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
-					} catch (RestClientException | EventServiceNotFoundException e) {
-						e.printStackTrace();
-					}
-				};
-			}.start();
 
-			new Thread(){
-				@Override
-				public void run() {
-					try {
-						template.postForLocation(getEventService() + "/events?gameid=nullGame", event);
-					} catch (RestClientException | EventServiceNotFoundException e) {
-						e.printStackTrace();
-					}
-				};
-			}.start();
-		} catch (final Exception e) {
-			game.removePlayer(playerID);
-			throw new BoardServiceNotFoundException("Unable to add Player " + playerID + " to Board");
-		}
+		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", "games/" + game.getGameid(), playerID);
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
+				} catch (RestClientException | EventServiceNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
 
-
-
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					template.postForLocation(getEventService() + "/events?gameid=nullGame", event);
+				} catch (RestClientException | EventServiceNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
 	}
 
-	public void signalPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException, GameNotStartedException {
+	synchronized public void signalPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException, GameNotStartedException, BoardServiceNotFoundException {
 		if(!getGame(gameID).isStarted()){
 			final Player player = getPlayerFromGame(gameID, playerID);
 			player.setReady(true);
 			signalPlayerReadyEvent(gameID, playerID);
-			boolean gameStartable = true;
 			if(getplayersFromGame(gameID).size() > 1){
+				System.out.println("Players on Start: " + getplayersFromGame(gameID));
+				boolean gameStartable = true;
 				for(final Player aPlayer: getplayersFromGame(gameID)){
 					gameStartable = gameStartable && aPlayer.isReady();
 				}
 				if(gameStartable){
 					getGame(gameID).start();
 					final Player firstPlayer = getCurrentPlayer(gameID);
+					startGame(gameID);
 					signalStartGameEvent(gameID);
 					anouncePlayerTurn(firstPlayer);
-
 				}
 			}
 		}else {
 			final Player player = getGame(gameID).nextTurn();
 			anouncePlayerTurn(player);
+		}
+	}
+
+	private void startGame(final long id) throws BoardServiceNotFoundException, GameDoesntExistsException {
+		String url = null;
+		url = getBoardService() + "/" + id;
+		System.out.println("startGame BoardserviceUrl: " + url);
+		try {
+			template.put(url,null);
+		} catch (final Exception e) {
+			this.games.remove(id);
+			throw new BoardServiceNotFoundException("No BoardService found");
+		}
+		for(final Player aPlayer: getplayersFromGame(id)){
+			String serviceCall;
+			try {
+				serviceCall = serviceRepository.getService(boardName) + "/" + id + "/players/" + aPlayer.getId();
+				System.err.println(serviceCall);
+				template.put(serviceCall,null);
+			} catch (final Exception e) {
+				throw new BoardServiceNotFoundException(e.getMessage());
+			}
+
 		}
 	}
 

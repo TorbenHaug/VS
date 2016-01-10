@@ -46,7 +46,7 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createBoard(@PathVariable(value="gameid") final long gameID) throws BankServiceNotFoundException {
+	public void createBoard(@PathVariable(value="gameid") final long gameID) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
 		boardService.createBoard(gameID);
 	}
 

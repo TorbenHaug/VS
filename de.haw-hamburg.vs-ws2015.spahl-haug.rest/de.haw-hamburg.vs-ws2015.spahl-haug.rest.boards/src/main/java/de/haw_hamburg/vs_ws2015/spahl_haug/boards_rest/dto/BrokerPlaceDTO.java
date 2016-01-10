@@ -12,6 +12,18 @@ public class BrokerPlaceDTO {
 
 	public BrokerPlaceDTO() {}
 
+	public BrokerPlaceDTO(final String place, final String owner, final int value, final List<Integer> rent, final List<Integer> cost, final int houses) {
+		super();
+		this.place = place;
+		this.owner = owner;
+		this.value = value;
+		this.rent = rent;
+		this.cost = cost;
+		this.houses = houses;
+	}
+
+
+
 	public String getPlace() {
 		return place;
 	}
