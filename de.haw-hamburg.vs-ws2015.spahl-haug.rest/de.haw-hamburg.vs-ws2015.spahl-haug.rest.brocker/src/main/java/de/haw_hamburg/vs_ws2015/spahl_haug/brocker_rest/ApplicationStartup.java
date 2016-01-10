@@ -50,7 +50,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
 		dto.setName("spahl_haug_broker");
 		dto.setDescription("BrokerService von Louisa Spahl und Torben Haug");
-		dto.setService("boker");
+		dto.setService("broker");
 		try {
 			SSLUtil.turnOffSslChecking();
 			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/broker");
