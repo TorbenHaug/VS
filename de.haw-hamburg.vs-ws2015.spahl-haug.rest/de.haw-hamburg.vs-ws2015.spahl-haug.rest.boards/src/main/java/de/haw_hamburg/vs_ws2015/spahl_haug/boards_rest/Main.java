@@ -14,6 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -29,7 +30,7 @@ public class Main {
 
 	private static String serviceId;
 	private static BoardService boardService;
-//	private static RestTemplate restTemplate = new RestTemplate();
+	//	private static RestTemplate restTemplate = new RestTemplate();
 
 	@RequestMapping(value = "/boards", method = RequestMethod.GET,  produces = "application/json")
 	public BoardsDTO getGames() {
@@ -45,7 +46,7 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createBoard(@PathVariable(value="gameid") final long gameID) {
+	public void createBoard(@PathVariable(value="gameid") final long gameID) throws BankServiceNotFoundException {
 		boardService.createBoard(gameID);
 	}
 
@@ -64,7 +65,7 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
-	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException {
+	public void  placePlayer(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException, RestClientException, BankServiceNotFoundException {
 		boardService.placePlayer(gameID, playerID);
 	}
 
@@ -130,7 +131,7 @@ public class Main {
 	public static void main(final String[] args) throws Exception {
 		//		final ServiceRepository repo = new ServiceRepository();
 		//		System.err.println(repo.getService("spahl_haug_games"));
-        boardService = new BoardService(new ServiceRepository());
+		boardService = new BoardService(new ServiceRepository());
 		SpringApplication.run(Main.class, args);
 	}
 

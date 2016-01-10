@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
@@ -55,7 +56,6 @@ public class GameService {
 			throw new EventServiceNotFoundException("No EventService found");
 		}
 	}
-
 
 	private long getNextGameID(){
 		while(games.get(this.nextGameID) != null){
