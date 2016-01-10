@@ -1,8 +1,8 @@
-package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto;
+package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto;
 
 import java.util.List;
 
-public class Place {
+public class BrokerPlaceDTO {
 	private String place;
 	private String owner;
 	private int value;
@@ -10,7 +10,19 @@ public class Place {
 	private List<Integer> cost;
 	private int houses;
 
-	public Place() {}
+	public BrokerPlaceDTO() {}
+
+	public BrokerPlaceDTO(final String place, final String owner, final int value, final List<Integer> rent, final List<Integer> cost, final int houses) {
+		super();
+		this.place = place;
+		this.owner = owner;
+		this.value = value;
+		this.rent = rent;
+		this.cost = cost;
+		this.houses = houses;
+	}
+
+
 
 	public String getPlace() {
 		return place;

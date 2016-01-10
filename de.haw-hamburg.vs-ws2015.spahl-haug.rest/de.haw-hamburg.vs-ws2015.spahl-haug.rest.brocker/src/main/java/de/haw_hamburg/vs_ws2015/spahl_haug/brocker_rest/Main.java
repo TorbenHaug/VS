@@ -24,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableAutoConfiguration
 public class Main {
 
-    private static String serviceId;
+	private static String serviceId;
 	private final BrockerService brockerService;
 
 
@@ -73,7 +73,7 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/broker/{gameId}/places/{placeid}/owner", method = RequestMethod.PUT,  produces = "application/json")
-	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException {
+	public void putOwner(@PathVariable(value="gameId") final String gameId, @PathVariable(value="placeid") final String placeid, @RequestBody final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException, NotForSaleException {
 		brockerService.changeOwner(gameId,placeid,player);
 	}
 

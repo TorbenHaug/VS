@@ -1,4 +1,4 @@
-package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto;
+package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,17 @@ public class BrockerDTO {
 
 	public BrockerDTO() {
 	}
+
+
+
+	public BrockerDTO(final String gameid, final String uri, final String players) {
+		super();
+		this.gameid = gameid;
+		this.uri = uri;
+		this.players = players;
+	}
+
+
 
 	public String getGameid() {
 		return gameid;

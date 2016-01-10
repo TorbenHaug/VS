@@ -303,6 +303,7 @@ public class GameWindow extends Frame implements IMyFrame{
 
 	private PlayersDTO getBoardPlayer(final String id){
 		try {
+			System.out.println(boardServiceAdress + "/" + id);
 			return template.getForObject(boardServiceAdress + "/" + id, PlayersDTO.class);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block

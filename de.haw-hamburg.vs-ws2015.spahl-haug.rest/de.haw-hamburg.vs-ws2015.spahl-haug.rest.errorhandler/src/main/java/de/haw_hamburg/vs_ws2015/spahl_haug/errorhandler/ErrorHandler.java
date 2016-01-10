@@ -40,7 +40,9 @@ public class ErrorHandler {
 
 	@ExceptionHandler({
 		BoardServiceNotFoundException.class,
-		EventServiceNotFoundException.class
+		EventServiceNotFoundException.class,
+		BankServiceNotFoundException.class,
+		BrokerServiceNotFoundException.class
 	})
 	@ResponseBody
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
