@@ -53,7 +53,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		dto.setService("boker");
 		try {
 			SSLUtil.turnOffSslChecking();
-			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/broker");
+			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort());
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
