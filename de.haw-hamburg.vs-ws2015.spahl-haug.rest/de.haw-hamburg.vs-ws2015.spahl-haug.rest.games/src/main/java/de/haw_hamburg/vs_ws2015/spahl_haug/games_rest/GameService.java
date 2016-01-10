@@ -171,8 +171,9 @@ public class GameService {
 				if(gameStartable){
 					getGame(gameID).start();
 					final Player firstPlayer = getCurrentPlayer(gameID);
-					anouncePlayerTurn(firstPlayer);
 					signalStartGameEvent(gameID);
+					anouncePlayerTurn(firstPlayer);
+
 				}
 			}
 		}else {

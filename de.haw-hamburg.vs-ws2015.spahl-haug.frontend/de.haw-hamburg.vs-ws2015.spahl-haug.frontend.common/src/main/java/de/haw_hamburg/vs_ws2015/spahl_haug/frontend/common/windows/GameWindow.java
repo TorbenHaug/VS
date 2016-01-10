@@ -42,9 +42,9 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final IGameActions lobbyActions;
 	private final IButtonBluePrint exitGameBp;
 	private final IButton exitGame;
-	private final Thread refreshThread;
+	//	private final Thread refreshThread;
 	private final RestTemplate template = new RestTemplate();
-	private final String gameId;
+	private final String gameURI;
 	private final List<PlayerPosition> players = new ArrayList<PlayerPosition>();
 	private final Map<String, PlayerInfo> playerInfos = new ConcurrentHashMap<String,PlayerInfo>();
 	private PlayersDTO boardPlayer;
@@ -55,9 +55,9 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final IUiThreadAccess uiThreadAccess;
 	private final String diceServiceAdress;
 
-	public GameWindow(final String userName, final String gameId, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress) {
-		super("GameLobby - " + userName + " - " + gameId);
-		this.gameId = gameId;
+	public GameWindow(final String userName, final String gameURI, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress) {
+		super("GameWindow - " + userName + " - " + gameURI);
+		this.gameURI = gameURI;
 		this.lobbyActions = lobbyActions;
 		this.gameServiceAdress = gameServiceAdress;
 		this.boardServiceAdress = boardServiceAdress;
@@ -70,7 +70,7 @@ public class GameWindow extends Frame implements IMyFrame{
 		addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowClosed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				//GameWindow.this.lobbyActions.closeWindow();
 			}
 		});
@@ -84,7 +84,7 @@ public class GameWindow extends Frame implements IMyFrame{
 			@Override
 			public void actionPerformed() {
 				roll.setEnabled(false);
-				final String turnAdress = gameServiceAdress + "/" + gameId + "/players/turn";
+				final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
 				try {
 					System.out.println(turnAdress);
 					final ResponseEntity<String> mutex = template.exchange(turnAdress + "?player=" + userName, HttpMethod.PUT, null, String.class);
@@ -97,6 +97,8 @@ public class GameWindow extends Frame implements IMyFrame{
 					final ResponseEntity<RollDTO> roll2 = template.exchange(roolAdress, HttpMethod.GET, null, RollDTO.class);
 					final PostRollDTO postRollDTO = new PostRollDTO(roll1.getBody(), roll2.getBody());
 					System.out.println(postRollDTO);
+					final String[] split = gameURI.split("/");
+					final String gameId = split[split.length-1];
 					final String rollAdress = boardServiceAdress + "/"  + gameId + "/players/" + userName + "/roll";
 					template.postForLocation(rollAdress, postRollDTO);
 				}catch(final RestClientException e){
@@ -104,7 +106,7 @@ public class GameWindow extends Frame implements IMyFrame{
 				}
 				try{
 					final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
-					final String readyAdress = gameServiceAdress + "/" + gameId + "/players/" + userName + "/ready";
+					final String readyAdress = gameServiceAdress + "/" + gameURI + "/players/" + userName + "/ready";
 					try{
 						template.put(readyAdress, null);
 					}catch(final RestClientException e){
@@ -126,7 +128,7 @@ public class GameWindow extends Frame implements IMyFrame{
 
 			@Override
 			public void actionPerformed() {
-				refreshThread.interrupt();
+				//				refreshThread.interrupt();
 				try {
 					GameWindow.this.lobbyActions.closeWindow();
 				} catch (final RepositoryException e) {
@@ -139,7 +141,7 @@ public class GameWindow extends Frame implements IMyFrame{
 		createPlayerPositions();
 
 		int playerInfoY = 170;
-		final Game initialGame = getGame(gameId);
+		final Game initialGame = getGame(gameURI);
 		for(final Player player: initialGame.getPlayers()){
 			final PlayerInfo playerInfo = new PlayerInfo(this, player.getId(), colors.remove(0));
 			playerInfo.setPosition(0, playerInfoY);
@@ -161,29 +163,30 @@ public class GameWindow extends Frame implements IMyFrame{
 
 		uiThreadAccess = Toolkit.getUiThreadAccess();
 
-		refreshThread = new Thread(){
-			@Override
-			public void run() {
-
-				while(!isInterrupted()){
-					try {
-						Thread.sleep(1000);
-						uiThreadAccess.invokeLater(new Runnable() {
-
-							@Override
-							public void run() {
-								updatePositions();
-							}
-						});
-					} catch (final InterruptedException e1) {
-						interrupt();
-					}
-				}
-			}
-		};
+		//		refreshThread = new Thread(){
+		//			@Override
+		//			public void run() {
+		//
+		//				while(!isInterrupted()){
+		//					try {
+		//						Thread.sleep(1000);
+		//						uiThreadAccess.invokeLater(new Runnable() {
+		//
+		//							@Override
+		//							public void run() {
+		//								updatePositions();
+		//							}
+		//						});
+		//					} catch (final InterruptedException e1) {
+		//						interrupt();
+		//					}
+		//				}
+		//			}
+		//		};
 
 		setVisible(true);
-		refreshThread.start();
+		//		refreshThread.start();
+		update();
 	}
 
 	private void setPlayerFromTo(final String color, final int oldPos, final int newPos) {
@@ -270,6 +273,8 @@ public class GameWindow extends Frame implements IMyFrame{
 	}
 
 	protected void updatePositions(){
+		final String[] split = gameURI.split("/");
+		final String gameId = split[split.length-1];
 		final PlayersDTO tmpPlayers = getBoardPlayer(gameId);
 		System.out.println(tmpPlayers);
 		for(final Player newPlayer: tmpPlayers.getPlayers()){
@@ -325,6 +330,15 @@ public class GameWindow extends Frame implements IMyFrame{
 	@Override
 	public IUiThreadAccess getUIThread() {
 		return uiThreadAccess;
+	}
+
+	public void update() {
+		uiThreadAccess.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updatePositions();
+			}
+		});
 	}
 
 

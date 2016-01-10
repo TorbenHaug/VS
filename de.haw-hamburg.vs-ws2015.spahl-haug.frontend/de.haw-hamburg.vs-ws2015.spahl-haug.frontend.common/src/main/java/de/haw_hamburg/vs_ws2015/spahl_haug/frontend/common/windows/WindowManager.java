@@ -278,16 +278,16 @@ public class WindowManager {
 
 	}
 
-	protected void showGameWindow(final String gameId) throws RepositoryException {
+	protected void showGameWindow(final String gameURI) throws RepositoryException {
 		disposeAll();
 		System.out.println("showit");
-		gameWindow = new GameWindow(userName, gameId, new IGameActions() {
+		gameWindow = new GameWindow(userName, gameURI, new IGameActions() {
 
 			@Override
 			public void closeWindow() throws RepositoryException {
 				String url;
 				try {
-					url = getGamesService() + "/" + gameId + "/players/" + userName;
+					url = getGamesService() + "/" + gameURI + "/players/" + userName;
 					template.delete(url);
 				} catch (final Exception e) {
 					// TODO Auto-generated catch block
@@ -299,6 +299,17 @@ public class WindowManager {
 			}
 		}, getGamesService(), getBoardsService(), getDiceService());
 
+		SubscriptionDTO subscriptionDTO;
+		try {
+			final String[] split = gameURI.split("/");
+			final String gameId = split[split.length-1];
+			System.err.println(gameId);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerMovedPosition"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+		} catch (final UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void setUsername(final String userName) {
@@ -334,6 +345,22 @@ public class WindowManager {
 	}
 
 	public void anounceTurn() {
+
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					while(gameWindow == null){
+						Thread.sleep(500);
+					}
+					gameWindow.anounceTurn();
+				} catch (final InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}.start();
 		//		System.out.println("EnableRollButton2");
 		//		if((gameWindow == null) && (gameLobbyWindow != null)){
 		//			gameLobbyWindow.anounceStartGame();
@@ -353,31 +380,40 @@ public class WindowManager {
 	}
 
 	synchronized public void anounceEvent(final String uri) {
-		try {
-			final EventDTO event = template.getForObject(getEventService() + uri, EventDTO.class);
-			System.err.println("Event for Player '" + userName + "': " + event);
-			if(event.getType().equals("CreateNewGame") && (lobbyWindow != null)){
-				lobbyWindow.update();
-			}else if(event.getType().equals("PlayerEnterGame") && (lobbyWindow != null)){
-				if((event.getPlayer() != null) && event.getPlayer().equals(userName)){
-					showGameLobby(event.getResource());
+		uiThreadAccess.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					final EventDTO event = template.getForObject(getEventService() + uri, EventDTO.class);
+					System.err.println("Event for Player '" + userName + "': " + event);
+					if(event.getType().equals("CreateNewGame") && (lobbyWindow != null)){
+						lobbyWindow.update();
+					}else if(event.getType().equals("PlayerEnterGame") && (lobbyWindow != null)){
+						if((event.getPlayer() != null) && event.getPlayer().equals(userName)){
+							showGameLobby(event.getResource());
+						}
+						else {
+							lobbyWindow.update();
+						}
+					}else if((event.getType().equals("PlayerEnterGame") || event.getType().equals("PlayerIsReady")) && (gameLobbyWindow != null)){
+						gameLobbyWindow.update();
+					}
+					else if((event.getType().equals("GameHasStarted")) && (gameLobbyWindow != null)){
+						showGameWindow(event.getResource());
+					}else if((event.getType().equals("PlayerMovedPosition")) && (gameWindow != null)){
+						gameWindow.update();
+					}
+				} catch (final RestClientException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (final RepositoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				else {
-					lobbyWindow.update();
-				}
-			}else if((event.getType().equals("PlayerEnterGame") || event.getType().equals("PlayerIsReady")) && (gameLobbyWindow != null)){
-				gameLobbyWindow.update();
 			}
-			else if((event.getType().equals("GameHasStarted")) && (gameLobbyWindow != null)){
-				showGameWindow(event.getResource());
-			}
-		} catch (final RestClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (final RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		});
+
 
 	}
 
