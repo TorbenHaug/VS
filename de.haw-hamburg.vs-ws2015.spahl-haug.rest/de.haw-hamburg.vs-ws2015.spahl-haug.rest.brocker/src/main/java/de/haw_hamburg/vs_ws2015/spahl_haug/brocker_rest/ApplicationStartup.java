@@ -48,7 +48,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_boker");
+		dto.setName("spahl_haug_broker");
 		dto.setDescription("BrokerService von Louisa Spahl und Torben Haug");
 		dto.setService("boker");
 		try {
