@@ -75,9 +75,11 @@ public class Brocker {
 	}
 
 	public Player getPlayer(final String id) throws PlayerDoesntExistsException {
-		System.out.println("getPlayer " + id);
+
 		try{
-			final Player player = restTemplate.getForObject(boardServiceURI + "/" + getPlayers() + "/" + id, Player.class);
+			final String uri = boardServiceURI + "/" + getPlayers() + "/" + id;
+			System.out.println("GetPlaYER " + uri);
+			final Player player = restTemplate.getForObject(uri, Player.class);
 			return player;
 		}catch(final RestClientException e){
 			throw new PlayerDoesntExistsException("There is no Player " + id + " in game");
@@ -87,7 +89,7 @@ public class Brocker {
 	public void changeOwner(final String placeid, final String id) throws PlaceNotFoundException, PlayerDoesntExistsException, NotForSaleException {
 		getPlayer(id);
 		final Place place = getPlace(placeid);
-		if (place.getOwner().equals("NotForSale")){
+		if ((place.getOwner() != null) && place.getOwner().equals("NotForSale")){
 			throw new NotForSaleException("Not for sale");
 		}
 		place.setOwner(id);

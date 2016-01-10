@@ -67,6 +67,7 @@ public class BrockerService {
 			final ServiceRepository serviceRepository = new ServiceRepository();
 			try {
 				boardServiceURI = serviceRepository.getService("spahl_haug_boards");
+				boardServiceURI = boardServiceURI.replace("/boards", "");
 			} catch (final Exception e) {
 				throw new RepositoryException("Cannot find board");
 			}
@@ -126,7 +127,7 @@ public class BrockerService {
 
 	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException, RestClientException, RepositoryException {
 		final Place place = getPlace(gameId, placeid);
-		if((place.getOwner() != null) || place.getOwner().equals("NotForSale")){
+		if((place.getOwner() != null)){
 			throw new NotForSaleException("The Owner is " + place.getOwner());
 		}
 		getBrocker(gameId).getPlayer(player.getId());
@@ -165,9 +166,10 @@ public class BrockerService {
 	}
 
 	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
-		final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
-		if(transfer.getStatusCode() != HttpStatus.CREATED){
-			throw new BankRejectedException("Bank");
+		try{
+			final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
+		}catch(final RestClientException e){
+			throw new BankRejectedException("bank rejected: " + e.getMessage());
 		}
 
 	}

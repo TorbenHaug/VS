@@ -53,6 +53,7 @@ public class WindowManager {
 	private String diceService;
 	private String eventService;
 	IUiThreadAccess uiThreadAccess;
+	private String brokerService;
 
 	public WindowManager(final IApplicationLifecycle lifecycle, final ServiceRepository serviceRepository) {
 		this.lifecycle = lifecycle;
@@ -101,6 +102,17 @@ public class WindowManager {
 			}
 		}
 		return eventService;
+	}
+
+	private String getBrokerService() throws RepositoryException{
+		if(brokerService==null){
+			try {
+				brokerService = serviceRepository.getService("spahl_haug_broker");
+			} catch (final Exception e) {
+				throw new RepositoryException("Cannot find Event");
+			}
+		}
+		return brokerService;
 	}
 
 	public void startWindowing(){
@@ -297,7 +309,7 @@ public class WindowManager {
 				showLobbyWindow();
 
 			}
-		}, getGamesService(), getBoardsService(), getDiceService());
+		}, getGamesService(), getBoardsService(), getDiceService(), getBrokerService());
 
 		SubscriptionDTO subscriptionDTO;
 		try {

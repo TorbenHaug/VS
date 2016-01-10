@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.deser.std.NullifyingDeserializer;
 import com.sun.jersey.core.impl.provider.header.NewCookieProvider;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
@@ -54,14 +55,20 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final String gameServiceAdress;
 	private final IUiThreadAccess uiThreadAccess;
 	private final String diceServiceAdress;
+	private final IButtonBluePrint buyFieldBp;
+	private final IButton buyField;
+	private final IButtonBluePrint endTurnBp;
+	private final IButton endTurn;
+	private final String brokerService;
 
-	public GameWindow(final String userName, final String gameURI, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress) {
+	public GameWindow(final String userName, final String gameURI, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress, final String brokerService) {
 		super("GameWindow - " + userName + " - " + gameURI);
 		this.gameURI = gameURI;
 		this.lobbyActions = lobbyActions;
 		this.gameServiceAdress = gameServiceAdress;
 		this.boardServiceAdress = boardServiceAdress;
 		this.diceServiceAdress = diceServiceAdress;
+		this.brokerService = brokerService;
 		boardPlayer  = new PlayersDTO();
 
 		setLayout(NullLayout.get());
@@ -104,7 +111,51 @@ public class GameWindow extends Frame implements IMyFrame{
 				}catch(final RestClientException e){
 					System.out.println("Somthing went wrong via rolling");
 				}
+				roll.setEnabled(false);
+				buyField.setEnabled(true);
+				endTurn.setEnabled(true);
+
+			}
+		});
+		roll.setEnabled(false);
+
+		buyFieldBp = BPF.button().setText("Buy Field");
+		buyField = getFrame().add(buyFieldBp);
+		buyField.setSize(new Dimension(150, 30));
+		buyField.setPosition(10,90);
+		buyField.addActionListener(new IActionListener() {
+
+			@Override
+			public void actionPerformed() {
+				//				refreshThread.interrupt();
+				final String[] split = gameURI.split("/");
+				final String gameId = split[split.length - 1];
+				final String uri = brokerService + "/broker/" + gameId + "/places/" + playerInfos.get(userName).getPos() + "/owner";
+				System.out.println("Buy the Place: " + uri);
 				try{
+					final Player player = new Player();
+					player.setId(userName);
+					template.postForLocation(uri, player);
+				}catch(final RestClientException e){
+					System.out.println("Not for sale");
+				}
+				buyField.setEnabled(false);
+			}
+		});
+		buyField.setEnabled(false);
+
+		endTurnBp = BPF.button().setText("End Turn");
+		endTurn = getFrame().add(endTurnBp);
+		endTurn.setSize(new Dimension(150, 30));
+		endTurn.setPosition(10,130);
+		endTurn.addActionListener(new IActionListener() {
+
+			@Override
+			public void actionPerformed() {
+				endTurn.setEnabled(false);
+				buyField.setEnabled(false);
+				try{
+					final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
 					final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
 					final String readyAdress = gameServiceAdress + "/" + gameURI + "/players/" + userName + "/ready";
 					try{
@@ -115,21 +166,32 @@ public class GameWindow extends Frame implements IMyFrame{
 				}catch(final RestClientException e){
 					System.out.println("Cannot ReleaseMutex");
 				}
-
 			}
 		});
-		roll.setEnabled(false);
+		endTurn.setEnabled(false);
 
 		exitGameBp = BPF.button().setText("Leave Game");
 		exitGame = getFrame().add(exitGameBp);
 		exitGame.setSize(new Dimension(150, 30));
-		exitGame.setPosition(10,130);
+		exitGame.setPosition(10,170);
 		exitGame.addActionListener(new IActionListener() {
 
 			@Override
 			public void actionPerformed() {
 				//				refreshThread.interrupt();
 				try {
+					try{
+						final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
+						final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
+						final String readyAdress = gameServiceAdress + "/" + gameURI + "/players/" + userName + "/ready";
+						try{
+							template.put(readyAdress, null);
+						}catch(final RestClientException e){
+							System.out.println(e.getMessage() + " " + readyAdress);
+						}
+					}catch(final RestClientException e){
+						System.out.println("Cannot ReleaseMutex");
+					}
 					GameWindow.this.lobbyActions.closeWindow();
 				} catch (final RepositoryException e) {
 					// TODO Auto-generated catch block
@@ -140,7 +202,7 @@ public class GameWindow extends Frame implements IMyFrame{
 
 		createPlayerPositions();
 
-		int playerInfoY = 170;
+		int playerInfoY = 200;
 		final Game initialGame = getGame(gameURI);
 		for(final Player player: initialGame.getPlayers()){
 			final PlayerInfo playerInfo = new PlayerInfo(this, player.getId(), colors.remove(0));
