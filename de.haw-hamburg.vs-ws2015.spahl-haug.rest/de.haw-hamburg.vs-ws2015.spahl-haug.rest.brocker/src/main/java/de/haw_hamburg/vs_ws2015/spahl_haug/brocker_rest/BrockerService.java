@@ -10,10 +10,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankRejectedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrockerNotExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotForSaleException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.NotSoldException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExeption;
@@ -28,11 +30,24 @@ public class BrockerService {
 	private String bankServiceURI = null;
 	private final RestTemplate restTemplate = new RestTemplate();
 	private String boardServiceURI;
+	private String eventService;
 
 	public BrockerService(){
 		brockers = new ConcurrentHashMap<>();
 		//Uncommit for testing
 		//bankServiceURI = "http://192.168.99.100:4568/banks"
+	}
+
+	private String getEventService() throws EventServiceNotFoundException{
+		try{
+			final ServiceRepository serviceRepository = new ServiceRepository();
+			if(eventService == null) {
+				eventService = serviceRepository.getService("spahl_haug_event");
+			}
+			return eventService;
+		}catch(final Exception e){
+			throw new EventServiceNotFoundException("No EventService found");
+		}
 	}
 
 	private String getBankServiceURI() throws RepositoryException{
@@ -135,6 +150,17 @@ public class BrockerService {
 		if((place.getOwner() != null) && !place.getOwner().equals("NotForSale") && !place.getOwner().equals(playerid)){
 			getBrocker(gameId).getPlayer(place.getOwner());
 			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
+			final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", "/banks/" + gameId + "/players/" + playerid, playerid);
+			new Thread(){
+				@Override
+				public void run() {
+					try {
+						restTemplate.postForLocation(getEventService() + "/events?gameid=" + gameId, eventDTO);
+					} catch (RestClientException | EventServiceNotFoundException e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
 		}
 	}
 

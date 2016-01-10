@@ -2,17 +2,25 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardsServiceDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrokerPlaceDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.CreateBankAccountDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.EventDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.FieldDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.PlayerDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.RollsDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrokerServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.RollnumberNotAcceptableException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -181,5 +189,39 @@ public class BoardService {
 
 	public List<Player> getPlayerFromBoard(final long gameID) {
 		return boards.get(gameID).getPlayers();
+	}
+
+	public BoardsServiceDTO movePlayer(final RollsDTO roll, final long gameID, final String playerID) throws RollnumberNotAcceptableException, PositionNotOnBoardException, PlayerDoesntExistsException, GameDoesntExistsException {
+		final int roll1 = roll.getRoll1().getNumber();
+		final int roll2 = roll.getRoll2().getNumber();
+		if(((roll1 < 1) || (roll1 > 6)) || ((roll2 < 1) || (roll2 > 6))) {
+			throw new RollnumberNotAcceptableException("The Roll numbers are not in the range 1 to 6");
+		}
+		final int rollSum = roll1 + roll2;
+		final Board board = placePlayer(gameID, playerID, rollSum);
+
+		final Player player = board.getPlayer(playerID);
+		final List<Field> fields = board.getFields();
+		final List<FieldDTO> f = new ArrayList<>();
+		for(final Field field : fields) {
+			final List<PlayerDTO> playerList = new ArrayList<>();
+			for(final Player player1 : field.getPlayers()){
+				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition());
+				playerList.add(playerDTO);
+			}
+			final FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
+			f.add(fieldDTO);
+		}
+		final BoardDTO boardDTO = new BoardDTO(f);
+		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
+		try {
+			final String uri = getBrokerService() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
+			System.out.println("Call Player Visit: " + uri);
+			template.postForLocation(uri, null);
+		} catch (RestClientException | BrokerServiceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new BoardsServiceDTO(playerDTO, boardDTO);
 	}
 }

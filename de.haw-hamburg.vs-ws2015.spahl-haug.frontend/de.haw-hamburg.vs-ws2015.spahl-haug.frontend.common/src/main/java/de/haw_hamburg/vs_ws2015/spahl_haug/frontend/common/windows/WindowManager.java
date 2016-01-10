@@ -306,6 +306,8 @@ public class WindowManager {
 			System.err.println(gameId);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerMovedPosition"));
 			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("MoneyTransfer"));
+			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -403,6 +405,8 @@ public class WindowManager {
 						showGameWindow(event.getResource());
 					}else if((event.getType().equals("PlayerMovedPosition")) && (gameWindow != null)){
 						gameWindow.update();
+					}else if((event.getType().equals("MoneyTransfer")) && (gameWindow != null)){
+						System.out.println(event.getResource());
 					}
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
