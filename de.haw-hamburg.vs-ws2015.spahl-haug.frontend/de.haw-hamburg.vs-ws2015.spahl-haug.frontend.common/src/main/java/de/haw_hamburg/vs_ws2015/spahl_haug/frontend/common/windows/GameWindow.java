@@ -379,6 +379,15 @@ public class GameWindow extends Frame implements IMyFrame{
 
 	}
 
+	public void updatePositionEvent(final String playerId, final String playerURI){
+		final Player player = template.getForObject(playerURI, Player.class);
+		final PlayerInfo playerInfo = playerInfos.get(playerId);
+		if(playerInfo.getPos() != player.getPosition()){
+			setPlayerFromTo(playerInfo.getColor(),playerInfo.getPos(), player.getPosition());
+			playerInfo.setPos(player.getPosition());
+		}
+	}
+
 	private Game getGame(final String gameURI){
 		try {
 			return template.getForObject(gameURI, Game.class);

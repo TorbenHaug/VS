@@ -344,7 +344,7 @@ public class WindowManager {
 					else if((event.getType().equals("GameHasStarted")) && (gameLobbyWindow != null)){
 						showGameWindow(event.getResource());
 					}else if((event.getType().equals("PlayerMovedPosition")) && (gameWindow != null)){
-						gameWindow.update();
+						gameWindow.updatePositionEvent(event.getPlayer(), event.getResource());
 					}else if((event.getType().equals("MoneyTransfer")) && (gameWindow != null)){
 						gameWindow.updateMoney(event.getPlayer(), event.getResource());
 					}else if((event.getType().equals("ChangeOwner")) && (gameWindow != null)){
