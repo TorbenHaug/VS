@@ -161,6 +161,19 @@ public class BrockerService {
 					}
 				};
 			}.start();
+
+			final EventDTO eventDTO2 = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + place.getOwner(), place.getOwner());
+			new Thread(){
+				@Override
+				public void run() {
+					try {
+						System.err.println("sendEvent: " + eventDTO2.getResource());
+						restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO2);
+					} catch (final RestClientException e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
 		}
 	}
 
