@@ -3,6 +3,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.events_rest;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameHasNoEventsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,12 +23,19 @@ public class EventService {
 	Map<String,Map<String,Set<String>>> subscribers = new ConcurrentHashMap<>();
 	Map<Integer,Event> events = new ConcurrentHashMap<>();
 	Map<String, List<Integer>> gameEventIds = new ConcurrentHashMap<>();
+	Components components;
 	private int nextNr = 0;
 
 	public void subscribe(final String gameId, final String uri, final String eventType) {
 		final Set<String> eventSubscribers = getEventSubscribers(gameId,eventType);
 		eventSubscribers.add(uri);
 
+	}
+	private Components getComponents(){
+		if (components == null){
+			components = new ServiceRepository().getComponents();
+		}
+		return components;
 	}
 
 	private Set<String> getEventSubscribers(final String gameId, final String eventType) {
@@ -53,7 +62,7 @@ public class EventService {
 	}
 
 	public String createEvent(final String gameid, final String type, final String name, final String reason, final String resource, final String player) {
-		final Event event = new Event(type, name, reason, resource, getUniqueNr(), player);
+		final Event event = new Event(type, name, reason, resource, getUniqueNr(), player, getComponents().getEvents());
 		events.put(event.getId(), event);
 		final List<Integer> eventIdsforGame = getEventIdsforGame(gameid);
 		eventIdsforGame.add(event.getId());

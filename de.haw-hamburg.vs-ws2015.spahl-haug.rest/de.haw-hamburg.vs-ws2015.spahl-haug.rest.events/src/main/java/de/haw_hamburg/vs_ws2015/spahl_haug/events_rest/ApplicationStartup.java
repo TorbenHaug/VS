@@ -50,12 +50,12 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_event");
+		dto.setName("spahl_haug_events_safe");
 		dto.setDescription("EventService von Louisa Spahl und Torben Haug");
 		dto.setService("event");
 		try {
 			SSLUtil.turnOffSslChecking();
-			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort());
+			dto.setUri("http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/events");
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

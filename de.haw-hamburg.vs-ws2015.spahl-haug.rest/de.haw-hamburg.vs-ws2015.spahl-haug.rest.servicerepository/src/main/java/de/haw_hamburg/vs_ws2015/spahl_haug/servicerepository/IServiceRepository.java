@@ -4,4 +4,6 @@ public interface IServiceRepository {
 
 	String getService(String name) throws Exception;
 
+	Components getComponents();
+
 }

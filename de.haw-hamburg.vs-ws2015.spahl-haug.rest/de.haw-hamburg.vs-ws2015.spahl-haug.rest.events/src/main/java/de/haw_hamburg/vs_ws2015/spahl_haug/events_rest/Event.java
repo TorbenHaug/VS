@@ -14,13 +14,13 @@ public class Event {
 	private final String uri;
 	private final String player;
 
-	public Event(final String type, final String name, final String reason, final String resource, final int id, final String player) {
+	public Event(final String type, final String name, final String reason, final String resource, final int id, final String player, final String uri) {
 		this.type = type;
 		this.name = name;
 		this.reason = reason;
 		this.id = id;
 		this.resource = resource;
-		this.uri = "/events/" + id;
+		this.uri = uri + "/" + id;
 		this.player = player;
 	}
 

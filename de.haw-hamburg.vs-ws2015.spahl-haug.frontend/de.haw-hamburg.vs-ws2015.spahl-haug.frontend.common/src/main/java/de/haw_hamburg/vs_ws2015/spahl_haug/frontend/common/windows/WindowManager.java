@@ -5,23 +5,9 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+
 import java.util.Enumeration;
-import java.util.concurrent.Semaphore;
-
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerBuilder;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
-import org.apache.catalina.Server;
 import org.jowidgets.api.threads.IUiThreadAccess;
-import org.jowidgets.api.widgets.IFrame;
 import org.jowidgets.common.application.IApplicationLifecycle;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -35,6 +21,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.SubscriptionEventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.restservice.RestService;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class WindowManager {
@@ -48,71 +35,13 @@ public class WindowManager {
 	private final RestTemplate template = new RestTemplate();
 	private GameLobbyWindow gameLobbyWindow;
 	private GameWindow gameWindow;
-	private String gamesService;
-	private String boardsService;
-	private String diceService;
-	private String eventService;
 	IUiThreadAccess uiThreadAccess;
-	private String brokerService;
+	private final Components components;
 
 	public WindowManager(final IApplicationLifecycle lifecycle, final ServiceRepository serviceRepository) {
 		this.lifecycle = lifecycle;
 		this.serviceRepository = serviceRepository;
-	}
-	private String getBoardsService() throws RepositoryException{
-		if(boardsService==null){
-			try {
-				boardsService = serviceRepository.getService("spahl_haug_boards");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find Board");
-			}
-		}
-		return boardsService;
-	}
-
-	private String getGamesService() throws RepositoryException{
-		if(gamesService==null){
-			try {
-				gamesService = serviceRepository.getService("spahl_haug_games");
-			} catch (final Exception e) {
-				e.printStackTrace();
-				throw new RepositoryException("Cannot find Game");
-			}
-		}
-		return gamesService;
-	}
-
-	private String getDiceService() throws RepositoryException{
-		if(diceService==null){
-			try {
-				diceService = serviceRepository.getService("spahl_haug_dice");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find Dice");
-			}
-		}
-		return diceService;
-	}
-
-	private String getEventService() throws RepositoryException{
-		if(eventService==null){
-			try {
-				eventService = serviceRepository.getService("spahl_haug_event");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find Event");
-			}
-		}
-		return eventService;
-	}
-
-	private String getBrokerService() throws RepositoryException{
-		if(brokerService==null){
-			try {
-				brokerService = serviceRepository.getService("spahl_haug_broker");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find Event");
-			}
-		}
-		return brokerService;
+		this.components = serviceRepository.getComponents();
 	}
 
 	public void startWindowing(){
@@ -164,7 +93,7 @@ public class WindowManager {
 
 				try {
 					final UriComponents putPlayerURI = UriComponentsBuilder
-							.fromHttpUrl(getGamesService() +"/"+ gameURI + "/players/" + userName)
+							.fromHttpUrl(gameURI + "/players/" + userName)
 							.queryParams(params)
 							.build();
 					System.out.println(putPlayerURI.toString());
@@ -183,7 +112,7 @@ public class WindowManager {
 			@Override
 			public void createGame() {
 				try {
-					final Game game = template.postForObject(getGamesService() + "/games", null, Game.class);
+					final Game game = template.postForObject(components.getGame(), null, Game.class);
 					//enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
@@ -194,13 +123,13 @@ public class WindowManager {
 				}
 
 			}
-		},getGamesService());
+		},components.getGame());
 
 		try {
 			SubscriptionDTO subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("CreateNewGame"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO("nullGame", "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerEnterGame"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents()  + "/subscriptions", subscriptionDTO);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -217,56 +146,52 @@ public class WindowManager {
 
 			@Override
 			public void run() {
-				try {
-					gameLobbyWindow = new GameLobbyWindow(userName, gameURI, new IGameLobbyActions() {
+				gameLobbyWindow = new GameLobbyWindow(userName, gameURI, new IGameLobbyActions() {
 
-						@Override
-						public void closeWindow() throws RepositoryException {
-							String url;
-							try {
-								url = getGamesService() + "/" + gameURI + "/players/" + userName;
-								template.delete(url);
-							} catch (final Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-							showLobbyWindow();
+					@Override
+					public void closeWindow() throws RepositoryException {
+						String url;
+						try {
+							url = gameURI + "/players/" + userName;
+							template.delete(url);
+						} catch (final Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 
-						@Override
-						public void ready(final String gameId) {
-							final String url;
-							try {
-								url = getGamesService() + "/" + gameId + "/players/" + userName + "/ready";
-								new Thread(){
-									@Override
-									public void run() {
-										template.put( url, String.class);
-									}
-								}.start();
-							} catch (final Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+						showLobbyWindow();
+					}
 
+					@Override
+					public void ready(final String gameURI) {
+						final String url;
+						try {
+							url = gameURI + "/players/" + userName + "/ready";
+							new Thread(){
+								@Override
+								public void run() {
+									template.put( url, String.class);
+								}
+							}.start();
+						} catch (final Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 
-						@Override
-						public void startGame(final String gameId) {
-							try {
-								showGameWindow(gameId);
-							} catch (final RepositoryException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+					}
 
+					@Override
+					public void startGame(final String gameId) {
+						try {
+							showGameWindow(gameId);
+						} catch (final RepositoryException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					}, getGamesService());
-				} catch (final RepositoryException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+					}
+				}, components.getGame());
+
 			}
 		});
 
@@ -276,11 +201,11 @@ public class WindowManager {
 			final String gameId = split[split.length-1];
 			System.err.println(gameId);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerEnterGame"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerIsReady"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("GameHasStarted"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -299,7 +224,7 @@ public class WindowManager {
 			public void closeWindow() throws RepositoryException {
 				String url;
 				try {
-					url = getGamesService() + "/" + gameURI + "/players/" + userName;
+					url = gameURI + "/players/" + userName;
 					template.delete(url);
 				} catch (final Exception e) {
 					// TODO Auto-generated catch block
@@ -309,7 +234,7 @@ public class WindowManager {
 				showLobbyWindow();
 
 			}
-		}, getGamesService(), getBoardsService(), getDiceService(), getBrokerService());
+		}, components.getGame(), components.getBoard(), components.getDice(), components.getBroker());
 
 		SubscriptionDTO subscriptionDTO;
 		try {
@@ -317,9 +242,9 @@ public class WindowManager {
 			final String gameId = split[split.length-1];
 			System.err.println(gameId);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("PlayerMovedPosition"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("MoneyTransfer"));
-			template.postForLocation(getEventService() + "/events/subscriptions", subscriptionDTO);
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -399,7 +324,8 @@ public class WindowManager {
 			@Override
 			public void run() {
 				try {
-					final EventDTO event = template.getForObject(getEventService() + uri, EventDTO.class);
+					System.out.println("fetching event: " + uri);
+					final EventDTO event = template.getForObject(uri, EventDTO.class);
 					System.err.println("Event for Player '" + userName + "': " + event);
 					if(event.getType().equals("CreateNewGame") && (lobbyWindow != null)){
 						lobbyWindow.update();

@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 public class ServiceRepository implements IServiceRepository {
 
+	private Components components;
+
 	/* (non-Javadoc)
 	 * @see de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository#getService(java.lang.String)
 	 */
@@ -39,5 +41,25 @@ public class ServiceRepository implements IServiceRepository {
 				return service.getBody().getUri();
 			}
 		}
+	}
+
+	@Override
+	public Components getComponents(){
+		if (components == null){
+			try {
+				components = new Components(
+						getService("spahl_haug_games_safe"),
+						getService("spahl_haug_dice_safe"),
+						getService("spahl_haug_boards_safe"),
+						getService("spahl_haug_bank") + "/banks",
+						getService("spahl_haug_broker_safe"),
+						getService("spahl_haug_events_safe")
+						);
+			} catch (final Exception e) {
+				System.err.println("error fetching service Adresses");
+				e.printStackTrace();
+			}
+		}
+		return components;
 	}
 }

@@ -51,12 +51,12 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_games");
+		dto.setName("spahl_haug_games_safe");
 		dto.setDescription("GamesService von Louisa Spahl und Torben Haug");
 		dto.setService("games");
 		try {
 			SSLUtil.turnOffSslChecking();
-			final String uri = "http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort();
+			final String uri = "http://" + getLocalHostLANAddress().getHostAddress() + ":"+ getServerPort() + "/games";
 			Main.setOwnURI(uri);
 			dto.setUri(uri);
 		} catch (final UnknownHostException e) {

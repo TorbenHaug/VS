@@ -130,7 +130,7 @@ public class GameWindow extends Frame implements IMyFrame{
 				//				refreshThread.interrupt();
 				final String[] split = gameURI.split("/");
 				final String gameId = split[split.length - 1];
-				final String uri = brokerService + "/broker/" + gameId + "/places/" + playerInfos.get(userName).getPos() + "/owner";
+				final String uri = brokerService + "/" + gameId + "/places/" + playerInfos.get(userName).getPos() + "/owner";
 				System.out.println("Buy the Place: " + uri);
 				try{
 					final Player player = new Player();
@@ -155,9 +155,9 @@ public class GameWindow extends Frame implements IMyFrame{
 				endTurn.setEnabled(false);
 				buyField.setEnabled(false);
 				try{
-					final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
+					final String turnAdress = gameURI + "/players/turn";
 					final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
-					final String readyAdress = gameServiceAdress + "/" + gameURI + "/players/" + userName + "/ready";
+					final String readyAdress = gameURI + "/players/" + userName + "/ready";
 					try{
 						template.put(readyAdress, null);
 					}catch(final RestClientException e){
@@ -338,7 +338,7 @@ public class GameWindow extends Frame implements IMyFrame{
 		final String[] split = gameURI.split("/");
 		final String gameId = split[split.length-1];
 		final PlayersDTO tmpPlayers = getBoardPlayer(gameId);
-		System.out.println(tmpPlayers);
+		System.out.println("Function updatePositions: Old Player before update " + tmpPlayers);
 		for(final Player newPlayer: tmpPlayers.getPlayers()){
 			final PlayerInfo playerInfo = playerInfos.get(newPlayer.getId());
 			if(playerInfo.getPos() != newPlayer.getPosition()){
@@ -350,9 +350,9 @@ public class GameWindow extends Frame implements IMyFrame{
 
 	}
 
-	private Game getGame(final String id){
+	private Game getGame(final String gameURI){
 		try {
-			return template.getForObject(gameServiceAdress + "/" + id, Game.class);
+			return template.getForObject(gameURI, Game.class);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

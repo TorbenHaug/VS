@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.util.SocketUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,44 +19,29 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredExce
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.EventDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 
 public class GameService {
 	private long nextGameID = 0;
 	private final Map<Long, Game> games;
-	private final IServiceRepository serviceRepository;
-	private final String boardName = "spahl_haug_boards";
 	private final RestTemplate template = new RestTemplate();
-	private String boardService = null;
-	private String eventService;
+	//	private final String boardService = null;
+	//	private String eventService;
+	private Components components;
 
 	public GameService(final IServiceRepository serviceRepository){
 
-		this.serviceRepository = serviceRepository;
 		this.games = new ConcurrentHashMap<>();
 	}
 
-	private String getBoardService() throws BoardServiceNotFoundException{
-		try{
-			if(boardService == null) {
-				boardService = serviceRepository.getService("spahl_haug_boards");
-			}
-			return boardService;
-		}catch(final Exception e){
-			throw new BoardServiceNotFoundException("No BoardService found");
+	private Components getComponents(){
+		if (components == null){
+			components = new ServiceRepository().getComponents();
 		}
-	}
-
-	private String getEventService() throws EventServiceNotFoundException{
-		try{
-			if(eventService == null) {
-				eventService = serviceRepository.getService("spahl_haug_event");
-			}
-			return eventService;
-		}catch(final Exception e){
-			throw new EventServiceNotFoundException("No EventService found");
-		}
+		return components;
 	}
 
 	private long getNextGameID(){
@@ -71,13 +58,13 @@ public class GameService {
 	public Game createNewGame() throws BoardServiceNotFoundException{
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", "games/" + game.getGameid(), null);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents().getGame() + "/" + game.getGameid(), null);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=nullGame", gameCreatedEvent);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					template.postForLocation(getComponents().getEvents() + "?gameid=nullGame", gameCreatedEvent);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -110,13 +97,15 @@ public class GameService {
 		final Game game = getGame(gameID);
 		game.addPlayer(player);
 
-		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", "games/" + game.getGameid(), playerID);
+		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", getComponents().getGame() + "/" + game.getGameid(), playerID);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
+					System.out.print("Function addPlayerToGame: POST " + uri);
+					template.postForLocation(uri, event);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -126,8 +115,10 @@ public class GameService {
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=nullGame", event);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					final String uri = getComponents().getEvents() + "?gameid=nullGame";
+					System.out.print("Function addPlayerToGame: POST nullGame " + uri);
+					template.postForLocation(uri, event);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -161,10 +152,10 @@ public class GameService {
 
 	private void startGame(final long id) throws BoardServiceNotFoundException, GameDoesntExistsException {
 		String url = null;
-		url = getBoardService() + "/" + id;
+		url = getComponents().getBoard() + "/" + id;
 		System.out.println("startGame BoardserviceUrl: " + url);
 		try {
-			template.put(url,null);
+			template.put(url, null);
 		} catch (final Exception e) {
 			this.games.remove(id);
 			throw new BoardServiceNotFoundException("No BoardService found");
@@ -172,9 +163,9 @@ public class GameService {
 		for(final Player aPlayer: getplayersFromGame(id)){
 			String serviceCall;
 			try {
-				serviceCall = serviceRepository.getService(boardName) + "/" + id + "/players/" + aPlayer.getId();
-				System.err.println(serviceCall);
-				template.put(serviceCall,null);
+				serviceCall = getComponents().getBoard() + "/" + id + "/players/" + aPlayer.getId();
+				System.err.println("Function startGame: PUT player on board" + serviceCall);
+				template.put(serviceCall, null);
 			} catch (final Exception e) {
 				throw new BoardServiceNotFoundException(e.getMessage());
 			}
@@ -183,13 +174,15 @@ public class GameService {
 	}
 
 	private void signalPlayerReadyEvent(final long gameID, final String playerID) {
-		final EventDTO event = new EventDTO("PlayerIsReady", "In Game with the ID " + gameID + " the Player " + playerID + " is ready", "PlayerIsReady", "games/" + gameID, playerID);
+		final EventDTO event = new EventDTO("PlayerIsReady", "In Game with the ID " + gameID + " the Player " + playerID + " is ready", "PlayerIsReady", getComponents().getGame() + "/" + gameID, playerID);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
+					System.out.print("Function signalPlayerReadyEvent: Player is ready event " + uri);
+					template.postForLocation(uri, event);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -197,13 +190,15 @@ public class GameService {
 	}
 
 	private void signalStartGameEvent(final long gameID) {
-		final EventDTO event = new EventDTO("GameHasStarted", "The Game with the ID " + gameID + " has started", "GameHasStarted", "games/" + gameID, null);
+		final EventDTO event = new EventDTO("GameHasStarted", "The Game with the ID " + gameID + " has started", "GameHasStarted", getComponents().getGame() + "/" + gameID, null);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
+					System.out.print("Function signalStartGameEvent: Game has started event " + uri);
+					template.postForLocation(uri, event);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -215,7 +210,9 @@ public class GameService {
 			@Override
 			public void run() {
 				try{
-					template.postForLocation(player.getPlayerURI() + "/player/turn", null);
+					final String uri = player.getPlayerURI() + "/player/turn";
+					System.out.print("Function anouncePlayerTurn: Player has its turn " + uri);
+					template.postForLocation(uri, null);
 				}catch(final RestClientException e){
 					System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!Something went wrong in Player anouncement!\n" + e.getStackTrace());
 					//throw new PlayerDoesntExistsException("Something went wrong in Player anouncement!.");

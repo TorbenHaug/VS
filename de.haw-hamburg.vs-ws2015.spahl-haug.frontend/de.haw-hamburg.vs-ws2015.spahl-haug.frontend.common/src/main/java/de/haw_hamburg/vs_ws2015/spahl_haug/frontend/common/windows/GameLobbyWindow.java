@@ -163,7 +163,7 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 
 	private Game getGame(final String Id){
 		try {
-			return template.getForObject(gameService + "/" + Id, Game.class);
+			return template.getForObject(gameURI, Game.class);
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

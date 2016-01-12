@@ -22,6 +22,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.BeanTableModel;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameList;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameTableRenderer;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class LobbyWindow extends Frame implements IMyFrame{
@@ -78,7 +79,7 @@ public class LobbyWindow extends Frame implements IMyFrame{
 			@Override
 			public void actionPerformed() {
 				if(model.getSelectedBean() != null){
-					LobbyWindow.this.lobbyActions.enterGame("games/" + model.getSelectedBean().getGameid());
+					LobbyWindow.this.lobbyActions.enterGame(gameService + "/" + model.getSelectedBean().getGameid());
 				}
 			}
 
@@ -154,7 +155,7 @@ public class LobbyWindow extends Frame implements IMyFrame{
 			@Override
 			public void run() {
 				try {
-					final GameList games = template.getForObject(gameService + "/games", GameList.class);
+					final GameList games = template.getForObject(gameService + "/", GameList.class);
 					if(games != null) {
 						updateGames(games);
 					}

@@ -22,57 +22,24 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceAlreadyExistsExepti
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.RepositoryException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
-	private String bankServiceURI = null;
 	private final RestTemplate restTemplate = new RestTemplate();
-	private String boardServiceURI;
-	private String eventService;
+	private Components components;
 
 	public BrockerService(){
 		brockers = new ConcurrentHashMap<>();
-		//Uncommit for testing
-		//bankServiceURI = "http://192.168.99.100:4568/banks"
 	}
 
-	private String getEventService() throws EventServiceNotFoundException{
-		try{
-			final ServiceRepository serviceRepository = new ServiceRepository();
-			if(eventService == null) {
-				eventService = serviceRepository.getService("spahl_haug_event");
-			}
-			return eventService;
-		}catch(final Exception e){
-			throw new EventServiceNotFoundException("No EventService found");
+	private Components getComponents(){
+		if (components == null){
+			components = new ServiceRepository().getComponents();
 		}
-	}
-
-	private String getBankServiceURI() throws RepositoryException{
-		if(bankServiceURI==null){
-			final ServiceRepository serviceRepository = new ServiceRepository();
-			try {
-				bankServiceURI = serviceRepository.getService("spahl_haug_bank") + "/banks";
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find bank");
-			}
-		}
-		return bankServiceURI;
-	}
-
-	private String getBoardServiceURI() throws RepositoryException{
-		if(boardServiceURI==null){
-			final ServiceRepository serviceRepository = new ServiceRepository();
-			try {
-				boardServiceURI = serviceRepository.getService("spahl_haug_boards");
-				boardServiceURI = boardServiceURI.replace("/boards", "");
-			} catch (final Exception e) {
-				throw new RepositoryException("Cannot find board");
-			}
-		}
-		return boardServiceURI;
+		return components;
 	}
 
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
@@ -88,7 +55,7 @@ public class BrockerService {
 		if(brockers.containsKey(gameId)){
 			throw new Exception("Brocker already exists");
 		}
-		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getBoardServiceURI()));
+		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getComponents().getBoard()));
 
 	}
 
@@ -156,8 +123,8 @@ public class BrockerService {
 				@Override
 				public void run() {
 					try {
-						restTemplate.postForLocation(getEventService() + "/events?gameid=" + gameId, eventDTO);
-					} catch (RestClientException | EventServiceNotFoundException e) {
+						restTemplate.postForLocation(getComponents().getEvents() + "?gameid=" + gameId, eventDTO);
+					} catch (final RestClientException e) {
 						e.printStackTrace();
 					}
 				};
@@ -167,18 +134,18 @@ public class BrockerService {
 
 	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
 		try{
-			final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
+			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents().getBank() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
 		}catch(final RestClientException e){
 			throw new BankRejectedException("bank rejected: " + e.getMessage());
 		}
 
 	}
 	private void transferMoneyFromPlayerToPlayer(final String gameId, final int value, final String playerIdFrom, final String playerIdTo, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
-		final ResponseEntity<String> transfer = restTemplate.postForEntity(getBankServiceURI() + "/" + gameId + "/transfer/from/" + playerIdFrom + "/to/" + playerIdTo + "/" + value, reason, String.class);
-		if(transfer.getStatusCode() != HttpStatus.CREATED){
-			throw new BankRejectedException("Bank");
+		try{
+			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents().getBank() + "/" + gameId + "/transfer/from/" + playerIdFrom + "/to/" + playerIdTo + "/" + value, reason, String.class);
+		}catch(final RestClientException e){
+			throw new BankRejectedException("bank rejected: " + e.getMessage());
 		}
-
 	}
 
 }

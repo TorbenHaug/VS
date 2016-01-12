@@ -18,7 +18,9 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsExceptio
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.RollnumberNotAcceptableException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
@@ -34,47 +36,21 @@ public class BoardService {
 	// Map<gameId, Board>
 	private final Map<Long, Board> boards;
 	private final RestTemplate template = new RestTemplate();
-	private final IServiceRepository serviceRepository;
-	private String eventService;
-	private String bankService;
-	private String brokerService;
+	private Components components;
 
 	public BoardService(final IServiceRepository serviceRepository){
-		this.serviceRepository = serviceRepository;
 		this.boards = new HashMap<>();
 	}
 
-	private String getEventService() throws EventServiceNotFoundException{
-		try{
-			if(eventService == null) {
-				eventService = serviceRepository.getService("spahl_haug_event");
-			}
-			return eventService;
-		}catch(final Exception e){
-			throw new EventServiceNotFoundException("No EventService found");
+
+
+	private Components getComponents(){
+		if (components == null){
+			components = new ServiceRepository().getComponents();
 		}
-	}
-	private String getBankService() throws BankServiceNotFoundException{
-		try{
-			if(bankService == null) {
-				bankService = serviceRepository.getService("spahl_haug_bank") + "/banks";
-			}
-			return bankService;
-		}catch(final Exception e){
-			throw new BankServiceNotFoundException("No BankService found");
-		}
+		return components;
 	}
 
-	private String getBrokerService() throws BrokerServiceNotFoundException{
-		try{
-			if(brokerService == null) {
-				brokerService = serviceRepository.getService("spahl_haug_broker") + "/broker";
-			}
-			return brokerService;
-		}catch(final Exception e){
-			throw new BrokerServiceNotFoundException("No BrokerService found");
-		}
-	}
 
 
 	@JsonIgnore
@@ -86,29 +62,30 @@ public class BoardService {
 
 
 		try {
-			template.put(getBankService() + "/" + gameID, null);
-		} catch (RestClientException | BankServiceNotFoundException e) {
+			System.err.println("CreateBank: " + getComponents().getBank() + "/" + gameID);
+			template.put(getComponents().getBank() + "/" + gameID, null);
+		} catch (final RestClientException e) {
 			try {
-				template.delete(getBrokerService() + "/" + gameID);
-			} catch (RestClientException | BrokerServiceNotFoundException e1) {
+				template.delete(getComponents().getBroker() + "/" + gameID);
+			} catch (final RestClientException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			throw new BrokerServiceNotFoundException(e.getMessage());
+			throw new BankServiceNotFoundException(e.getMessage());
 		}
 
 		try {
-			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), "game/" + gameID, "boards/" + gameID + "/players");
-			System.out.println(getBrokerService() + "/" + gameID);
-			template.put(getBrokerService() + "/" + gameID, brockerDTO);
-		} catch (RestClientException | BrokerServiceNotFoundException e) {
+			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), getComponents().getGame() + "/" + gameID, getComponents().getBoard() + "/" + gameID + "/players");
+			System.out.println(getComponents().getBroker() + "/" + gameID);
+			template.put(getComponents().getBroker()+ "/" + gameID, brockerDTO);
+		} catch (final RestClientException  e) {
 			throw new BrokerServiceNotFoundException(e.getMessage());
 		}
 		for(final Place place: Place.values()){
 			final BrokerPlaceDTO brokerPlaceDTO = new BrokerPlaceDTO(place.name(), place.getOwner(), place.getValue(), place.getRent(), place.getCost(), place.getHouses());
 			try {
-				template.put(getBrokerService() + "/" + gameID + "/places/" + place.getPosition(), brokerPlaceDTO);
-			} catch (RestClientException | BrokerServiceNotFoundException e) {
+				template.put(getComponents().getBroker() + "/" + gameID + "/places/" + place.getPosition(), brokerPlaceDTO);
+			} catch (final RestClientException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -141,10 +118,10 @@ public class BoardService {
 		boards.get(gameID).setPlayer(playerID);
 		final CreateBankAccountDTO createBankAccountDTO = new CreateBankAccountDTO(playerID, 1000);
 		try{
-			final String uri = getBankService() + "/" + gameID + "/players";
+			final String uri = getComponents().getBank() + "/" + gameID + "/players";
 			System.out.println(uri);
 			template.postForLocation(uri, createBankAccountDTO);
-		}catch(RestClientException | BankServiceNotFoundException e){
+		}catch(final RestClientException e){
 			removePlayerFromBoard(gameID, playerID);
 			throw new BankServiceNotFoundException(e.getMessage());
 		}
@@ -166,8 +143,8 @@ public class BoardService {
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getEventService() + "/events?gameid=" + gameID, event);
-				} catch (RestClientException | EventServiceNotFoundException e) {
+					template.postForLocation(getComponents().getEvents() + "?gameid=" + gameID, event);
+				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
 			};
@@ -215,10 +192,10 @@ public class BoardService {
 		final BoardDTO boardDTO = new BoardDTO(f);
 		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
 		try {
-			final String uri = getBrokerService() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
+			final String uri = getComponents().getBroker() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
 			System.out.println("Call Player Visit: " + uri);
 			template.postForLocation(uri, null);
-		} catch (RestClientException | BrokerServiceNotFoundException e) {
+		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
