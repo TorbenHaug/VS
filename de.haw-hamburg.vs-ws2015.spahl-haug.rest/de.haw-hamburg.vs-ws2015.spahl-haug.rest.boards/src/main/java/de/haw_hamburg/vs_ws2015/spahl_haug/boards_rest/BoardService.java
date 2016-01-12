@@ -138,7 +138,7 @@ public class BoardService {
 	}
 
 	private void placePlacerEvent(final String gameID, final String playerID) {
-		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
+		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", getComponents().getBoard() + "/" + gameID + "/players/" + playerID, playerID);
 		new Thread(){
 			@Override
 			public void run() {

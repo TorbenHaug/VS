@@ -118,7 +118,7 @@ public class BrockerService {
 		if((place.getOwner() != null) && !place.getOwner().equals("NotForSale") && !place.getOwner().equals(playerid)){
 			getBrocker(gameId).getPlayer(place.getOwner());
 			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
-			final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", "/banks/" + gameId + "/players/" + playerid, playerid);
+			final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents() + "/" + gameId + "/players/" + playerid, playerid);
 			new Thread(){
 				@Override
 				public void run() {
