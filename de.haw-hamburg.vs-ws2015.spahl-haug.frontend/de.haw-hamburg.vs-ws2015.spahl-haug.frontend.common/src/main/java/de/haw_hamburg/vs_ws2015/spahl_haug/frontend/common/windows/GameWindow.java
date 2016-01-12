@@ -60,8 +60,9 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final IButtonBluePrint endTurnBp;
 	private final IButton endTurn;
 	private final String brokerService;
+	private final String bankServiceAdress;
 
-	public GameWindow(final String userName, final String gameURI, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress, final String brokerService) {
+	public GameWindow(final String userName, final String gameURI, final IGameActions lobbyActions, final String gameServiceAdress, final String boardServiceAdress, final String diceServiceAdress, final String brokerService, final String bankServiceAdress) {
 		super("GameWindow - " + userName + " - " + gameURI);
 		this.gameURI = gameURI;
 		this.lobbyActions = lobbyActions;
@@ -69,6 +70,7 @@ public class GameWindow extends Frame implements IMyFrame{
 		this.boardServiceAdress = boardServiceAdress;
 		this.diceServiceAdress = diceServiceAdress;
 		this.brokerService = brokerService;
+		this.bankServiceAdress = bankServiceAdress;
 		boardPlayer  = new PlayersDTO();
 
 		setLayout(NullLayout.get());
@@ -225,29 +227,7 @@ public class GameWindow extends Frame implements IMyFrame{
 
 		uiThreadAccess = Toolkit.getUiThreadAccess();
 
-		//		refreshThread = new Thread(){
-		//			@Override
-		//			public void run() {
-		//
-		//				while(!isInterrupted()){
-		//					try {
-		//						Thread.sleep(1000);
-		//						uiThreadAccess.invokeLater(new Runnable() {
-		//
-		//							@Override
-		//							public void run() {
-		//								updatePositions();
-		//							}
-		//						});
-		//					} catch (final InterruptedException e1) {
-		//						interrupt();
-		//					}
-		//				}
-		//			}
-		//		};
-
 		setVisible(true);
-		//		refreshThread.start();
 		update();
 	}
 
@@ -400,6 +380,18 @@ public class GameWindow extends Frame implements IMyFrame{
 			@Override
 			public void run() {
 				updatePositions();
+			}
+		});
+	}
+
+	public void updateMoney(final String playerID, final String playerBankURI){
+		uiThreadAccess.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				System.out.println("Update Money: " + playerBankURI);
+				final ResponseEntity<Integer> amount = template.getForEntity(playerBankURI, Integer.class);
+				playerInfos.get(playerID).updateMoney(amount.getBody());
 			}
 		});
 	}

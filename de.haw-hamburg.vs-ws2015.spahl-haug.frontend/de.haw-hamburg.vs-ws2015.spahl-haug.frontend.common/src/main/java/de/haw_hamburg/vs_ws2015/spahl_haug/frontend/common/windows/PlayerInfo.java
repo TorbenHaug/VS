@@ -19,6 +19,7 @@ public class PlayerInfo extends CompositeControl{
 	private final ITextLabel idLabel;
 	private int pos = 0;
 	private final String color;
+	private final ITextLabel moneyLabel;
 
 	public PlayerInfo(final IContainer parent, final String playerId, final String color) {
 		super(parent);
@@ -26,7 +27,7 @@ public class PlayerInfo extends CompositeControl{
 		this.color = color;
 		final IComposite composite = getComposite();
 		composite.setLayout(NullLayout.get());
-		setSize(80, 20);
+		setSize(200, 20);
 		final URL imageUrl = PlayerPosition.class.getClassLoader().getResource(color + ".png");
 		final IImage image = ImageFactory.createImage(imageUrl);
 		imageIcon = composite.add(BPF.icon(image));
@@ -35,6 +36,9 @@ public class PlayerInfo extends CompositeControl{
 		idLabel = composite.add(BPF.textLabel(playerId));
 		idLabel.setPosition(25,0);
 		idLabel.setSize(55,20);
+		moneyLabel = composite.add(BPF.textLabel("1000"));
+		moneyLabel.setPosition(90,0);
+		moneyLabel.setSize(55,20);
 	}
 
 	public int getPos() {
@@ -47,6 +51,10 @@ public class PlayerInfo extends CompositeControl{
 
 	public String getColor() {
 		return color;
+	}
+
+	public void updateMoney(final int amount){
+		moneyLabel.setText(String.valueOf(amount));
 	}
 
 
