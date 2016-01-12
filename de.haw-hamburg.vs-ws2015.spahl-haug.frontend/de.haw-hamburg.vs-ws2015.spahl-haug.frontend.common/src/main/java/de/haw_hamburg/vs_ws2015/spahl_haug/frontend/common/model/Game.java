@@ -8,6 +8,8 @@ public class Game {
 
 	private long gameid;
 	private List<Player> players = new ArrayList<Player>();
+	private boolean started;
+
 	public long getGameid() {
 		return gameid;
 	}
@@ -20,9 +22,16 @@ public class Game {
 	public void setPlayers(final List<Player> players) {
 		this.players = players;
 	}
+
+	public boolean isStarted() {
+		return started;
+	}
+	public void setStarted(final boolean started) {
+		this.started = started;
+	}
 	@Override
 	public String toString() {
-		return "Game [gameid=" + gameid + ", players=" + players + "]";
+		return "Game [gameid=" + gameid + ", players=" + players + ", started=" + started + "]";
 	}
 	@Override
 	public int hashCode() {
@@ -30,6 +39,7 @@ public class Game {
 		int result = 1;
 		result = (prime * result) + (int) (gameid ^ (gameid >>> 32));
 		result = (prime * result) + ((players == null) ? 0 : players.hashCode());
+		result = (prime * result) + (started ? 1231 : 1237);
 		return result;
 	}
 	@Override
@@ -54,8 +64,12 @@ public class Game {
 		} else if (!players.equals(other.players)) {
 			return false;
 		}
+		if (started != other.started) {
+			return false;
+		}
 		return true;
 	}
+
 
 
 

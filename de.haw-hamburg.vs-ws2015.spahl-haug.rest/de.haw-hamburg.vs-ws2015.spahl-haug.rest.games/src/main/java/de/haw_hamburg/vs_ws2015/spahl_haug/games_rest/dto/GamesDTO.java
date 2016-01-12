@@ -1,17 +1,21 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.Game;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 
 public class GamesDTO {
-	private List<Game> games;
+	private final List<GameDTO> games = new ArrayList<>();
 
-	public List<Game> getGames() {
-		return games;
+	public GamesDTO(final List<Game> games) {
+		for(final Game game: games){
+			this.games.add(new GameDTO(game.getGameid(), game.getUri() + "/players",game.getUri(), game.isStarted(), game.getComponents()));
+		}
 	}
 
-	public void setGames(final List<Game> games) {
-		this.games = games;
+	public List<GameDTO> getGames() {
+		return games;
 	}
 }

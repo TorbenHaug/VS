@@ -112,7 +112,8 @@ public class WindowManager {
 			@Override
 			public void createGame() {
 				try {
-					final Game game = template.postForObject(components.getGame(), components, Game.class);
+					System.out.println(components);
+					template.postForLocation(components.getGame(), components);
 					//enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block

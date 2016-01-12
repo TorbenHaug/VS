@@ -2,6 +2,8 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 import java.util.List;
 
+import javax.xml.ws.http.HTTPException;
+
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
@@ -22,6 +24,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredExce
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.EventDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GameDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
@@ -50,15 +53,15 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games", method = RequestMethod.POST,  produces = "application/json")
-	public ResponseEntity<Game> createGame(@RequestBody Components components) throws BoardServiceNotFoundException {
+	public ResponseEntity<GameDTO> createGame(@RequestBody final Components components) throws BoardServiceNotFoundException {
 		final Game game = gameService.createNewGame(components);
-		return new ResponseEntity<>(game , HttpStatus.CREATED);
+		final GameDTO gameDTO = new GameDTO(game.getGameid(), game.getUri() + "/players",game.getUri(), game.isStarted(), game.getComponents());
+		return new ResponseEntity<>(gameDTO, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/games", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<GamesDTO> getGames() {
-		final GamesDTO games = new GamesDTO();
-		games.setGames(gameService.getAllGames());
+		final GamesDTO games = new GamesDTO(gameService.getAllGames());
 		return new ResponseEntity<>(games , HttpStatus.OK);
 	}
 
@@ -69,8 +72,10 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}", method = RequestMethod.GET,  produces = "application/json")
-	public ResponseEntity<Game> getGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
-		return new ResponseEntity<>(gameService.getGame(gameID) , HttpStatus.OK);
+	public ResponseEntity<GameDTO> getGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
+		final Game game = gameService.getGame(gameID);
+		final GameDTO gameDTO = new GameDTO(game.getGameid(), game.getUri() + "/players",game.getUri(), game.isStarted(), game.getComponents());
+		return new ResponseEntity<>(gameDTO, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/games/{gameID}", method = RequestMethod.DELETE,  produces = "application/json")
@@ -81,8 +86,7 @@ public class Main {
 
 	@RequestMapping(value = "/games/{gameID}/players", method = RequestMethod.GET,  produces = "application/json")
 	public ResponseEntity<PlayersDTO> getPlayersFromGame(@PathVariable(value="gameID") final long gameID) throws GameDoesntExistsException {
-		final PlayersDTO playersDTO = new PlayersDTO();
-		playersDTO.setPlayers(gameService.getplayersFromGame(gameID));
+		final PlayersDTO playersDTO = new PlayersDTO(gameService.getplayersFromGame(gameID));
 		return new ResponseEntity<>(playersDTO , HttpStatus.OK);
 	}
 

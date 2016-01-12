@@ -51,7 +51,7 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final List<PlayerPosition> players = new ArrayList<PlayerPosition>();
 	private final ArrayList<ITextLabel> owners = new ArrayList<ITextLabel>();
 	private final Map<String, PlayerInfo> playerInfos = new ConcurrentHashMap<String,PlayerInfo>();
-	private PlayersDTO boardPlayer;
+	private final PlayersDTO boardPlayer;
 	private final IIcon gamefield;
 	private final List<String> colors = new ArrayList<String>(Arrays.asList("black", "blue", "green", "purple","red","yellow"));
 	private final String boardServiceAdress;
@@ -96,7 +96,7 @@ public class GameWindow extends Frame implements IMyFrame{
 			@Override
 			public void actionPerformed() {
 				roll.setEnabled(false);
-				final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
+				final String turnAdress = gameURI + "/players/turn";
 				try {
 					System.out.println(turnAdress);
 					final ResponseEntity<String> mutex = template.exchange(turnAdress + "?player=" + userName, HttpMethod.PUT, null, String.class);
@@ -186,9 +186,9 @@ public class GameWindow extends Frame implements IMyFrame{
 				//				refreshThread.interrupt();
 				try {
 					try{
-						final String turnAdress = gameServiceAdress + "/" + gameURI + "/players/turn";
+						final String turnAdress = gameURI + "/players/turn";
 						final ResponseEntity<String> mutex = template.exchange(turnAdress, HttpMethod.DELETE, null, String.class);
-						final String readyAdress = gameServiceAdress + "/" + gameURI + "/players/" + userName + "/ready";
+						final String readyAdress = gameURI + "/players/" + userName + "/ready";
 						try{
 							template.put(readyAdress, null);
 						}catch(final RestClientException e){
@@ -208,8 +208,15 @@ public class GameWindow extends Frame implements IMyFrame{
 		createPlayerPositions();
 
 		int playerInfoY = 200;
-		final Game initialGame = getGame(gameURI);
-		for(final Player player: initialGame.getPlayers()){
+		//		final Game initialGame = getGame(gameURI);
+		final PlayersDTO playersDTO = template.getForObject(gameURI + "/players", PlayersDTO.class);
+		final List<Player> players = new ArrayList<Player>();
+		for(final String playerURI: playersDTO.getPlayers()){
+			System.out.println(playerURI);
+			final Player player = template.getForObject(playerURI, Player.class);
+			players.add(player);
+		}
+		for(final Player player: players){
 			final PlayerInfo playerInfo = new PlayerInfo(this, player.getId(), colors.remove(0));
 			playerInfo.setPosition(0, playerInfoY);
 			playerInfo.setVisible(true);
@@ -231,7 +238,7 @@ public class GameWindow extends Frame implements IMyFrame{
 		uiThreadAccess = Toolkit.getUiThreadAccess();
 
 		setVisible(true);
-		update();
+		//		update();
 	}
 
 	private void setPlayerFromTo(final String color, final int oldPos, final int newPos) {
@@ -363,21 +370,21 @@ public class GameWindow extends Frame implements IMyFrame{
 		return position;
 	}
 
-	protected void updatePositions(){
-		final String[] split = gameURI.split("/");
-		final String gameId = split[split.length-1];
-		final PlayersDTO tmpPlayers = getBoardPlayer(gameId);
-		System.out.println("Function updatePositions: Old Player before update " + tmpPlayers);
-		for(final Player newPlayer: tmpPlayers.getPlayers()){
-			final PlayerInfo playerInfo = playerInfos.get(newPlayer.getId());
-			if(playerInfo.getPos() != newPlayer.getPosition()){
-				setPlayerFromTo(playerInfo.getColor(),playerInfo.getPos(), newPlayer.getPosition());
-				playerInfo.setPos(newPlayer.getPosition());
-			}
-		}
-		boardPlayer = tmpPlayers;
-
-	}
+	//	protected void updatePositions(){
+	//		final String[] split = gameURI.split("/");
+	//		final String gameId = split[split.length-1];
+	//		final PlayersDTO tmpPlayers = getBoardPlayer(gameId);
+	//		System.out.println("Function updatePositions: Old Player before update " + tmpPlayers);
+	//		for(final Player newPlayer: tmpPlayers.getPlayers()){
+	//			final PlayerInfo playerInfo = playerInfos.get(newPlayer.getId());
+	//			if(playerInfo.getPos() != newPlayer.getPosition()){
+	//				setPlayerFromTo(playerInfo.getColor(),playerInfo.getPos(), newPlayer.getPosition());
+	//				playerInfo.setPos(newPlayer.getPosition());
+	//			}
+	//		}
+	//		boardPlayer = tmpPlayers;
+	//
+	//	}
 
 	public void updatePositionEvent(final String playerId, final String playerURI){
 		final Player player = template.getForObject(playerURI, Player.class);
@@ -388,18 +395,18 @@ public class GameWindow extends Frame implements IMyFrame{
 		}
 	}
 
-	private Game getGame(final String gameURI){
-		try {
-			return template.getForObject(gameURI, Game.class);
-		} catch (final RestClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (final Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+	//	private Game getGame(final String gameURI){
+	//		try {
+	//			return template.getForObject(gameURI, Game.class);
+	//		} catch (final RestClientException e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//		} catch (final Exception e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//		}
+	//		return null;
+	//	}
 
 	private PlayersDTO getBoardPlayer(final String id){
 		try {
@@ -433,14 +440,14 @@ public class GameWindow extends Frame implements IMyFrame{
 		return uiThreadAccess;
 	}
 
-	public void update() {
-		uiThreadAccess.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				updatePositions();
-			}
-		});
-	}
+	//	public void update() {
+	//		uiThreadAccess.invokeLater(new Runnable() {
+	//			@Override
+	//			public void run() {
+	//				updatePositions();
+	//			}
+	//		});
+	//	}
 
 	public void updateMoney(final String playerID, final String playerBankURI){
 		uiThreadAccess.invokeLater(new Runnable() {

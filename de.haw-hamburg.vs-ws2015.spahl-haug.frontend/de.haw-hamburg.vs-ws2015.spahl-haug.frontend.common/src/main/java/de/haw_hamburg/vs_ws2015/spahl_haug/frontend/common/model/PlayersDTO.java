@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayersDTO {
-	private List<Player> players = new ArrayList<Player>();
+	private List<String> players = new ArrayList<String>();
 
-	public List<Player> getPlayers() {
+	public List<String> getPlayers() {
 		return players;
 	}
 
-	public void setPlayers(final List<Player> players) {
+	public void setPlayers(final List<String> players) {
 		this.players = players;
 	}
 

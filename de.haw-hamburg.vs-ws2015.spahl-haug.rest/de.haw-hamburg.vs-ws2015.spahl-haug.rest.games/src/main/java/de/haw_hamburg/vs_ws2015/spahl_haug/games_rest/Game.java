@@ -11,21 +11,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 
 public class Game {
 
 	private final long gameid;
 	private final List<Player> players;
-    private final String uri;
+	private final String uri;
 	private boolean started = false;
 	private int currentPlayer = 0;
 	private int mutexHolder = -1;
+	private final Components components;
 
-	public Game(final long id, String uri) {
+	public Game(final long id, final String uri, final Components components) {
 		super();
 		this.gameid = id;
+		this.components = components;
 		this.players = new ArrayList<>();
-        this.uri = uri;
+		this.uri = uri;
 	}
 
 	public List<Player> getPlayers() {
@@ -118,7 +121,11 @@ public class Game {
 		return getCurrentPlayer();
 	}
 
-    public String getUri() {
-        return uri;
-    }
+	public String getUri() {
+		return uri;
+	}
+
+	public Components getComponents() {
+		return components;
+	}
 }

@@ -20,8 +20,12 @@ import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.BeanTableModel;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameList;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameListDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameTableRenderer;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
@@ -155,10 +159,26 @@ public class LobbyWindow extends Frame implements IMyFrame{
 			@Override
 			public void run() {
 				try {
-					final GameList games = template.getForObject(gameService + "/", GameList.class);
-					if(games != null) {
-						updateGames(games);
+
+					final GameListDTO gameListDTO = template.getForObject(gameService + "/", GameListDTO.class);
+					final GameList games = new GameList();
+					for(final GameDTO gameDTO: gameListDTO.getGames()){
+						final PlayersDTO playersDTO = template.getForObject(gameDTO.getPlayers(), PlayersDTO.class);
+						final List<Player> players = new ArrayList<Player>();
+						for(final String playerURI: playersDTO.getPlayers()){
+							System.out.println(playerURI);
+							final Player player = template.getForObject(playerURI, Player.class);
+							players.add(player);
+						}
+						final Game game = new Game();
+						game.setPlayers(players);
+						game.setGameid(gameDTO.getGameid());
+						game.setStarted(gameDTO.isStarted());
+						if(!game.isStarted()){
+							games.getGames().add(game);
+						}
 					}
+					updateGames(games);
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

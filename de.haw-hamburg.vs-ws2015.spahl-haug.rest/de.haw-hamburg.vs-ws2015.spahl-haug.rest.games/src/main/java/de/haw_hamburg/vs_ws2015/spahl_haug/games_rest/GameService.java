@@ -20,6 +20,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexAllreadyAquiredExce
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.MutexIsYoursException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.EventDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.games_rest.dto.GamesDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
@@ -29,15 +30,15 @@ public class GameService {
 	private long nextGameID = 0;
 	private final Map<Long, Game> games;
 	private final RestTemplate template = new RestTemplate();
-    private Map<Long, Components> componentsMap;
+	private final Map<Long, Components> componentsMap;
 
 	public GameService(){
 		this.games = new ConcurrentHashMap<>();
-        this.componentsMap = new ConcurrentHashMap<>();
+		this.componentsMap = new ConcurrentHashMap<>();
 	}
 
-	private Components getComponents(long gameId){
-        return componentsMap.get(gameId);
+	private Components getComponents(final long gameId){
+		return componentsMap.get(gameId);
 	}
 
 	private long getNextGameID(){
@@ -51,21 +52,21 @@ public class GameService {
 		this.games.put(id, game);
 	}
 
-	public Game createNewGame(Components components) throws BoardServiceNotFoundException {
-        long nextGameId = getNextGameID();
-        componentsMap.put(nextGameId, components);
-        String gameUri = getComponents(nextGameId).getGame() + "/" + nextGameId;
-        System.err.println("Function createNewGame: creating new game with resource " + gameUri);
-        final Game game = new Game(nextGameId, gameUri);
-        this.addNewGame(game.getGameid(), game);
-        final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents(game.getGameid()).getGame() + "/" + game.getGameid(), null);
+	public Game createNewGame(final Components components) throws BoardServiceNotFoundException {
+		final long nextGameId = getNextGameID();
+		componentsMap.put(nextGameId, components);
+		final String gameUri = getComponents(nextGameId).getGame() + "/" + nextGameId;
+		System.err.println("Function createNewGame: creating new game with resource " + gameUri);
+		final Game game = new Game(nextGameId, gameUri, components);
+		this.addNewGame(game.getGameid(), game);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents(game.getGameid()).getGame() + "/" + game.getGameid(), null);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-                    String uri = getComponents(game.getGameid()).getEvents() + "?gameid=nullGame";
-                    System.err.println("Function createNewGame: with uri " + uri);
-                    template.postForLocation(uri, gameCreatedEvent);
+					final String uri = getComponents(game.getGameid()).getEvents() + "?gameid=nullGame";
+					System.err.println("Function createNewGame: with uri " + uri);
+					template.postForLocation(uri, gameCreatedEvent);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
@@ -95,8 +96,9 @@ public class GameService {
 	}
 
 	public void addPlayerToGame(final long gameID, final String playerID, final String playerName, final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException, GameFullException {
-		final Player player = new Player(playerName, playerID, playerURI);
 		final Game game = getGame(gameID);
+		final Player player = new Player(playerName, playerID, game.getUri() + "/players", playerURI);
+
 		game.addPlayer(player);
 
 		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", getComponents(gameID).getGame() + "/" + game.getGameid(), playerID);
@@ -156,9 +158,9 @@ public class GameService {
 		String url = null;
 		url = getComponents(gameId).getBoard() + "/" + gameId;
 		System.out.println("startGame BoardserviceUrl: " + url);
-        Components request = getComponents(gameId);
-        try {
-            template.put(url, request);
+		final Components request = getComponents(gameId);
+		try {
+			template.put(url, request);
 		} catch (final Exception e) {
 			this.games.remove(gameId);
 			throw new BoardServiceNotFoundException("No BoardService found");
@@ -213,7 +215,7 @@ public class GameService {
 			@Override
 			public void run() {
 				try{
-					final String uri = player.getUri() + "/player/turn";
+					final String uri = player.getPlayerServiceUri() + "/player/turn";
 					System.out.print("Function anouncePlayerTurn: Player has its turn " + uri);
 					template.postForLocation(uri, null);
 				}catch(final RestClientException e){

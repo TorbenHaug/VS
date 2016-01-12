@@ -20,10 +20,12 @@ import org.springframework.web.client.RestTemplate;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.BeanTableModel;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Game;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameList;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.GameTableRenderer;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PlayerTableRenderer;
+import de.haw_hamburg.vs_ws2015.spahl_haug.frontend.common.model.PlayersDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 
 public class GameLobbyWindow extends Frame implements IMyFrame{
@@ -163,7 +165,19 @@ public class GameLobbyWindow extends Frame implements IMyFrame{
 
 	private Game getGame(final String Id){
 		try {
-			return template.getForObject(gameURI, Game.class);
+			final GameDTO gameDTO = template.getForObject(gameURI, GameDTO.class);
+			final PlayersDTO playersDTO = template.getForObject(gameDTO.getPlayers(), PlayersDTO.class);
+			final List<Player> players = new ArrayList<Player>();
+			for(final String playerURI: playersDTO.getPlayers()){
+				System.out.println(playerURI);
+				final Player player = template.getForObject(playerURI, Player.class);
+				players.add(player);
+			}
+			final Game game = new Game();
+			game.setPlayers(players);
+			game.setGameid(gameDTO.getGameid());
+			game.setStarted(gameDTO.isStarted());
+			return game;
 		} catch (final RestClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
