@@ -106,13 +106,26 @@ public class BrockerService {
 		getBrocker(gameId).getPlayer(player.getId());
 		transferMoneyToBank(gameId, place.getValue(),player.getId(), "Buy a Street!");
 		changeOwner(gameId, placeid, player);
-		final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + player.getId(), player.getId());
+		final EventDTO eventMoney = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + player.getId(), player.getId());
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					System.err.println("sendEvent: " + eventDTO.getResource());
-					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO);
+					System.err.println("sendEvent: " + eventMoney.getResource());
+					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventMoney);
+				} catch (final RestClientException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
+
+		final EventDTO eventField = new EventDTO("ChangeOwner", "ChangeOwner", "ChangeOwner", getComponents(Long.valueOf(gameId)).getBroker() + "/" + gameId + "/places/" + placeid, player.getId());
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					System.err.println("sendEvent: " + eventField.getResource());
+					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventField);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
