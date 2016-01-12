@@ -25,12 +25,10 @@ public class Brocker {
 	private final String players;
 	private final Map<String, Place> places;
 	private final RestTemplate restTemplate;
-	private final String boardServiceURI;
 
-	public Brocker(final String gameId, final BrockerDTO brockerDTO, final RestTemplate restTemplate, final String boardServiceURI) {
+	public Brocker(final String gameId, final BrockerDTO brockerDTO, final RestTemplate restTemplate) {
 		this.gameId = gameId;
 		this.restTemplate = restTemplate;
-		this.boardServiceURI = boardServiceURI;
 		this.players = brockerDTO.getPlayers();
 		this.places = new ConcurrentHashMap<>();
 	}

@@ -16,6 +16,8 @@ import org.jowidgets.api.threads.IUiThreadAccess;
 import org.jowidgets.api.toolkit.Toolkit;
 import org.jowidgets.api.widgets.IButton;
 import org.jowidgets.api.widgets.IIcon;
+import org.jowidgets.api.widgets.ITextControl;
+import org.jowidgets.api.widgets.ITextLabel;
 import org.jowidgets.api.widgets.blueprint.IButtonBluePrint;
 import org.jowidgets.common.types.Dimension;
 import org.jowidgets.common.widgets.controller.IActionListener;
@@ -47,6 +49,7 @@ public class GameWindow extends Frame implements IMyFrame{
 	private final RestTemplate template = new RestTemplate();
 	private final String gameURI;
 	private final List<PlayerPosition> players = new ArrayList<PlayerPosition>();
+	private final ArrayList<ITextLabel> owners = new ArrayList<ITextLabel>();
 	private final Map<String, PlayerInfo> playerInfos = new ConcurrentHashMap<String,PlayerInfo>();
 	private PlayersDTO boardPlayer;
 	private final IIcon gamefield;
@@ -258,49 +261,95 @@ public class GameWindow extends Frame implements IMyFrame{
 		}
 	}
 
+	private ITextLabel createOwnerField(final int x, final int y){
+		final ITextLabel owner = this.add(BPF.textLabel());
+		owner.setSize(40, 15);
+		owner.setPosition(x,y);
+		return owner;
+	}
 	private void createPlayerPositions() {
 		int x= 820;
 		int y= 680;
 		players.add(createPlayerPosition(x + 30,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58,y,false));
+		owners.add(createOwnerField(x, y-40));
 		players.add(createPlayerPosition(x=x-58-30,y,false));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-75,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57,true));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x,y=y-57-40,false));
+		owners.add(createOwnerField(x + 120, y));
 		players.add(createPlayerPosition(x=x+58+30,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x=x+58+30,y,false));
+		owners.add(createOwnerField(x, y+70));
 		players.add(createPlayerPosition(x = x - 13,y=y+57+40,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 		players.add(createPlayerPosition(x,y=y+57,true));
+		owners.add(createOwnerField(x -70, y));
 
 	}
 
@@ -395,6 +444,19 @@ public class GameWindow extends Frame implements IMyFrame{
 			}
 		});
 	}
+
+	public void updatePlace(final String playerID, final String placeURI){
+		uiThreadAccess.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				final String[] split = placeURI.split("/");
+				final String placeId = split[split.length - 1];
+				owners.get(Integer.valueOf(placeId)).setText(playerID);
+			}
+		});
+	}
+
 
 
 }

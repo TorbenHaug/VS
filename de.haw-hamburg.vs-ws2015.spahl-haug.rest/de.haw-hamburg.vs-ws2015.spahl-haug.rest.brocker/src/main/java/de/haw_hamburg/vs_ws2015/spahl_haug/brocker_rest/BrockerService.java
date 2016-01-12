@@ -29,15 +29,16 @@ public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
 	private final RestTemplate restTemplate = new RestTemplate();
-    private Map<Long, Components> componentsMap;
+	private final Map<Long, Components> componentsMap;
 
 	public BrockerService(){
 		brockers = new ConcurrentHashMap<>();
+		componentsMap = new ConcurrentHashMap<>();
 	}
 
-    private Components getComponents(long gameId){
-        return componentsMap.get(gameId);
-    }
+	private Components getComponents(final long gameId){
+		return componentsMap.get(gameId);
+	}
 
 
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
@@ -50,11 +51,17 @@ public class BrockerService {
 	}
 
 	public Brocker createBrocker(final String gameId, final BrockerDTO brockerDTO) throws Exception {
-        componentsMap.put(Long.valueOf(gameId), brockerDTO.getComponents());
+		System.err.println("Creating broker " + gameId);
+		componentsMap.put(Long.valueOf(gameId), brockerDTO.getComponents());
+		System.err.println("Adding Components " + gameId);
 		if(brockers.containsKey(gameId)){
-			throw new Exception("Brocker already exists");
+			System.err.println("Broker already exists");
+			throw new Exception("Broker already exists");
 		}
-		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getComponents(Long.valueOf(gameId)).getBoard()));
+		System.err.println("Instanz Broker " + gameId);
+		final Brocker value = new Brocker(gameId, brockerDTO, restTemplate);
+		System.err.println("Created broker " + gameId);
+		return brockers.put(gameId, value);
 
 	}
 
@@ -99,13 +106,26 @@ public class BrockerService {
 		getBrocker(gameId).getPlayer(player.getId());
 		transferMoneyToBank(gameId, place.getValue(),player.getId(), "Buy a Street!");
 		changeOwner(gameId, placeid, player);
-		final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + player.getId(), player.getId());
+		final EventDTO eventMoney = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + player.getId(), player.getId());
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					System.err.println("sendEvent: " + eventDTO.getResource());
-					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO);
+					System.err.println("sendEvent: " + eventMoney.getResource());
+					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventMoney);
+				} catch (final RestClientException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
+
+		final EventDTO eventField = new EventDTO("ChangeOwner", "ChangeOwner", "ChangeOwner", getComponents(Long.valueOf(gameId)).getBroker() + "/" + gameId + "/places/" + placeid, player.getId());
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					System.err.println("sendEvent: " + eventField.getResource());
+					restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventField);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
@@ -134,8 +154,8 @@ public class BrockerService {
 				@Override
 				public void run() {
 					try {
-                        System.err.println("sendEvent: " + eventDTO.getResource());
-                        restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO);
+						System.err.println("sendEvent: " + eventDTO.getResource());
+						restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO);
 					} catch (final RestClientException e) {
 						e.printStackTrace();
 					}

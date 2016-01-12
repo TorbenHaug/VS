@@ -19,7 +19,7 @@ public class BrockerDTO {
 		this.gameid = gameid;
 		this.uri = uri;
 		this.players = players;
-        this.components = components;
+		this.components = components;
 	}
 
 	public String getGameid() {
@@ -46,7 +46,9 @@ public class BrockerDTO {
 		this.players = players;
 	}
 
-    public Components getComponents() {
-        return components;
-    }
+	public Components getComponents() {
+		return components;
+	}
+
+
 }

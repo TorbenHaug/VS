@@ -8,7 +8,7 @@ public class Components {
 	private String broker;
 	private String events;
 
-    public Components() { }
+	public Components() { }
 
 	public Components(final String game, final String dice, final String board, final String bank, final String broker, final String events) {
 		super();
@@ -38,6 +38,13 @@ public class Components {
 	public String getEvents() {
 		return events;
 	}
+
+	@Override
+	public String toString() {
+		return "Components [game=" + game + ", dice=" + dice + ", board=" + board + ", bank=" + bank + ", broker="
+				+ broker + ", events=" + events + "]";
+	}
+
 
 
 }

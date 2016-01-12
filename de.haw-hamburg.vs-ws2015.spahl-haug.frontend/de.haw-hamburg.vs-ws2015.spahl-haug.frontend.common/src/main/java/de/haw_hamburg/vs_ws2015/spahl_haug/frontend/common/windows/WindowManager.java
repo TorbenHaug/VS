@@ -112,7 +112,7 @@ public class WindowManager {
 			@Override
 			public void createGame() {
 				try {
-					final Game game = template.postForObject(components.getGame(), null, Game.class);
+					final Game game = template.postForObject(components.getGame(), components, Game.class);
 					//enterGame("" + game.getGameid());
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
@@ -245,6 +245,8 @@ public class WindowManager {
 			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("MoneyTransfer"));
 			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
+			subscriptionDTO = new SubscriptionDTO(gameId, "http://" + getLocalHostLANAddress().getHostAddress() + ":" + SERVER_PORT + "/monopolyrwt/playerservice/" + userName + "/player/event", new SubscriptionEventDTO("ChangeOwner"));
+			template.postForLocation(components.getEvents() + "/subscriptions", subscriptionDTO);
 		} catch (final UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -345,6 +347,8 @@ public class WindowManager {
 						gameWindow.update();
 					}else if((event.getType().equals("MoneyTransfer")) && (gameWindow != null)){
 						gameWindow.updateMoney(event.getPlayer(), event.getResource());
+					}else if((event.getType().equals("ChangeOwner")) && (gameWindow != null)){
+						gameWindow.updatePlace(event.getPlayer(), event.getResource());
 					}
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block
