@@ -31,7 +31,7 @@ public class PlayerPosition extends CompositeControl{
 		setSize(40, 60);
 
 		ownerLabel = composite.add(BPF.textLabel("0"));
-		ownerLabel.setPosition(-10,0);
+		ownerLabel.setPosition(0,0);
 		ownerLabel.setSize(55,20);
 
 		final URL blue = PlayerPosition.class.getClassLoader().getResource("blue.png");

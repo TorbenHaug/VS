@@ -37,14 +37,14 @@ public class BoardService {
 	// Map<gameId, Board>
 	private final Map<Long, Board> boards;
 	private final RestTemplate template = new RestTemplate();
-	private Map<Long, Components> componentsMap;
+	private final Map<Long, Components> componentsMap;
 
 	public BoardService(){
 		this.boards = new ConcurrentHashMap<>();
 		this.componentsMap = new ConcurrentHashMap<>();
 	}
 
-	private Components getComponents(long gameId){
+	private Components getComponents(final long gameId){
 		return componentsMap.get(gameId);
 	}
 
@@ -54,13 +54,13 @@ public class BoardService {
 		return boards.get(gameID);
 	}
 
-	public void createBoard(final long gameID,  Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
+	public void createBoard(final long gameID,  final Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
 		componentsMap.put(gameID, components);
-        Components componentsForGame = getComponents(gameID);
-        try {
-            String uri = componentsForGame.getBank() + "/" + gameID;
+		final Components componentsForGame = getComponents(gameID);
+		try {
+			final String uri = componentsForGame.getBank() + "/" + gameID;
 			System.err.println("CreateBank: " + uri);
-            Components request = componentsForGame;
+			final Components request = componentsForGame;
 			template.put(uri, request);
 		} catch (final RestClientException e) {
 			try {
@@ -74,8 +74,9 @@ public class BoardService {
 
 		try {
 			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), componentsForGame.getGame() + "/" + gameID, getComponents(gameID).getBoard() + "/" + gameID + "/players", componentsForGame);
-			String uri = componentsForGame.getBroker()+ "/" + gameID;
-            System.out.println(uri);
+			final String uri = componentsForGame.getBroker()+ "/" + gameID;
+			System.err.println("Creating: " + uri);
+			System.err.println("BrokerDTo Components: " + brockerDTO.getComponents().toString());
 			template.put(uri, brockerDTO);
 		} catch (final RestClientException  e) {
 			throw new BrokerServiceNotFoundException(e.getMessage());
@@ -138,7 +139,7 @@ public class BoardService {
 
 
 	private void placePlayerEvent(final long gameID, final String playerID) {
-//		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
+		//		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
 		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", getComponents(gameID).getBoard() + "/" + gameID + "/players/" + playerID, playerID);
 
 		new Thread(){

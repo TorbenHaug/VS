@@ -38,4 +38,10 @@ public class BrockerDTO {
 	public Components getComponents() {
 		return components;
 	}
+
+	public void setComponents(final Components components) {
+		this.components = components;
+	}
+
+
 }
