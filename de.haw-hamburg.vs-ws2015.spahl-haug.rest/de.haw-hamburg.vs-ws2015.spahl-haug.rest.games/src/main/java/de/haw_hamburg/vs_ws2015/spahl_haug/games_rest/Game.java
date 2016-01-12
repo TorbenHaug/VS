@@ -16,14 +16,16 @@ public class Game {
 
 	private final long gameid;
 	private final List<Player> players;
+    private final String uri;
 	private boolean started = false;
 	private int currentPlayer = 0;
 	private int mutexHolder = -1;
 
-	public Game(final long id) {
+	public Game(final long id, String uri) {
 		super();
 		this.gameid = id;
 		this.players = new ArrayList<>();
+        this.uri = uri;
 	}
 
 	public List<Player> getPlayers() {
@@ -115,4 +117,8 @@ public class Game {
 		currentPlayer = (currentPlayer + 1) % players.size();
 		return getCurrentPlayer();
 	}
+
+    public String getUri() {
+        return uri;
+    }
 }

@@ -3,11 +3,13 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 public class Player {
     private String id;
+    private String uri;
     private Place place;
     private int position;
 
-    public Player(String id) {
+    public Player(String id, String uri) {
         this.id = id;
+        this.uri = uri;
     }
 
     public String getId() {
@@ -37,5 +39,9 @@ public class Player {
                 ", place=" + place +
                 ", position=" + position +
                 '}';
+    }
+
+    public String getUri() {
+        return uri;
     }
 }

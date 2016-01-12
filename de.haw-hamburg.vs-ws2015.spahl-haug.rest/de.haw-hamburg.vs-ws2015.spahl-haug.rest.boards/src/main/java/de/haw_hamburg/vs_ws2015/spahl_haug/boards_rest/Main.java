@@ -81,7 +81,7 @@ public class Main {
 	@ResponseStatus(HttpStatus.OK)
 	public PlayerDTO getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
 		final Player p = boardService.getPlayerPosition(gameID, playerID);
-		final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition());
+		final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition(), p.getUri());
 		return player;
 	}
 
@@ -89,12 +89,7 @@ public class Main {
 	@RequestMapping(value = " /boards/{gameid}/places", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public List<PlaceDTO>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
-		final List<PlaceDTO> placeList = new ArrayList<>();
-		for(final Place place : boardService.getPlaces(gameID)) {
-			final PlaceDTO placeDTO = new PlaceDTO(place.toString());
-			placeList.add(placeDTO);
-		}
-		return placeList;
+        return boardService.getAvailablePlacesOnBoard(gameID);
 	}
 
 

@@ -2,15 +2,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BoardsServiceDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrockerDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.BrokerPlaceDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.CreateBankAccountDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.EventDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.FieldDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.PlayerDTO;
-import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.RollsDTO;
+import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrokerServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
@@ -89,8 +81,8 @@ public class BoardService {
 				e.printStackTrace();
 			}
 		}
-
-		final Board board = new Board();
+        String boardUri = getComponents(gameID).getBoard() + "/" + gameID;
+		final Board board = new Board(boardUri);
 		this.boards.put(gameID, board);
 
 	}
@@ -103,7 +95,7 @@ public class BoardService {
 		boards.remove(gameID);
 	}
 
-	public List<Place>  getPlaces(final long gameID) {
+	public List<Place> getPlaces(final long gameID) {
 		final List<Place> placesMap = new ArrayList<>();
 
 		for(final Field field : boards.get(gameID).getFields()) {
@@ -114,7 +106,8 @@ public class BoardService {
 	}
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException, BankServiceNotFoundException {
-		boards.get(gameID).setPlayer(playerID);
+		String playerUri = getComponents(gameID).getBoard() + "/players/" + playerID;
+        boards.get(gameID).setPlayer(playerID, playerUri);
 		final CreateBankAccountDTO createBankAccountDTO = new CreateBankAccountDTO(playerID, 1000);
 		try{
 			final String uri = getComponents(gameID).getBank() + "/" + gameID + "/players";
@@ -185,14 +178,14 @@ public class BoardService {
 		for(final Field field : fields) {
 			final List<PlayerDTO> playerList = new ArrayList<>();
 			for(final Player player1 : field.getPlayers()){
-				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition());
+				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition(), player1.getUri());
 				playerList.add(playerDTO);
 			}
 			final FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
 			f.add(fieldDTO);
 		}
 		final BoardDTO boardDTO = new BoardDTO(f);
-		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
+		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition(), player.getUri());
 		try {
 			final String uri = getComponents(gameID).getBroker() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
 			System.out.println("Call Player Visit: " + uri);
@@ -203,4 +196,14 @@ public class BoardService {
 		}
 		return new BoardsServiceDTO(playerDTO, boardDTO);
 	}
+
+    public List<PlaceDTO> getAvailablePlacesOnBoard(long gameID) {
+        final List<PlaceDTO> placeList = new ArrayList<>();
+        for(final Place place : getPlaces(gameID)) {
+            String placeUri = getComponents(gameID).getBoard() + "/places/" + place.getPosition();
+            final PlaceDTO placeDTO = new PlaceDTO(place.toString(), placeUri);
+            placeList.add(placeDTO);
+        }
+        return placeList;
+    }
 }

@@ -10,14 +10,17 @@ public class Board {
 	private final List<Field> fields;
 	// Map<playerId, Player>
 	private final Map<String, Player> players;
+    private final String uri;
 
-	public Board() {
+
+	public Board(String uri) {
 		final List<Field> fieldList = new ArrayList<>();
 		for ( final Place place : Place.values()) {
 			fieldList.add(new Field(place));
 		}
 		this.fields = fieldList;
 		this.players = new HashMap<>();
+        this.uri = uri;
 	}
 
 	public List<Field> getFields() {
@@ -28,8 +31,8 @@ public class Board {
 		return playerOnBoard(playerId);
 	}
 
-	public void setPlayer(final String playerId) {
-		final Player player = new Player(playerId);
+	public void setPlayer(final String playerId, String playerUri) {
+		final Player player = new Player(playerId, playerUri);
 		for(final Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
 			final Field f = iterator.next();
 			if (f.getPlace().getPosition() == 0) {

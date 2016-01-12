@@ -52,10 +52,13 @@ public class GameService {
 	}
 
 	public Game createNewGame(Components components) throws BoardServiceNotFoundException {
-		final Game game = new Game(getNextGameID());
-		this.addNewGame(game.getGameid(), game);
-        componentsMap.put(game.getGameid(), components);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents(game.getGameid()).getGame() + "/" + game.getGameid(), null);
+        long nextGameId = getNextGameID();
+        componentsMap.put(nextGameId, components);
+        String gameUri = getComponents(nextGameId).getGame() + "/" + nextGameId;
+        System.err.println("Function createNewGame: creating new game with resource " + gameUri);
+        final Game game = new Game(nextGameId, gameUri);
+        this.addNewGame(game.getGameid(), game);
+        final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents(game.getGameid()).getGame() + "/" + game.getGameid(), null);
 		new Thread(){
 			@Override
 			public void run() {
@@ -210,7 +213,7 @@ public class GameService {
 			@Override
 			public void run() {
 				try{
-					final String uri = player.getPlayerURI() + "/player/turn";
+					final String uri = player.getUri() + "/player/turn";
 					System.out.print("Function anouncePlayerTurn: Player has its turn " + uri);
 					template.postForLocation(uri, null);
 				}catch(final RestClientException e){
