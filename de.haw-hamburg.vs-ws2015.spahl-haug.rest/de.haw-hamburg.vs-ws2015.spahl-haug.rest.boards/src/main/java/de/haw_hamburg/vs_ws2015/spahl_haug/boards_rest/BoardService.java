@@ -136,8 +136,11 @@ public class BoardService {
 		return board;
 	}
 
+
 	private void placePlayerEvent(final long gameID, final String playerID) {
-		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
+//		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
+		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", getComponents(gameID).getBoard() + "/" + gameID + "/players/" + playerID, playerID);
+
 		new Thread(){
 			@Override
 			public void run() {

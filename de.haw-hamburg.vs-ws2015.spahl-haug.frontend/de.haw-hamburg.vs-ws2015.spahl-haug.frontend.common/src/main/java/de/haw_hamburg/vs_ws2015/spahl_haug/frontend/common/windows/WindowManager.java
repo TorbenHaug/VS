@@ -234,7 +234,7 @@ public class WindowManager {
 				showLobbyWindow();
 
 			}
-		}, components.getGame(), components.getBoard(), components.getDice(), components.getBroker());
+		}, components.getGame(), components.getBoard(), components.getDice(), components.getBroker(), components.getBank());
 
 		SubscriptionDTO subscriptionDTO;
 		try {
@@ -344,7 +344,7 @@ public class WindowManager {
 					}else if((event.getType().equals("PlayerMovedPosition")) && (gameWindow != null)){
 						gameWindow.update();
 					}else if((event.getType().equals("MoneyTransfer")) && (gameWindow != null)){
-						System.out.println(event.getResource());
+						gameWindow.updateMoney(event.getPlayer(), event.getResource());
 					}
 				} catch (final RestClientException e) {
 					// TODO Auto-generated catch block

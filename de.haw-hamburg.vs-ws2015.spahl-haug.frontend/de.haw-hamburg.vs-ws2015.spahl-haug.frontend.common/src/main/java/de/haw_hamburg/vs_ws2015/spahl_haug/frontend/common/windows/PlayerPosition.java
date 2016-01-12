@@ -9,6 +9,7 @@ import org.jowidgets.api.layout.NullLayout;
 import org.jowidgets.api.widgets.IComposite;
 import org.jowidgets.api.widgets.IContainer;
 import org.jowidgets.api.widgets.IIcon;
+import org.jowidgets.api.widgets.ITextLabel;
 import org.jowidgets.tools.widgets.base.CompositeControl;
 import org.jowidgets.tools.widgets.blueprint.BPF;
 
@@ -21,12 +22,17 @@ public class PlayerPosition extends CompositeControl{
 	private final IIcon imageIconPurple;
 	private final IIcon imageIconBlack;
 	private boolean rotated = false;
+	private final ITextLabel ownerLabel;
 
 	public PlayerPosition(final IContainer parent) {
 		super(parent);
 		final IComposite composite = getComposite();
 		composite.setLayout(NullLayout.get());
 		setSize(40, 60);
+
+		ownerLabel = composite.add(BPF.textLabel("0"));
+		ownerLabel.setPosition(-10,0);
+		ownerLabel.setSize(55,20);
 
 		final URL blue = PlayerPosition.class.getClassLoader().getResource("blue.png");
 		final IImage imageBlue = ImageFactory.createImage(blue);
