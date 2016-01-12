@@ -1,6 +1,7 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,20 +29,15 @@ public class GameService {
 	private long nextGameID = 0;
 	private final Map<Long, Game> games;
 	private final RestTemplate template = new RestTemplate();
-	//	private final String boardService = null;
-	//	private String eventService;
-	private Components components;
+    private Map<Long, Components> componentsMap;
 
-	public GameService(final IServiceRepository serviceRepository){
-
+	public GameService(){
 		this.games = new ConcurrentHashMap<>();
+        this.componentsMap = new ConcurrentHashMap<>();
 	}
 
-	private Components getComponents(){
-		if (components == null){
-			components = new ServiceRepository().getComponents();
-		}
-		return components;
+	private Components getComponents(long gameId){
+        return componentsMap.get(gameId);
 	}
 
 	private long getNextGameID(){
@@ -51,19 +47,22 @@ public class GameService {
 		return this.nextGameID++;
 	}
 
-	private void addNewGame(final long id, final Game game) throws BoardServiceNotFoundException{
+	private void addNewGame(final long id, final Game game) throws BoardServiceNotFoundException {
 		this.games.put(id, game);
 	}
 
-	public Game createNewGame() throws BoardServiceNotFoundException{
+	public Game createNewGame(Components components) throws BoardServiceNotFoundException {
 		final Game game = new Game(getNextGameID());
 		this.addNewGame(game.getGameid(), game);
-		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents().getGame() + "/" + game.getGameid(), null);
+        componentsMap.put(game.getGameid(), components);
+		final EventDTO gameCreatedEvent = new EventDTO("CreateNewGame", "The Game with the ID " + game.getGameid() + " is created", "CreateNewGame", getComponents(game.getGameid()).getGame() + "/" + game.getGameid(), null);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getComponents().getEvents() + "?gameid=nullGame", gameCreatedEvent);
+                    String uri = getComponents(game.getGameid()).getEvents() + "?gameid=nullGame";
+                    System.err.println("Function createNewGame: with uri " + uri);
+                    template.postForLocation(uri, gameCreatedEvent);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
@@ -97,13 +96,13 @@ public class GameService {
 		final Game game = getGame(gameID);
 		game.addPlayer(player);
 
-		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", getComponents().getGame() + "/" + game.getGameid(), playerID);
+		final EventDTO event = new EventDTO("PlayerEnterGame", "The Player " + playerID + " entered Game " + gameID, "PlayerEnterGame", getComponents(gameID).getGame() + "/" + game.getGameid(), playerID);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
-					System.out.print("Function addPlayerToGame: POST " + uri);
+					final String uri = getComponents(gameID).getEvents() + "?gameid=" + gameID;
+					System.err.print("Function addPlayerToGame: POST " + uri);
 					template.postForLocation(uri, event);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
@@ -115,8 +114,8 @@ public class GameService {
 			@Override
 			public void run() {
 				try {
-					final String uri = getComponents().getEvents() + "?gameid=nullGame";
-					System.out.print("Function addPlayerToGame: POST nullGame " + uri);
+					final String uri = getComponents(gameID).getEvents() + "?gameid=nullGame";
+					System.err.print("Function addPlayerToGame: POST nullGame " + uri);
 					template.postForLocation(uri, event);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
@@ -150,20 +149,21 @@ public class GameService {
 		}
 	}
 
-	private void startGame(final long id) throws BoardServiceNotFoundException, GameDoesntExistsException {
+	private void startGame(final long gameId) throws BoardServiceNotFoundException, GameDoesntExistsException {
 		String url = null;
-		url = getComponents().getBoard() + "/" + id;
+		url = getComponents(gameId).getBoard() + "/" + gameId;
 		System.out.println("startGame BoardserviceUrl: " + url);
-		try {
-			template.put(url, null);
+        Components request = getComponents(gameId);
+        try {
+            template.put(url, request);
 		} catch (final Exception e) {
-			this.games.remove(id);
+			this.games.remove(gameId);
 			throw new BoardServiceNotFoundException("No BoardService found");
 		}
-		for(final Player aPlayer: getplayersFromGame(id)){
+		for(final Player aPlayer: getplayersFromGame(gameId)){
 			String serviceCall;
 			try {
-				serviceCall = getComponents().getBoard() + "/" + id + "/players/" + aPlayer.getId();
+				serviceCall = getComponents(gameId).getBoard() + "/" + gameId + "/players/" + aPlayer.getId();
 				System.err.println("Function startGame: PUT player on board" + serviceCall);
 				template.put(serviceCall, null);
 			} catch (final Exception e) {
@@ -173,13 +173,13 @@ public class GameService {
 		}
 	}
 
-	private void signalPlayerReadyEvent(final long gameID, final String playerID) {
-		final EventDTO event = new EventDTO("PlayerIsReady", "In Game with the ID " + gameID + " the Player " + playerID + " is ready", "PlayerIsReady", getComponents().getGame() + "/" + gameID, playerID);
+	private void signalPlayerReadyEvent(final long gameId, final String playerID) {
+		final EventDTO event = new EventDTO("PlayerIsReady", "In Game with the ID " + gameId + " the Player " + playerID + " is ready", "PlayerIsReady", getComponents(gameId).getGame() + "/" + gameId, playerID);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
+					final String uri = getComponents(gameId).getEvents() + "?gameid=" + gameId;
 					System.out.print("Function signalPlayerReadyEvent: Player is ready event " + uri);
 					template.postForLocation(uri, event);
 				} catch (final RestClientException e) {
@@ -189,13 +189,13 @@ public class GameService {
 		}.start();
 	}
 
-	private void signalStartGameEvent(final long gameID) {
-		final EventDTO event = new EventDTO("GameHasStarted", "The Game with the ID " + gameID + " has started", "GameHasStarted", getComponents().getGame() + "/" + gameID, null);
+	private void signalStartGameEvent(final long gameId) {
+		final EventDTO event = new EventDTO("GameHasStarted", "The Game with the ID " + gameId + " has started", "GameHasStarted", getComponents(gameId).getGame() + "/" + gameId, null);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					final String uri = getComponents().getEvents() + "?gameid=" + gameID;
+					final String uri = getComponents(gameId).getEvents() + "?gameid=" + gameId;
 					System.out.print("Function signalStartGameEvent: Game has started event " + uri);
 					template.postForLocation(uri, event);
 				} catch (final RestClientException e) {
@@ -222,8 +222,8 @@ public class GameService {
 
 	}
 
-	public boolean getPlayerReady(final long gameID, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
-		return getPlayerFromGame(gameID, playerID).isReady();
+	public boolean getPlayerReady(final long gameId, final String playerID) throws PlayerDoesntExistsException, GameDoesntExistsException {
+		return getPlayerFromGame(gameId, playerID).isReady();
 	}
 
 	public List<Game> getAllGames() {

@@ -29,18 +29,16 @@ public class BrockerService {
 
 	private final Map<String, Brocker> brockers;
 	private final RestTemplate restTemplate = new RestTemplate();
-	private Components components;
+    private Map<Long, Components> componentsMap;
 
 	public BrockerService(){
 		brockers = new ConcurrentHashMap<>();
 	}
 
-	private Components getComponents(){
-		if (components == null){
-			components = new ServiceRepository().getComponents();
-		}
-		return components;
-	}
+    private Components getComponents(long gameId){
+        return componentsMap.get(gameId);
+    }
+
 
 	public Brocker getBrocker(final String gameId) throws BrockerNotExistsException {
 		final Brocker brocker = brockers.get(gameId);
@@ -52,10 +50,11 @@ public class BrockerService {
 	}
 
 	public Brocker createBrocker(final String gameId, final BrockerDTO brockerDTO) throws Exception {
+        componentsMap.put(Long.valueOf(gameId), brockerDTO.getComponents());
 		if(brockers.containsKey(gameId)){
 			throw new Exception("Brocker already exists");
 		}
-		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getComponents().getBoard()));
+		return brockers.put(gameId, new Brocker(gameId, brockerDTO, restTemplate, getComponents(Long.valueOf(gameId)).getBoard()));
 
 	}
 
@@ -123,7 +122,7 @@ public class BrockerService {
 				@Override
 				public void run() {
 					try {
-						restTemplate.postForLocation(getComponents().getEvents() + "?gameid=" + gameId, eventDTO);
+						restTemplate.postForLocation(getComponents(Long.valueOf(gameId)).getEvents() + "?gameid=" + gameId, eventDTO);
 					} catch (final RestClientException e) {
 						e.printStackTrace();
 					}
@@ -134,7 +133,7 @@ public class BrockerService {
 
 	private void transferMoneyToBank(final String gameId, final int value, final String playerId, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
 		try{
-			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents().getBank() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
+			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/transfer/from/" + playerId + "/" + value, reason, String.class);
 		}catch(final RestClientException e){
 			throw new BankRejectedException("bank rejected: " + e.getMessage());
 		}
@@ -142,7 +141,7 @@ public class BrockerService {
 	}
 	private void transferMoneyFromPlayerToPlayer(final String gameId, final int value, final String playerIdFrom, final String playerIdTo, final String reason) throws BankRejectedException, RestClientException, RepositoryException {
 		try{
-			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents().getBank() + "/" + gameId + "/transfer/from/" + playerIdFrom + "/to/" + playerIdTo + "/" + value, reason, String.class);
+			final ResponseEntity<String> transfer = restTemplate.postForEntity(getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/transfer/from/" + playerIdFrom + "/to/" + playerIdTo + "/" + value, reason, String.class);
 		}catch(final RestClientException e){
 			throw new BankRejectedException("bank rejected: " + e.getMessage());
 		}

@@ -6,6 +6,7 @@ import java.util.List;
 import de.haw_hamburg.vs_ws2015.spahl_haug.boards_rest.dto.*;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.*;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.IServiceRepository;
 import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.ServiceRepository;
 import org.springframework.boot.*;
@@ -46,8 +47,8 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createBoard(@PathVariable(value="gameid") final long gameID) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
-		boardService.createBoard(gameID);
+	public void createBoard(@PathVariable(value="gameid") final long gameID, @RequestBody Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
+		boardService.createBoard(gameID, components);
 	}
 
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.DELETE,  produces = "application/json")
@@ -107,7 +108,7 @@ public class Main {
 	public static void main(final String[] args) throws Exception {
 		//		final ServiceRepository repo = new ServiceRepository();
 		//		System.err.println(repo.getService("spahl_haug_games"));
-		boardService = new BoardService(new ServiceRepository());
+		boardService = new BoardService();
 		SpringApplication.run(Main.class, args);
 	}
 

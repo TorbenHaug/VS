@@ -1,12 +1,12 @@
 package de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 
 public class BrockerDTO {
 	private String gameid;
 	private String uri;
 	private String players;
+	private Components components;
 
 	public BrockerDTO() {
 	}
@@ -35,5 +35,7 @@ public class BrockerDTO {
 		this.players = players;
 	}
 
-
+	public Components getComponents() {
+		return components;
+	}
 }

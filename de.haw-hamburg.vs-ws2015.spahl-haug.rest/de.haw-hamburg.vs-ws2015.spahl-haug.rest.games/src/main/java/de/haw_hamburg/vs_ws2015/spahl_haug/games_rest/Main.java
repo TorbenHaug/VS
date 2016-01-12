@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
 
+import de.haw_hamburg.vs_ws2015.spahl_haug.servicerepository.Components;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
@@ -49,8 +50,8 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games", method = RequestMethod.POST,  produces = "application/json")
-	public ResponseEntity<Game> createGame() throws BoardServiceNotFoundException {
-		final Game game = gameService.createNewGame();
+	public ResponseEntity<Game> createGame(@RequestBody Components components) throws BoardServiceNotFoundException {
+		final Game game = gameService.createNewGame(components);
 		return new ResponseEntity<>(game , HttpStatus.CREATED);
 	}
 
@@ -129,18 +130,7 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
-		//		final ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-		//final IServiceRepository serviceRepository = new ServiceRepository();
-		final IServiceRepository serviceRepository = new ServiceRepository()
-				//		{
-				//
-				//			@Override
-				//			public String getService(final String name) throws Exception {
-				//				return "http://192.168.99.100:4569/boards";
-				//			}
-				//		}
-				;
-		gameService = new GameService(serviceRepository);
+		gameService = new GameService();
 		SpringApplication.run(Main.class, args);
 	}
 

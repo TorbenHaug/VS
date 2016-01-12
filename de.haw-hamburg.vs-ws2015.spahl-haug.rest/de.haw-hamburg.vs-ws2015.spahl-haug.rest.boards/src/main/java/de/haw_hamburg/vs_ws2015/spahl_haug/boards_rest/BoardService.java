@@ -30,27 +30,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class BoardService {
 	// Map<gameId, Board>
 	private final Map<Long, Board> boards;
 	private final RestTemplate template = new RestTemplate();
-	private Components components;
+	private Map<Long, Components> componentsMap;
 
-	public BoardService(final IServiceRepository serviceRepository){
-		this.boards = new HashMap<>();
+	public BoardService(){
+		this.boards = new ConcurrentHashMap<>();
+		this.componentsMap = new ConcurrentHashMap<>();
 	}
 
-
-
-	private Components getComponents(){
-		if (components == null){
-			components = new ServiceRepository().getComponents();
-		}
-		return components;
+	private Components getComponents(long gameId){
+		return componentsMap.get(gameId);
 	}
-
 
 
 	@JsonIgnore
@@ -58,15 +54,17 @@ public class BoardService {
 		return boards.get(gameID);
 	}
 
-	public void createBoard(final long gameID) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
-
-
-		try {
-			System.err.println("CreateBank: " + getComponents().getBank() + "/" + gameID);
-			template.put(getComponents().getBank() + "/" + gameID, null);
+	public void createBoard(final long gameID,  Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
+		componentsMap.put(gameID, components);
+        Components componentsForGame = getComponents(gameID);
+        try {
+            String uri = componentsForGame.getBank() + "/" + gameID;
+			System.err.println("CreateBank: " + uri);
+            Components request = componentsForGame;
+			template.put(uri, request);
 		} catch (final RestClientException e) {
 			try {
-				template.delete(getComponents().getBroker() + "/" + gameID);
+				template.delete(componentsForGame.getBroker() + "/" + gameID);
 			} catch (final RestClientException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -75,16 +73,17 @@ public class BoardService {
 		}
 
 		try {
-			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), getComponents().getGame() + "/" + gameID, getComponents().getBoard() + "/" + gameID + "/players");
-			System.out.println(getComponents().getBroker() + "/" + gameID);
-			template.put(getComponents().getBroker()+ "/" + gameID, brockerDTO);
+			final BrockerDTO brockerDTO = new BrockerDTO(String.valueOf(gameID), componentsForGame.getGame() + "/" + gameID, getComponents(gameID).getBoard() + "/" + gameID + "/players", componentsForGame);
+			String uri = componentsForGame.getBroker()+ "/" + gameID;
+            System.out.println(uri);
+			template.put(uri, brockerDTO);
 		} catch (final RestClientException  e) {
 			throw new BrokerServiceNotFoundException(e.getMessage());
 		}
 		for(final Place place: Place.values()){
 			final BrokerPlaceDTO brokerPlaceDTO = new BrokerPlaceDTO(place.name(), place.getOwner(), place.getValue(), place.getRent(), place.getCost(), place.getHouses());
 			try {
-				template.put(getComponents().getBroker() + "/" + gameID + "/places/" + place.getPosition(), brokerPlaceDTO);
+				template.put(getComponents(gameID).getBroker() + "/" + gameID + "/places/" + place.getPosition(), brokerPlaceDTO);
 			} catch (final RestClientException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -118,7 +117,7 @@ public class BoardService {
 		boards.get(gameID).setPlayer(playerID);
 		final CreateBankAccountDTO createBankAccountDTO = new CreateBankAccountDTO(playerID, 1000);
 		try{
-			final String uri = getComponents().getBank() + "/" + gameID + "/players";
+			final String uri = getComponents(gameID).getBank() + "/" + gameID + "/players";
 			System.out.println(uri);
 			template.postForLocation(uri, createBankAccountDTO);
 		}catch(final RestClientException e){
@@ -133,17 +132,17 @@ public class BoardService {
 			throw new GameDoesntExistsException("Board cant find Game");
 		}
 		board.placePlayerOnPos(playerID, numOfPosMoves);
-		placePlacerEvent(String.valueOf(gameID), playerID);
+		placePlayerEvent(gameID, playerID);
 		return board;
 	}
 
-	private void placePlacerEvent(final String gameID, final String playerID) {
+	private void placePlayerEvent(final long gameID, final String playerID) {
 		final EventDTO event = new EventDTO("PlayerMovedPosition", "In Game with the ID " + gameID + " Player " + playerID + " moved its position", "PlayerMovedPosition", "boards/" + playerID, playerID);
 		new Thread(){
 			@Override
 			public void run() {
 				try {
-					template.postForLocation(getComponents().getEvents() + "?gameid=" + gameID, event);
+					template.postForLocation(getComponents(gameID).getEvents() + "?gameid=" + gameID, event);
 				} catch (final RestClientException e) {
 					e.printStackTrace();
 				}
@@ -192,7 +191,7 @@ public class BoardService {
 		final BoardDTO boardDTO = new BoardDTO(f);
 		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition());
 		try {
-			final String uri = getComponents().getBroker() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
+			final String uri = getComponents(gameID).getBroker() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
 			System.out.println("Call Player Visit: " + uri);
 			template.postForLocation(uri, null);
 		} catch (final RestClientException e) {
