@@ -80,9 +80,8 @@ public class Main {
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public PlayerDTO getPlayerPostion(@PathVariable(value="gameid") final long gameID, @PathVariable(value="playerid") final String playerID) throws PlayerDoesntExistsException {
-		final Player p = boardService.getPlayerPosition(gameID, playerID);
-		final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition(), p.getUri());
-		return player;
+		final PlayerDTO p = boardService.getPlayerPosition(gameID, playerID);
+		return p;
 	}
 
 

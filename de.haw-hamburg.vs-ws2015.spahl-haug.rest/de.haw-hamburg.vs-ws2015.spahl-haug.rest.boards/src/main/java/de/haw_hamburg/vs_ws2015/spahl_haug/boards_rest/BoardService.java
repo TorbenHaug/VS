@@ -151,8 +151,10 @@ public class BoardService {
 		boards.get(gameID).removePlayer(playerID);
 	}
 
-	public Player getPlayerPosition(final long gameID, final String playerID) throws PlayerDoesntExistsException {
-		return boards.get(gameID).getPosition(playerID);
+	public PlayerDTO getPlayerPosition(final long gameID, final String playerID) throws PlayerDoesntExistsException {
+        Player p = boards.get(gameID).getPosition(playerID);
+        final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition(), p.getUri(), getComponents(gameID).getBoard());
+        return player;
 	}
 
 	@JsonIgnore
@@ -179,14 +181,14 @@ public class BoardService {
 		for(final Field field : fields) {
 			final List<PlayerDTO> playerList = new ArrayList<>();
 			for(final Player player1 : field.getPlayers()){
-				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition(), player1.getUri());
+				final PlayerDTO playerDTO = new PlayerDTO(player1.getId(), gameID, player1.getPosition(), player1.getUri(), getComponents(gameID).getBoard());
 				playerList.add(playerDTO);
 			}
 			final FieldDTO fieldDTO = new FieldDTO(gameID, field.getPlace().getPosition(), playerList);
 			f.add(fieldDTO);
 		}
 		final BoardDTO boardDTO = new BoardDTO(f);
-		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition(), player.getUri());
+		final PlayerDTO playerDTO = new PlayerDTO(player.getId(), gameID, player.getPosition(), player.getUri(), getComponents(gameID).getBoard());
 		try {
 			final String uri = getComponents(gameID).getBroker() + "/" + gameID + "/places/" + board.getPosition(playerID).getPosition() + "/visit/" + playerID;
 			System.out.println("Call Player Visit: " + uri);

@@ -10,8 +10,8 @@ public class PlayerDTO {
 
     }
 
-    public PlayerDTO(String id, long gameId, int position, String uri) {
-        this.place = "/boards/" + gameId +"/places/" + position;
+    public PlayerDTO(String id, long gameId, int position, String uri, String BoardServiceUri) {
+        this.place = BoardServiceUri + "/" + gameId +"/places/" + position;
         this.id = id;
         this.position = position;
         this.uri = uri;
