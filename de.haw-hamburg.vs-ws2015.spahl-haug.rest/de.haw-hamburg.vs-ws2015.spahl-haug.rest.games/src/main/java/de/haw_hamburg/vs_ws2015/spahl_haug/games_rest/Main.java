@@ -2,6 +2,7 @@ package de.haw_hamburg.vs_ws2015.spahl_haug.games_rest;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.http.HTTPException;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameNotStartedException;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BoardServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
@@ -91,8 +93,9 @@ public class Main {
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.PUT,  produces = "application/json")
-	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam(value="name") final String playerName, @RequestParam(value="uri") final String playerURI) throws GameDoesntExistsException, BoardServiceNotFoundException, GameFullException{
+	public void addPlayerToGame(@PathVariable(value="gameID") final long gameID, @PathVariable(value="playerID") final String playerID, @RequestParam(value="name") final String playerName, @RequestParam(value="uri") final String playerURI, final UriComponentsBuilder uriBuilder, final HttpServletResponse response) throws GameDoesntExistsException, BoardServiceNotFoundException, GameFullException{
 		gameService.addPlayerToGame(gameID, playerID, playerName, playerURI);
+		response.setHeader("Location", uriBuilder.path("/games/{gameID}/players/{playerID}").buildAndExpand(gameID, playerID).toUriString());
 	}
 
 	@RequestMapping(value = "/games/{gameID}/players/{playerID}", method = RequestMethod.DELETE,  produces = "application/json")

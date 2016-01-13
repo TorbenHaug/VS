@@ -114,7 +114,7 @@ public class BrockerService {
 
 	}
 
-	public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException, RestClientException, RepositoryException {
+	synchronized public void buyPlace(final String gameId, final String placeid, final Player player) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, NotForSaleException, RestClientException, RepositoryException {
 		final Place place = getPlace(gameId, placeid);
 		if((place.getOwner() != null)){
 			throw new NotForSaleException("The Owner is " + place.getOwner());
