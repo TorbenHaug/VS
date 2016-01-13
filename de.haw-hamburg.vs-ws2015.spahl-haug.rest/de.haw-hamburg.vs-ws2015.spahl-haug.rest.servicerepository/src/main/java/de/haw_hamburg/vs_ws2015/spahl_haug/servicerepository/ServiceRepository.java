@@ -48,12 +48,12 @@ public class ServiceRepository implements IServiceRepository {
 		if (components == null){
 			try {
 				components = new Components(
-						getService("spahl_haug_games_safe"),
-						getService("spahl_haug_dice_safe"),
-						getService("spahl_haug_boards_safe"),
+						getService("spahl_haug_games_v1"),
+						getService("spahl_haug_dice_v1"),
+						getService("spahl_haug_boards_v1"),
 						getService("spahl_haug_bank") + "/banks",
-						getService("spahl_haug_broker_safe"),
-						getService("spahl_haug_events_safe")
+						getService("spahl_haug_broker_v1"),
+						getService("spahl_haug_events_v1")
 						);
 			} catch (final Exception e) {
 				System.err.println("error fetching service Adresses");

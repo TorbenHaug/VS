@@ -51,7 +51,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	@Override
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_games_safe");
+		dto.setName("spahl_haug_games_v1");
 		dto.setDescription("GamesService von Louisa Spahl und Torben Haug");
 		dto.setService("games");
 		try {

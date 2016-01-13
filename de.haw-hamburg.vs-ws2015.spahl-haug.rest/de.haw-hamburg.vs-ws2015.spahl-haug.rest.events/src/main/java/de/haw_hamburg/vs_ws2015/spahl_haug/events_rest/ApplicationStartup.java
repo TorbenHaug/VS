@@ -50,7 +50,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	public void onApplicationEvent(final ContextRefreshedEvent arg0) {
 
 		final RegisterServiceDTO dto = new RegisterServiceDTO();
-		dto.setName("spahl_haug_events_safe");
+		dto.setName("spahl_haug_events_v1");
 		dto.setDescription("EventService von Louisa Spahl und Torben Haug");
 		dto.setService("event");
 		try {
