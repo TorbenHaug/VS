@@ -7,13 +7,16 @@ public class Player {
 	private boolean ready;
 	private final String uri;
 	private final String readyAdress;
+	private String onBank;
+	private String onBoard;
+	private String onBroker;
 
 	public Player(final String name, final String id, final String uri, final String playerServiceUri){
 		this.name = name;
 		this.id = id;
-		this.uri = uri;
-		this.playerServiceUri = playerServiceUri + "/" + id;
-		this.readyAdress = uri + "/ready";
+		this.uri = uri + "/" + id;
+		this.playerServiceUri = playerServiceUri;
+		this.readyAdress = this.uri + "/ready";
 	}
 
 	public String getId() {
@@ -43,6 +46,30 @@ public class Player {
 
 	public String getReadyAdress() {
 		return readyAdress;
+	}
+
+	public String getOnBank() {
+		return onBank;
+	}
+
+	public void setOnBank(final String onBank) {
+		this.onBank = onBank;
+	}
+
+	public String getOnBoard() {
+		return onBoard;
+	}
+
+	public void setOnBoard(final String onBoard) {
+		this.onBoard = onBoard;
+	}
+
+	public String getOnBroker() {
+		return onBroker;
+	}
+
+	public void setOnBroker(final String onBroker) {
+		this.onBroker = onBroker;
 	}
 
 

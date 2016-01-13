@@ -43,5 +43,11 @@ public class BrockerDTO {
 		this.components = components;
 	}
 
+	@Override
+	public String toString() {
+		return "BrockerDTO [gameid=" + gameid + ", uri=" + uri + ", players=" + players + ", components=" + components
+				+ "]";
+	}
+
 
 }

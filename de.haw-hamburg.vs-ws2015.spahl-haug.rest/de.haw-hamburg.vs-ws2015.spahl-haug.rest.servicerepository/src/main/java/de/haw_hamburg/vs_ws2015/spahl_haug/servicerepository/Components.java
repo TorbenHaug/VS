@@ -41,8 +41,8 @@ public class Components {
 
 	@Override
 	public String toString() {
-		return "{\"game\"=\"" + game + "\", \"dice\"=\"" + dice + "\", \"board=\"" + board + "\", \"bank\"=\"" + bank + "\", \"broker\"=\""
-				+ broker + "\", \"events\"=\"" + events + "\"}";
+		return "{\"game\":\"" + game + "\", \"dice\":\"" + dice + "\", \"board\":\"" + board + "\", \"bank\":\"" + bank + "\", \"broker\":\""
+				+ broker + "\", \"events\":\"" + events + "\"}";
 	}
 
 

@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.BrockerDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.EventDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Place;
+import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.PlaceDTO;
 import de.haw_hamburg.vs_ws2015.spahl_haug.brocker_rest.dto.Player;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankRejectedException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrockerNotExistsException;
@@ -81,6 +82,20 @@ public class BrockerService {
 		}
 		return place;
 
+
+	}
+
+	public PlaceDTO getPlaceDTO(final String gameId, final String placeid) throws BrockerNotExistsException, PlaceNotFoundException{
+		final Place place = getPlace(gameId, placeid);
+		return new PlaceDTO(
+				getComponents(Long.valueOf(gameId)).getBoard() + "/" + gameId + "/places/" + placeid,
+				getComponents(Long.valueOf(gameId)).getBroker() + "/" + gameId + "/places/" + placeid + "/owner",
+				place.getValue(),
+				place.getRent(),
+				place.getCost(),
+				place.getHouses(),
+				getComponents(Long.valueOf(gameId)).getBroker() + "/" + gameId + "/places/" + placeid + "/visit"
+				);
 	}
 
 	public void createPlace(final String gameId, final String placeid, final Place place) throws PlaceAlreadyExistsExeption, BrockerNotExistsException {
@@ -94,6 +109,7 @@ public class BrockerService {
 	}
 
 	public void changeOwner(final String gameId, final String placeid, final Player player) throws PlaceNotFoundException, PlayerDoesntExistsException, BrockerNotExistsException, NotForSaleException {
+		System.err.println(player.getId());
 		getBrocker(gameId).changeOwner(placeid,player.getId());
 
 	}
@@ -147,6 +163,7 @@ public class BrockerService {
 	public void visit(final String gameId, final String placeid, final String playerid) throws BrockerNotExistsException, PlaceNotFoundException, PlayerDoesntExistsException, BankRejectedException, RestClientException, RepositoryException {
 		final Place place = getPlace(gameId, placeid);
 		if((place.getOwner() != null) && !place.getOwner().equals("NotForSale") && !place.getOwner().equals(playerid)){
+			System.out.println("Owner:" +  place.getOwner());
 			getBrocker(gameId).getPlayer(place.getOwner());
 			transferMoneyFromPlayerToPlayer(gameId, place.getRent().get(place.getHouses()), playerid, place.getOwner(), "Miete");
 			final EventDTO eventDTO = new EventDTO("MoneyTransfer", "MoneyTransfer", "MoneyTransfer", getComponents(Long.valueOf(gameId)).getBank() + "/" + gameId + "/players/" + playerid, playerid);

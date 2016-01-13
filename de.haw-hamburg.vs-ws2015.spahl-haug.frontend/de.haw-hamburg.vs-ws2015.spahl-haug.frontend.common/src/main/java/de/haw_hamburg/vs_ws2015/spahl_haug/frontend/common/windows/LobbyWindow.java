@@ -168,6 +168,7 @@ public class LobbyWindow extends Frame implements IMyFrame{
 						for(final String playerURI: playersDTO.getPlayers()){
 							System.out.println(playerURI);
 							final Player player = template.getForObject(playerURI, Player.class);
+							System.out.println(player);
 							players.add(player);
 						}
 						final Game game = new Game();

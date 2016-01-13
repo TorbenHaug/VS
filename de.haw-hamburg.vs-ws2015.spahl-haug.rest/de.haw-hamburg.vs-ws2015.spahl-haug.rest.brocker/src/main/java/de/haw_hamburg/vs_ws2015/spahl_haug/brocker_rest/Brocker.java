@@ -75,6 +75,7 @@ public class Brocker {
 	public Player getPlayer(final String id) throws PlayerDoesntExistsException {
 
 		try{
+			System.out.println("Players: " + getPlayers());
 			final String uri = getPlayers() + "/" + id;
 			System.out.println("GetPlaYER " + uri);
 			final Player player = restTemplate.getForObject(uri, Player.class);

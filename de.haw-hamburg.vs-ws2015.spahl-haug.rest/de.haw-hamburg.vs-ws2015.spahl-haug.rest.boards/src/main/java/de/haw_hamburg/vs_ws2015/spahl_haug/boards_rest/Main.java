@@ -47,7 +47,7 @@ public class Main {
 	// von Game aufgerufen
 	@RequestMapping(value = " /boards/{gameid}", method = RequestMethod.PUT,  produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createBoard(@PathVariable(value="gameid") final long gameID, @RequestBody Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
+	public void createBoard(@PathVariable(value="gameid") final long gameID, @RequestBody final Components components) throws BankServiceNotFoundException, BrokerServiceNotFoundException {
 		boardService.createBoard(gameID, components);
 	}
 
@@ -88,9 +88,14 @@ public class Main {
 	@RequestMapping(value = " /boards/{gameid}/places", method = RequestMethod.GET,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)
 	public List<PlaceDTO>  getAvailablePlacesOnBoard(@PathVariable(value="gameid") final long gameID)  {
-        return boardService.getAvailablePlacesOnBoard(gameID);
+		return boardService.getAvailablePlacesOnBoard(gameID);
 	}
 
+	@RequestMapping(value = " /boards/{gameid}/places/{placeID}", method = RequestMethod.GET,  produces = "application/json")
+	@ResponseStatus(HttpStatus.OK)
+	public PlaceDTO  getPlaceOnBoard(@PathVariable(value="gameid") final long gameID, @PathVariable(value="placeID") final long placeID) throws PlaceNotFoundException  {
+		return boardService.getPlace(gameID,placeID);
+	}
 
 	@RequestMapping(value = " /boards/{gameid}/players/{playerid}/roll", method = RequestMethod.POST,  produces = "application/json")
 	@ResponseStatus(HttpStatus.OK)

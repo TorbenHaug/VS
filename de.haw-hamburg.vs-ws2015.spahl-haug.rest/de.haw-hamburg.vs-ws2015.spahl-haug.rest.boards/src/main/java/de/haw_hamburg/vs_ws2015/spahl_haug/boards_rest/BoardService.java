@@ -7,6 +7,7 @@ import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BankServiceNotFoundExcep
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.BrokerServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.EventServiceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.GameDoesntExistsException;
+import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlaceNotFoundException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PlayerDoesntExistsException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.PositionNotOnBoardException;
 import de.haw_hamburg.vs_ws2015.spahl_haug.errorhandler.RollnumberNotAcceptableException;
@@ -82,7 +83,7 @@ public class BoardService {
 				e.printStackTrace();
 			}
 		}
-        String boardUri = getComponents(gameID).getBoard() + "/" + gameID;
+		final String boardUri = getComponents(gameID).getBoard() + "/" + gameID;
 		final Board board = new Board(boardUri);
 		this.boards.put(gameID, board);
 
@@ -107,8 +108,8 @@ public class BoardService {
 	}
 
 	public void placePlayer(final long gameID, final String playerID) throws PositionNotOnBoardException, PlayerDoesntExistsException, BankServiceNotFoundException {
-		String playerUri = getComponents(gameID).getBoard() + "/players/" + playerID;
-        boards.get(gameID).setPlayer(playerID, playerUri);
+		final String playerUri = getComponents(gameID).getBoard() + "/players/" + playerID;
+		boards.get(gameID).setPlayer(playerID, playerUri);
 		final CreateBankAccountDTO createBankAccountDTO = new CreateBankAccountDTO(playerID, 1000);
 		try{
 			final String uri = getComponents(gameID).getBank() + "/" + gameID + "/players";
@@ -152,9 +153,9 @@ public class BoardService {
 	}
 
 	public PlayerDTO getPlayerPosition(final long gameID, final String playerID) throws PlayerDoesntExistsException {
-        Player p = boards.get(gameID).getPosition(playerID);
-        final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition(), p.getUri(), getComponents(gameID).getBoard());
-        return player;
+		final Player p = boards.get(gameID).getPosition(playerID);
+		final PlayerDTO player = new PlayerDTO(playerID, gameID, p.getPosition(), p.getUri(), getComponents(gameID).getBoard());
+		return player;
 	}
 
 	@JsonIgnore
@@ -200,13 +201,22 @@ public class BoardService {
 		return new BoardsServiceDTO(playerDTO, boardDTO);
 	}
 
-    public List<PlaceDTO> getAvailablePlacesOnBoard(long gameID) {
-        final List<PlaceDTO> placeList = new ArrayList<>();
-        for(final Place place : getPlaces(gameID)) {
-            String placeUri = getComponents(gameID).getBoard() + "/places/" + place.getPosition();
-            final PlaceDTO placeDTO = new PlaceDTO(place.toString(), placeUri);
-            placeList.add(placeDTO);
-        }
-        return placeList;
-    }
+	public List<PlaceDTO> getAvailablePlacesOnBoard(final long gameID) {
+		final List<PlaceDTO> placeList = new ArrayList<>();
+		for(final Place place : getPlaces(gameID)) {
+			final String placeUri = getComponents(gameID).getBoard() + "/places/" + place.getPosition();
+			final PlaceDTO placeDTO = new PlaceDTO(place.toString(), placeUri, getComponents(gameID).getBroker() + "/" + gameID + "/places/" + place.getPosition());
+			placeList.add(placeDTO);
+		}
+		return placeList;
+	}
+
+	public PlaceDTO getPlace(final long gameID, final long placeID) throws PlaceNotFoundException {
+		for(final Place place: getPlaces(gameID)){
+			if(place.getPosition() == placeID){
+				return new PlaceDTO(place.name(), getComponents(gameID).getBoard() + "/places/" + place.getPosition(), getComponents(gameID).getBroker() + "/" + gameID + "/places/" + place.getPosition());
+			}
+		}
+		throw new PlaceNotFoundException("Place " + placeID + " not found");
+	}
 }

@@ -166,11 +166,15 @@ public class GameService {
 			throw new BoardServiceNotFoundException("No BoardService found");
 		}
 		for(final Player aPlayer: getplayersFromGame(gameId)){
-			String serviceCall;
 			try {
-				serviceCall = getComponents(gameId).getBoard() + "/" + gameId + "/players/" + aPlayer.getId();
-				System.err.println("Function startGame: PUT player on board" + serviceCall);
-				template.put(serviceCall, null);
+				final String onBoard = getComponents(gameId).getBoard() + "/" + gameId + "/players/" + aPlayer.getId();
+				final String onBank = getComponents(gameId).getBank() + "/" + gameId + "/players/" + aPlayer.getId();
+				final String onBroker = getComponents(gameId).getBank() + "/" + gameId + "/players/" + aPlayer.getId();
+				System.err.println("Function startGame: PUT player on board" + onBoard);
+				template.put(onBoard, null);
+				aPlayer.setOnBoard(onBoard);
+				aPlayer.setOnBank(onBank);
+				aPlayer.setOnBroker(onBroker);
 			} catch (final Exception e) {
 				throw new BoardServiceNotFoundException(e.getMessage());
 			}
